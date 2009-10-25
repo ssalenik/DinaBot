@@ -1,6 +1,7 @@
 package dinaBOT;
 
 import lejos.nxt.Motor;
+import dinaBOT.debug.Debug;
 
 /**
  * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
@@ -15,6 +16,7 @@ public class DinaBOT {
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
 	public static void main(String[] args) {
+		Debug.start();
 		DinaBOT dinaBOT = new DinaBOT();
 		dinaBOT.helloWorld();
 	}
