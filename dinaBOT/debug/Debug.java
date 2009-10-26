@@ -74,7 +74,7 @@ public class Debug {
 	/**
 	 * Starts the underlying {@link BTDebugDaemon}. This daemon established connection to the penultimate debug console and handles the communication details.
 	 *
-	 * @see #startAndWaitForConnection(int timeout)
+	 * @see #start(int timeout)
 	 * @see #stop()
 	*/
 	public static void start() {
@@ -91,7 +91,7 @@ public class Debug {
 	 * @see #start()
 	 * @see #stop()
 	*/
-	public static boolean startAndWaitForConnection(int timeout) {
+	public static boolean start(int timeout) {
 		return debug_daemon.start(timeout);
 	}
 	
@@ -99,7 +99,7 @@ public class Debug {
 	 * Stops the underlying {@link BTDebugDaemon}.
 	 *
 	 * @see #start()
-	 * @see #startAndWaitForConnection(int timeout)
+	 * @see #start(int timeout)
 	*/
 	public static void stop() {
 		debug_daemon.stop();

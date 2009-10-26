@@ -1,4 +1,3 @@
-
 package dinaBOT.debug;
 
 import dinaBOT.navigation.Odometer;
@@ -62,6 +61,7 @@ public class BTDebugDaemon implements Runnable {
 	*/
 	boolean start(int timeout) {
 		if(!running) {
+			running = true;
 			debug_daemon_thread = new Thread(this);
 			debug_daemon_thread.setDaemon(true);
 			debug_daemon_thread.start();
@@ -73,6 +73,7 @@ public class BTDebugDaemon implements Runnable {
 				if(connected) return true;
 				Thread.yield();
 			}
+			
 			return false;
 		}
 	}
@@ -175,7 +176,7 @@ public class BTDebugDaemon implements Runnable {
 		if(connected) {
 			try {
 				synchronized(this) {
-					output_stream.writeInt(QUERY_RESPONSE);
+					output_stream.writeInt(QUERY);
 					output_stream.writeInt(s.length());
 					output_stream.writeChars(s);			
 				}
@@ -205,12 +206,13 @@ public class BTDebugDaemon implements Runnable {
 		double[] position = new double[3];
 		while(running) {
 			if(!connected) {
-				connection = Bluetooth.waitForConnection(1000, 0);
+				connection = Bluetooth.waitForConnection(2000, 0);
 				if(connection != null) {
 					input_stream = connection.openDataInputStream();
 					output_stream = connection.openDataOutputStream();
 					connected = true;
 				}
+				
 			} else {
 				try {
 					synchronized(this) {
@@ -222,7 +224,7 @@ public class BTDebugDaemon implements Runnable {
 						output_stream.writeDouble(position[2]);
 					}
 					try {
-						Thread.sleep(500);
+						Thread.sleep(250);
 					} catch(InterruptedException e) {
 						
 					}
@@ -252,6 +254,11 @@ public class BTDebugDaemon implements Runnable {
 		}
 
 		connection.close();
+		
+		input_stream = null;
+		output_stream = null;
+		
+		connection = null;
 
 		connected = false;
 	}
