@@ -15,11 +15,11 @@ public interface Odometer extends Runnable {
 	/**
 	 * Puts the current position into the double array <code>position</code>. The array must have a length of three. It will be filled with the x, y and theta components in that order respectively.
 	 *
-	 * @param position the array to fill with the current position values
+	 * @return position the array with the current position values
 	 * @see #setPosition(double[] position, boolean[] update)
 	*/
-	public void getPosition(double[] position);
-
+	public double[] position();	
+	
 	/**
 	 * Updates the components of the odometer's position using the values in the <code>position</code> array if and only if the corresponding entry in the masking array <code>update</code> is true.
 	 *

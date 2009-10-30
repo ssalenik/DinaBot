@@ -9,38 +9,17 @@ import dinaBOT.navigation.*;
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
 */
-public class DinaBOT {
+public class DinaBOTMaster {
 
 	/**
 	 * This is where the static main method lies. This is where execution begins.
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
-	public static void main(String[] args) {
-		ArcOdometer odometer = new ArcOdometer(Motor.A, Motor.B);
+	public static void main(String[] args) {		
 		
-		Debug.registerOdometer(odometer);
-		Debug.start(10000);
-		
-		Debug.println("Line 1");
-		Debug.print("Line 2");
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-			
-		}
-		Debug.println(" Line 2 continued");
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-			
-		}
-		System.out.println(Debug.query("A Query !"));
-		
-		DinaBOT dinaBOT = new DinaBOT();
-		
-		if(Debug.prompt("A Prompt !")) dinaBOT.helloWorld();
-		
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster();
+				
 		while(true);
 	}
 	
