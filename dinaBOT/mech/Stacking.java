@@ -4,9 +4,9 @@ public interface Stacking {
 	
 	public boolean pickUp();
 	
-	public void openCage();
+	public void openDockingBay();
 	
-	public void closeCage();
+	public void closeDockingBay();
 	
 	public boolean getCageStatus();
 	
