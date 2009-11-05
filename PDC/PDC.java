@@ -134,7 +134,7 @@ public class PDC extends JFrame implements Runnable {
 		query_panel.setBorder(new LineBorder(Color.BLACK));
 		query_panel.setSize(275,75);
 		query_panel.setLocation(420,620);
-		query_message = new JTextField("Do you asdf adsf lkj klj asdlfkj lasddf?");
+		query_message = new JTextField("This is Query Field. Answer Yes or No?");
 		query_message.setEnabled(false);
 		confirm = new JButton("Yes");
 		//confirm.setEnabled(false);

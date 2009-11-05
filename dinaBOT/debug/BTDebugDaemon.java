@@ -218,7 +218,7 @@ public class BTDebugDaemon implements Runnable {
 					synchronized(this) {
 						output_stream.writeInt(UPDATE);
 						output_stream.writeInt(Battery.getVoltageMilliVolt());
-						if(odometer != null) odometer.getPosition(position);
+						if(odometer != null) position = odometer.getPosition();
 						output_stream.writeDouble(position[0]);
 						output_stream.writeDouble(position[1]);
 						output_stream.writeDouble(position[2]);

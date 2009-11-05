@@ -2,6 +2,8 @@ package dinaBOT.sensor;
 
 public interface LineDetectorListener {
 	
-	public void lineDetected();
+	public enum Position { LEFT, RIGHT }
+	
+	public void lineDetected(Position position);
 	
 }
