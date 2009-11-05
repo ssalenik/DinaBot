@@ -10,29 +10,20 @@ public class Stacker implements Stacking {
 	Motor leftGate;
 	Motor rightGate;
 
-	final int gatesRotation;
-	final int clawRotation;
+	final int gatesRotation = 110;
+	final int clawRotation = -250;
 
-	final int clawSpeed;
-	final int gateSpeed;
+	final int clawSpeed = 175;
+	final int gateSpeed = 175;
 
 	public Stacker(Motor leftGate, Motor rightGate, Motor claw){
 
-		leftGate = this.leftGate;
-		rightGate = this.rightGate;
-		claw = this.claw;
-
-		this.gatesRotation = 90;
-		this.clawRotation = -250;
-
-		this.clawSpeed = 175;
-		this.gateSpeed = 175;
+		this.leftGate = leftGate;
+		this.rightGate = rightGate;
+		this.claw = claw;			
 	}
 
-
-
-
-	public boolean pickUp() {
+	public boolean activateMechanicalClaw() {
 
 		claw.setSpeed(clawSpeed);
 
@@ -62,7 +53,8 @@ public class Stacker implements Stacking {
 
 	}
 
-     //implement a method to make the robot move forward to get rid of te blocks
+     //implement a method to make the robot move forward to get rid of the blocks
+	//to be implemented in master via BTB communication
 
 	public void closeDockingBay() {
 
@@ -77,7 +69,7 @@ public class Stacker implements Stacking {
 
 	}
 
-	public boolean getCageStatus() {
+	public boolean getDockStatus() {
 
 		//checks if the cage is open
 		if(leftGate.getTachoCount() > 0 || rightGate.getTachoCount() > 0)

@@ -2,12 +2,12 @@ package dinaBOT.mech;
 
 public interface Stacking {
 	
-	public boolean pickUp();
+	public boolean activateMechanicalClaw();
 	
 	public void openDockingBay();
 	
 	public void closeDockingBay();
 	
-	public boolean getCageStatus();
+	public boolean getDockStatus();
 	
 }
