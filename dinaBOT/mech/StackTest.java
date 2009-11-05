@@ -11,11 +11,17 @@ public class StackTest {
 		
 		Button.waitForPress();
 		
-		stacker.activateMechanicalClaw();
-		Button.waitForPress();
-		stacker.openDockingBay();
-		Button.waitForPress();
-		stacker.closeDockingBay();
-		Button.waitForPress();
+		while(true){
+			
+			if(Button.ENTER.isPressed()){
+				stacker.activateMechanicalClaw();
+				Button.waitForPress();}
+			if(Button.ESCAPE.isPressed()){
+				stacker.openDockingBay();
+				Button.waitForPress();
+				stacker.closeDockingBay();
+			}
+		}		
+		
 	}
 }

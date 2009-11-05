@@ -11,6 +11,7 @@ public class Stacker implements Stacking {
 	Motor rightGate;
 
 	final int gatesRotation = 110;
+	final int gatesPickUpRotation = 50;
 	final int clawRotation = -250;
 
 	final int clawSpeed = 175;
@@ -24,18 +25,30 @@ public class Stacker implements Stacking {
 	}
 
 	public boolean activateMechanicalClaw() {
+				
+		claw.setSpeed(clawSpeed);		
+		leftGate.setSpeed(gateSpeed);
+		rightGate.setSpeed(gateSpeed);
 
-		claw.setSpeed(clawSpeed);
+		leftGate.resetTachoCount();
+		rightGate.resetTachoCount();
 
-		claw.rotateTo(clawRotation);
+		leftGate.rotate(gatesPickUpRotation-15, true);
+		rightGate.rotate(gatesPickUpRotation-15);
 
+		claw.rotateTo(clawRotation);	
+		claw.stop();
+		
         try{
         Thread.sleep(1000);
-        } catch (Exception e) {}
+        } catch (Exception e) {}        
 
 		claw.rotateTo(0);
 
 		claw.flt();
+		
+		leftGate.rotateTo(0, true);
+		rightGate.rotateTo(0);
 
 		return true;
 	}
