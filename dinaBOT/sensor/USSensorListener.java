@@ -2,6 +2,6 @@ package dinaBOT.sensor;
 
 public interface USSensorListener {
 	
-	public void newValue();
+	public void newValues(int[] new_values);
 	
 }
