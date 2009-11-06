@@ -33,8 +33,8 @@ public class Stacker implements Stacking {
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 
-		leftGate.rotate(gatesPickUpRotation-15, true);
-		rightGate.rotate(gatesPickUpRotation-15);
+		leftGate.rotate(gatesPickUpRotation-10, true);
+		rightGate.rotate(gatesPickUpRotation-10);
 
 		claw.rotateTo(clawRotation);	
 		claw.stop();
