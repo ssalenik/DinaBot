@@ -13,6 +13,7 @@ public class Stacker implements Stacking {
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;
 	final int clawRotation = -250;
+	int brickCount = 0;
 
 	final int clawSpeed = 175;
 	final int gateSpeed = 175;
@@ -49,6 +50,8 @@ public class Stacker implements Stacking {
 		
 		leftGate.rotateTo(0, true);
 		rightGate.rotateTo(0);
+		
+		brickCount += 1;
 
 		return true;
 	}
@@ -79,6 +82,8 @@ public class Stacker implements Stacking {
 
 		leftGate.stop();
         rightGate.stop();
+        
+        brickCount = 0;
 
 	}
 
