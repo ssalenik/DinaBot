@@ -19,11 +19,11 @@ public class DinaBOTSlave {
 	 *
 	*/
 	public void test() {
-		stacker.pickUp();
+		stacker.activateMechanicalClaw();
 		stacker.openDockingBay();
-		stacker.getCageStatus();
+		stacker.getDockStatus();
 		stacker.closeDockingBay();
-		stacker.getCageStatus();
+		stacker.getDockStatus();
 		
 	}
 	/**
