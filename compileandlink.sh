@@ -1,26 +1,77 @@
 #/bin/bash
-mkdir bin
-if [ $1 = "m" ]
-then
-	nxjc dinaBOT/DinaBOTMaster.java -d bin
-	cd bin
-	nxjlink dinaBOT/DinaBOTMaster -cp ./ -o ../DinaBOTMaster.nxj
-	cd ..
-	rm -rf bin
-	if [ $2 = "f" ]
+
+if [ $# -eq 1 -o $# -eq 2 ]
 	then
-		nxjupload DinaBOTSlave.nxj -u
+	echo "Setup ..."
+	
+	if ! mkdir bin
+		then
+		exit 1
 	fi
-fi
-if [ $1 = "s" ]
-then
-	nxjc dinaBOT/DinaBOTSlave.java -d bin
-	cd bin
-	nxjlink dinaBOT/DinaBOTSlave -cp ./ -o ../DinaBOTSlave.nxj
-	cd ..
+	if ! cd bin
+		then
+		exit 1
+	fi
+	
+	echo "Build and Link ..."
+	
+	if [ $1 = "m" ]
+		then
+		if ! nxjc ../dinaBOT/DinaBOTMaster.java -d ./ -sourcepath ../
+			then
+			cd ..
+			rm -rf bin
+			exit 1
+		fi
+		
+		if ! nxjlink dinaBOT/DinaBOTMaster -cp ./ -o ../DinaBOTMaster.nxj
+			then
+			cd ..
+			rm -rf bin
+			exit 1
+		fi
+		
+		cd ..
+		
+		if [ $# -eq 2 ]
+			then
+			if [ $2 = "f" ]
+				then
+				echo "Flashing ..."
+				nxjupload DinaBOTMaster.nxj -u
+			fi
+		fi
+	fi
+	
+	if [ $1 = "s" ]
+		then
+		if ! nxjc ../dinaBOT/DinaBOTSlave.java -d ./ -sourcepath ../
+			then
+			cd ..
+			rm -rf bin
+			exit 1
+		fi
+		
+		if ! nxjlink dinaBOT/DinaBOTSlave -cp ./ -o ../DinaBOTSlave.nxj
+			then
+			cd ..
+			rm -rf bin
+			exit 1
+		fi
+		
+		cd ..
+		
+		if [ $# -eq 2 ]
+			then
+			if [ $2 = "f" ]
+				then
+				echo "Flashing ..."
+				nxjupload DinaBOTSlave.nxj -u
+			fi
+		fi
+	fi
+	
 	rm -rf bin
-	if [ $2 = "f" ]
-	then
-		nxjupload DinaBOTSlave.nxj -u
-	fi
+	exit 0
 fi
+exit 1
