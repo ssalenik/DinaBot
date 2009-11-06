@@ -1,6 +1,7 @@
 package dinaBOT.navigation;
 
 import dinaBOT.sensor.LineDetectorListener;
+import dinaBOT.mech.MechConstants;
 
 /**
  * The odometer interface specifies the methods which any odometry implementation should conform to.
@@ -12,7 +13,7 @@ import dinaBOT.sensor.LineDetectorListener;
  * @author Severin Smith
  * @version 1
 */
-public interface Odometer extends Runnable, LineDetectorListener {
+public interface Odometer extends Runnable, LineDetectorListener, MechConstants {
 	
 	/**
 	 * Puts the current position into the double array <code>position</code>. The array must have a length of three. It will be filled with the x, y and theta components in that order respectively.
@@ -38,8 +39,11 @@ public interface Odometer extends Runnable, LineDetectorListener {
 	*/
 	public void setDebug(boolean state);
 	
+	/**
+	 * Performs initial localization, adjacent to a wall
+	 *
+	 *
+	*/
 	public void localize();
-	
-	public void setCoor(boolean set);
 	
 }

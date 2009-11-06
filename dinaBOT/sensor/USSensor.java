@@ -1,5 +1,7 @@
 package dinaBOT.sensor;
 
+import dinaBOT.sensor.USSensorListener;
+
 public class USSensor implements Runnable {
 	
 	public static USSensor high_sensor;
@@ -9,6 +11,8 @@ public class USSensor implements Runnable {
 		
 	} 
 	
-	public void registerListener(USSensorListener);
+	public void registerListener(USSensorListener listener) {
+		
+	}
 	
 }

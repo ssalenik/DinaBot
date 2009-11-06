@@ -113,7 +113,6 @@ public class BasicNavigator implements Movement {
 	}
 
 	public synchronized void turnTo(double angle, int speed, boolean returnImmediately) {
-		odometer.setCoor(false);
 		if(speed == 0) { //Avoid silly input
 			stop();
 			return;
@@ -200,7 +199,6 @@ public class BasicNavigator implements Movement {
 			//The angle was reached, stop the motors
 			stop();
 		}
-		odometer.setCoor(true);
 	}
 
 	public synchronized void rotate(boolean direction, int speed) {

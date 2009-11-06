@@ -14,7 +14,7 @@ import lejos.nxt.Battery;
  * @author Severin Smith
  * @version 1
 */
-public class BTDebugDaemon implements Runnable {
+class BTDebugDaemon implements Runnable {
 
 	/* Protocol Constants */
 

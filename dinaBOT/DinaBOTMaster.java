@@ -1,25 +1,31 @@
 package dinaBOT;
 
-import lejos.nxt.Motor;
-import lejos.nxt.Button;
-import lejos.nxt.ButtonListener;
+import lejos.nxt.*;
+
 import dinaBOT.navigation.*;
+import dinaBOT.mech.*;
 
 /**
  * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
 */
-public class DinaBOTMaster {
+public class DinaBOTMaster implements MechConstants {
 	
-	public static double UNIT_TILE = 30.48;
+	/* Static Variables */
 	
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
 	
+	/* Class Variables */
+	
 	Odometer odometer;
 	Movement movement;
 	
+	/**
+	 * This is the contructor for the DinaBOT master
+	 *
+	*/
 	public DinaBOTMaster() {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicNavigator(odometer, left_motor, right_motor);
@@ -29,15 +35,17 @@ public class DinaBOTMaster {
 	 * This is our win method. It will be gone soon
 	 *
 	*/
-	public void win() {
-		System.out.println("Hello World");
+	public void test() {	
 		odometer.setDebug(true);
+		odometer.setPosition(new double[] {30.48,30.48,0}, new boolean[] {true,true, false});
+	
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
 			
 		}
-		for(int i = 0;i < 4*8;i++) {
+		
+		for(int i = 0;i < 4*4;i++) {
 			movement.goForward(UNIT_TILE*2, 150);
 			movement.turnTo(Math.PI/2*(i+1), 150);
 		}
@@ -49,6 +57,7 @@ public class DinaBOTMaster {
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
 	public static void main(String[] args) {
+		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonPressed(Button b) {
 				System.exit(0);
@@ -59,11 +68,10 @@ public class DinaBOTMaster {
 			}
 		});
 		
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster();
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Initiate the DinaBOT Master
+		dinaBOTmaster.test(); //Run Test 
 		
-		dinaBOTmaster.win();
-		
-		while(true);
+		while(true); //Never quit
 	}
 	
 }
