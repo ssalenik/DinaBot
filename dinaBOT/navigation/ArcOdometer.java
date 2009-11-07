@@ -26,6 +26,7 @@ public class ArcOdometer implements Odometer {
 	int coor_corr_status;
 	int coor_corr_tacho;
 	Position coor_corr_position;
+	boolean coor_enable;
 	
 	public ArcOdometer(Encoder left_encoder, Encoder right_encoder) {	
 		this.left_encoder = left_encoder;
@@ -42,6 +43,7 @@ public class ArcOdometer implements Odometer {
 		
 		LineDetector.left.registerListener(this);
 		LineDetector.right.registerListener(this);
+		coor_enable = false;
 	}
 	
 	public void run() {
@@ -155,66 +157,68 @@ public class ArcOdometer implements Odometer {
 	}
 	
 	public void lineDetected(Position side) {
-		double current_ang = position[2]%(Math.PI*2);
-		if(current_ang < 0) current_ang += Math.PI*2;
-		if((current_ang > Math.PI/4 && current_ang < Math.PI*3/4) || (current_ang > Math.PI*5/4 && current_ang < Math.PI*7/4)) {
-			if(position[0]%UNIT_TILE > -12 && position[0]%UNIT_TILE < 12);
-			else return;
-		} else {
-			if(position[1]%UNIT_TILE > -12 && position[1]%UNIT_TILE < 12);
-			else return;
-		}
-		if(coor_corr_status == 0) {
-			coor_corr_status = 1;
-			coor_corr_position = side;
-			if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
-			else coor_corr_tacho = right_encoder.getTachoCount();
-		} else if(coor_corr_status == 1) {
-			if(coor_corr_position == side) {
+		if(coor_enable) {
+			double current_ang = position[2]%(Math.PI*2);
+			if(current_ang < 0) current_ang += Math.PI*2;
+			if((current_ang > Math.PI/4 && current_ang < Math.PI*3/4) || (current_ang > Math.PI*5/4 && current_ang < Math.PI*7/4)) {
+				if((position[0]%UNIT_TILE)*sin(position[2]) > -12 && (position[0]%UNIT_TILE)*sin(position[2]) < 12);
+				else return;
+			} else {
+				if((position[1]%UNIT_TILE)*cos(position[2]) > -12 && (position[1]%UNIT_TILE)*cos(position[2]) < 12);
+				else return;
+			}
+			if(coor_corr_status == 0) {
 				coor_corr_status = 1;
 				coor_corr_position = side;
 				if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
 				else coor_corr_tacho = right_encoder.getTachoCount();
-			} else {
-				int dtacho = -coor_corr_tacho;
-				if(coor_corr_position == Position.LEFT) dtacho += left_encoder.getTachoCount();
-				else dtacho += right_encoder.getTachoCount();
-				double distanceTravelled = Math.abs((double)dtacho/360.0*2.0*Math.PI*WHEEL_RADIUS);
-		
-				if(distanceTravelled > 15) {
+			} else if(coor_corr_status == 1) {
+				if(coor_corr_position == side) {
 					coor_corr_status = 1;
 					coor_corr_position = side;
 					if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
 					else coor_corr_tacho = right_encoder.getTachoCount();
 				} else {
-					double offsetAngle = Math.atan(distanceTravelled/SENSOR_BASE);
-					double base_angle = 0;
-					double current_dir = position[2]%(Math.PI*2);
-					if(current_dir < 0) current_dir += Math.PI*2;
-					if (current_dir > Math.PI/4 && current_dir < 3*Math.PI/4) {
-						base_angle = Math.PI/2;
-					} else if (current_dir > 3*Math.PI/4 && current_dir < 5*Math.PI/4) {
-						base_angle = Math.PI;
-					} else if (current_dir > 5*Math.PI/4 && current_dir < 7*Math.PI/4) {
-						base_angle = 3*Math.PI/2;
-					}
-					double final_angle = base_angle;
-					if(coor_corr_position == Position.LEFT) final_angle -= offsetAngle;
-					else final_angle += offsetAngle;
-					boolean x_or_y;
-					double new_position = 0;
-
-					if(base_angle == 0 || base_angle == Math.PI) {
-						x_or_y = true;
-						new_position = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.cos(final_angle);
+					int dtacho = -coor_corr_tacho;
+					if(coor_corr_position == Position.LEFT) dtacho += left_encoder.getTachoCount();
+					else dtacho += right_encoder.getTachoCount();
+					double distanceTravelled = (double)dtacho/360.0*2.0*Math.PI*WHEEL_RADIUS;
+		
+					if(distanceTravelled > 15) {
+						coor_corr_status = 1;
+						coor_corr_position = side;
+						if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
+						else coor_corr_tacho = right_encoder.getTachoCount();
 					} else {
-						x_or_y = false;
-						new_position = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.sin(final_angle);
+						double offsetAngle = Math.atan(distanceTravelled/SENSOR_BASE);
+						double base_angle = 0;
+						double current_dir = position[2]%(Math.PI*2);
+						if(current_dir < 0) current_dir += Math.PI*2;
+						if (current_dir > Math.PI/4 && current_dir < 3*Math.PI/4) {
+							base_angle = Math.PI/2;
+						} else if (current_dir > 3*Math.PI/4 && current_dir < 5*Math.PI/4) {
+							base_angle = Math.PI;
+						} else if (current_dir > 5*Math.PI/4 && current_dir < 7*Math.PI/4) {
+							base_angle = 3*Math.PI/2;
+						}
+						double final_angle = base_angle;
+						if(coor_corr_position == Position.LEFT) final_angle -= offsetAngle;
+						else final_angle += offsetAngle;
+						boolean x_or_y;
+						double new_position = 0;
+
+						if(base_angle == 0 || base_angle == Math.PI) {
+							x_or_y = true;
+							new_position = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.cos(final_angle);
+						} else {
+							x_or_y = false;
+							new_position = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.sin(final_angle);
+						}
+				
+				
+						setPosition(new double[] {new_position,new_position,final_angle}, new boolean[] {x_or_y, !x_or_y, true});
+						coor_corr_status = 0;
 					}
-				
-				
-					setPosition(new double[] {new_position,new_position,final_angle}, new boolean[] {x_or_y, !x_or_y, true});
-					coor_corr_status = 0;
 				}
 			}
 		}
@@ -224,5 +228,8 @@ public class ArcOdometer implements Odometer {
 		
 	}
 	
+	public void enableSnapping(boolean enabled) {
+		coor_enable = enabled;
+	}
 
 }

@@ -2,6 +2,7 @@ package dinaBOT.navigation;
 
 import lejos.nxt.Motor;
 import java.lang.Math;
+import dinaBOT.util.*;
 
 public class BasicNavigator implements Movement {
 
@@ -249,6 +250,71 @@ public class BasicNavigator implements Movement {
 		right_motor.stop();
 
 		moving = false;
+	}
+	
+	public void driveStraight(int direction, double distance, int speed) {
+		
+		turnTo(Math.PI*direction, speed);
+		double latch_corrdinate = 0;
+		double variable_coordinate = 0;
+		position = odometer.getPosition();
+		if(direction%2 == 0) {
+			latch_corrdinate = position[1];
+			variable_coordinate = position[0];
+		} else {
+			latch_corrdinate = position[0];
+			variable_coordinate = position[1];
+		}
+		System.out.println(latch_corrdinate);
+		System.out.print(variable_coordinate);
+		System.out.println("---");
+		
+		Controller controller = new PIDController((float)latch_corrdinate, 20f, 0f, 0f);
+		
+		left_motor.setSpeed(speed);
+		right_motor.setSpeed(speed);
+		try {
+			Thread.sleep(1000);
+		} catch(Exception e) {
+			
+		}
+		
+		left_motor.forward();
+		right_motor.forward();
+		
+		if(direction == 0) {
+			while(position[0]-variable_coordinate < distance) {
+				position = odometer.getPosition();
+				int correction = (int)controller.output((float)position[1], 1f);
+				System.out.println(correction);
+				left_motor.setSpeed(speed-correction);
+				right_motor.setSpeed(speed+correction);
+			}
+		} else if(direction == 1) {
+			while(position[0]-variable_coordinate < distance) {
+				position = odometer.getPosition();
+				int correction = (int)controller.output((float)position[0], 1f);
+				left_motor.setSpeed(speed+correction);
+				right_motor.setSpeed(speed-correction);
+			}
+		} else if(direction == 2) {
+			while(variable_coordinate-position[0] < distance) {
+				position = odometer.getPosition();
+				int correction = (int)controller.output((float)position[1], 1f);
+				left_motor.setSpeed(speed-correction);
+				right_motor.setSpeed(speed+correction);
+			}
+		} else if(direction == 3) {
+			while(variable_coordinate-position[0] < distance) {
+				position = odometer.getPosition();
+				int correction = (int)controller.output((float)position[0], 1f);
+				left_motor.setSpeed(speed-correction);
+				right_motor.setSpeed(speed+correction);
+			}
+		}
+
+		left_motor.stop();
+		right_motor.stop();
 	}
 
 	synchronized void stopOngoingMovement() {

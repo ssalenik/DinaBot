@@ -39,12 +39,13 @@ public class DinaBOTMaster implements MechConstants {
 	}
 	
 	/**
-	 * This is our win method. It will be gone soon
+	 * This is our move test method. It will be gone soon
 	 *
 	*/
 	public void moveTest() {	
-		odometer.setDebug(true);
-		odometer.setPosition(new double[] {30.48,30.48,0}, new boolean[] {true,true, false});
+	/*	odometer.setDebug(true);
+		odometer.setPosition(new double[] {30.48,30.48, 0}, new boolean[] {true, true, false});
+	//	odometer.enableSnapping(false);
 	
 		try {
 			Thread.sleep(1000);
@@ -52,10 +53,20 @@ public class DinaBOTMaster implements MechConstants {
 			
 		}
 		
-		for(int i = 0;i < 4*4;i++) {
-			movement.goForward(UNIT_TILE*2, 150);
-			movement.turnTo(Math.PI/2*(i+1), 150);
+	//	for(int i = 0;i < 4*4;i++) {
+	//		movement.goForward(-UNIT_TILE, 150);
+	//		movement.turnTo(Math.PI, 150);
+	//		movement.goForward(-UNIT_TILE, 150);
+	//	}
+	
+		movement.rotate(false, 150);
+		
+		while(odometer.getPosition()[2] < 2*Math.PI) {
+			Thread.yield();
 		}
+		movement.stop();
+		
+	//	movement.driveStraight(0, UNIT_TILE*10, 150); */
 	}
 	
 	public void pickupTest() {
@@ -71,7 +82,6 @@ public class DinaBOTMaster implements MechConstants {
 		}
 			
 	}
-	
 	
 	
 	/**

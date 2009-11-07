@@ -46,4 +46,6 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	*/
 	public void localize();
 	
+	public void enableSnapping(boolean enabled);
+	
 }

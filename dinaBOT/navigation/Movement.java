@@ -58,4 +58,7 @@ public interface Movement {
 	*/
 	public void stop();
 	
+	public void rotate(boolean direction, int speed);
+	
+	public void driveStraight(int direction, double distance, int speed);
 }
