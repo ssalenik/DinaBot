@@ -4,6 +4,8 @@ import lejos.nxt.*;
 
 import dinaBOT.navigation.*;
 import dinaBOT.mech.*;
+import dinaBOT.comm.*;
+
 
 /**
  * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
@@ -21,6 +23,7 @@ public class DinaBOTMaster implements MechConstants {
 	
 	Odometer odometer;
 	Movement movement;
+	BTmaster BTconnect;
 	
 	/**
 	 * This is the contructor for the DinaBOT master
@@ -29,13 +32,17 @@ public class DinaBOTMaster implements MechConstants {
 	public DinaBOTMaster() {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicNavigator(odometer, left_motor, right_motor);
+		LCD.drawString("Going into constructor", 0, 0);
+		Button.waitForPress();
+		BTconnect = new BTmaster();
+		BTconnect.connect();
 	}
 	
 	/**
 	 * This is our win method. It will be gone soon
 	 *
 	*/
-	public void test() {	
+	public void moveTest() {	
 		odometer.setDebug(true);
 		odometer.setPosition(new double[] {30.48,30.48,0}, new boolean[] {true,true, false});
 	
@@ -50,6 +57,22 @@ public class DinaBOTMaster implements MechConstants {
 			movement.turnTo(Math.PI/2*(i+1), 150);
 		}
 	}
+	
+	public void pickupTest() {
+		odometer.setPosition(new double[] {30.48,30.48,0}, new boolean[] {true,true, false});
+		
+		try {
+			Thread.sleep(1000);
+		} catch(Exception e) {
+		}
+		if(BTconnect.requestPickup()) {
+			LCD.clear();
+			LCD.drawString("Success", 0, 0);
+		}
+			
+	}
+	
+	
 	
 	/**
 	 * This is where the static main method lies. This is where execution begins.
@@ -69,7 +92,7 @@ public class DinaBOTMaster implements MechConstants {
 		});
 		
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Initiate the DinaBOT Master
-		dinaBOTmaster.test(); //Run Test 
+		dinaBOTmaster.pickupTest(); //Run Test 
 		
 		while(true); //Never quit
 	}

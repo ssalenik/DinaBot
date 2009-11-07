@@ -1,5 +1,5 @@
 package dinaBOT;
-
+import lejos.nxt.*;
 import lejos.nxt.Motor;
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
@@ -9,6 +9,12 @@ import dinaBOT.comm.*;
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
 */
+
+/*
+ class 16
+ method 134
+ */
+
 public class DinaBOTSlave {
 	
 	public static final byte DO_NOTHING = 0;
@@ -21,21 +27,15 @@ public class DinaBOTSlave {
 	
 	public DinaBOTSlave() {
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
+		LCD.drawString("Going into constructor",0 ,0);
+		Button.waitForPress();
 		BTconnect = new BTslave();
+		BTconnect.waitForConnection();
 	}
 	/**
 	 * This is our Hello World method. It will be gone soon
 	 *
 	*/
-	public void test() {
-		
-		stacker.pickUp();
-		stacker.openDockingBay();
-		stacker.getCageStatus();
-		stacker.closeDockingBay();
-		stacker.getCageStatus();
-		
-	}
 	
 	public void obey() {
 		
@@ -55,20 +55,18 @@ public class DinaBOTSlave {
 					break;
 					
 				case OPEN_CAGE:
-					success = stacker.openDockingBay();
+					stacker.openDockingBay();
+					success = true;
 					break;
 					
 				case CLOSE_CAGE:
-					success = stacker.closeDockingBay();
+					stacker.closeDockingBay();
+					success = true;
 					break;
 					
 			}
-			
 			BTconnect.sendStatus(success);
-			
 		}
-		
-		
 		
 	}
 	
@@ -77,25 +75,22 @@ public class DinaBOTSlave {
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
+		
+		Button.ESCAPE.addButtonListener(new ButtonListener() {
+										public void buttonPressed(Button b) {
+										System.exit(0);
+										} 
+										
+										public void buttonReleased(Button b) {
+										System.exit(0);
+										}
+										});
 		
 		DinaBOTSlave dinaBOTslave = new DinaBOTSlave();
 		dinaBOTslave.obey();
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	

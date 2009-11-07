@@ -1,4 +1,4 @@
-
+package dinaBOT.comm;
 
 public interface BTcomm {
 	
