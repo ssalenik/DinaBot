@@ -2,132 +2,57 @@ package dinaBOT.navigation;
 
 import lejos.nxt.Motor;
 import java.lang.Math;
-import dinaBOT.util.*;
 
 public class BasicMovement implements Movement {
+
+	enum Mode { INACTIVE, ROTATE_CW, ROTATE_CCW, ADVANCE }
 
 	Odometer odometer;
 
 	Motor left_motor, right_motor;
 
-	double[] position;
-
-	boolean moving, ongoing_movement;
-	Thread ongoing_movement_thread;
-	double destination_distance, destination_angle;
+	MovementDaemon movement_daemon;
+	Thread movement_daemon_thread;
+	boolean movement_daemon_running;
+	
+	boolean moving;
 
 	public BasicMovement(Odometer odometer, Motor left_motor, Motor right_motor) {
 		this.odometer = odometer;
 
 		this.left_motor = left_motor;
 		this.right_motor = right_motor;
-
+		
 		moving = false;
-		ongoing_movement = false;
-
-		position = new double[3];
+		
+		movement_daemon_running = true;
+		movement_daemon = new MovementDaemon();
+		movement_daemon_thread = new Thread(movement_daemon);
+		movement_daemon_thread.setDaemon(true);
+		movement_daemon_thread.start();
 	}
 
+	public synchronized void driveStraight(int direction, double distance, int speed) {
+		System.out.println("NOT IMPLEMENTED");
+	}
 
 	public void goForward(double distance, int speed) {
 		goForward(distance, speed, false);
 	}
 
 	public synchronized void goForward(double distance, int speed, boolean returnImmediately) {
-		if(speed == 0 || distance == 0) { //Avoid silly input
-			stop();
-			return;
-		}
-
 		stop();
-
-		//Update the position array
-		position = odometer.getPosition();
-
-		//Set the motor speeds
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
-
-		moving = true;
-
-		if(returnImmediately) {
-			ongoing_movement = true;
-			destination_distance = distance;
-			ongoing_movement_thread = new Thread(new Runnable() {
-				public void run() {
-					//Remeber the initial position
-					double initial_x = position[0];
-					double initial_y = position[1];
-
-					//If distance is positive, go forward, else go backwards
-					if(destination_distance > 0) {
-						left_motor.forward();
-						right_motor.forward();
-					} else {
-						left_motor.backward();
-						right_motor.backward();
-					}
-
-					//While the euclidian distance from the start is less than the requested distance
-					while(ongoing_movement && destination_distance*destination_distance > ((position[0]-initial_x)*(position[0]-initial_x)+(position[1]-initial_y)*(position[1]-initial_y))) {
-						position = odometer.getPosition(); //Update the position
-						Thread.yield(); //And yield
-					}
-
-					//The distance was reached, stop the motors
-					left_motor.stop();
-					right_motor.stop();
-					ongoing_movement = false;
-					moving = false;
-				}
-			});
-
-			ongoing_movement_thread.setDaemon(true);
-			ongoing_movement_thread.start();
-		} else {
-			//Remeber the initial position
-			double initial_x = position[0];
-			double initial_y = position[1];
-
-			//If distance is positive, go forward, else go backwards
-			if(distance > 0) {
-				left_motor.forward();
-				right_motor.forward();
-			} else {
-				left_motor.backward();
-				right_motor.backward();
-			}
-
-			//While the euclidian distance from the start is less than the requested distance
-			while(distance*distance > ((position[0]-initial_x)*(position[0]-initial_x)+(position[1]-initial_y)*(position[1]-initial_y))) {
-				position = odometer.getPosition(); //Update the position
-				Thread.yield(); //And yield
-			}
-
-			//The distance was reached, stop the motors
-			stop();
-		}
+		if(speed == 0 || distance == 0) return; //Avoid silly input
+		movement_daemon.goForward(distance, speed);
+		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
 	
-	/**
-	 * Rotate a given amount (relative change) at a given speed.
-	 *
-	 * @param angle the amount to rotate by (in radians)
-	 * @param speed the speed to rotate at
-	*/
 	public void turn(double angle, int speed) {
-		
+		turn(angle, speed, false);
 	}
 
-	/**
-	 * Rotate a given amount (relative change) at a given speed, return immediately if requested.
-	 *
-	 * @param angle the amount to rotate by (in radians)
-	 * @param speed the speed to rotate at
-	 * @param immediateReturn returns immediately if true, blocks otherwise
-	*/
 	public void turn(double angle, int speed, boolean immediateReturn) {
-		
+		turnTo(angle+odometer.getPosition()[2], speed, immediateReturn);
 	}
 
 	public void turnTo(double angle, int speed) {
@@ -135,96 +60,14 @@ public class BasicMovement implements Movement {
 	}
 
 	public synchronized void turnTo(double angle, int speed, boolean returnImmediately) {
-		if(speed == 0) { //Avoid silly input
-			stop();
-			return;
-		}
-
 		stop();
-
-		//Set the motor speeds
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
-
-		//Update the position array
-		position = odometer.getPosition();
-
-		moving = true;
-
-		if(returnImmediately) {
-			ongoing_movement = true;
-			destination_angle = angle;
-			ongoing_movement_thread = new Thread(new Runnable() {
-				public void run() {
-					//Convert modulo 2*pi (angle E [-2*pi, 2*pi])
-					destination_angle = (destination_angle)%(2*Math.PI);
-
-					//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
-					//eg within pi of the current positon
-					while(destination_angle < (position[2] - Math.PI)) destination_angle += 2*Math.PI;
-					while(destination_angle > (position[2] + Math.PI)) destination_angle -= 2*Math.PI;
-					//NB this is the same method used in the lejos source code
-					//although this code was not copied from there
-
-					if((destination_angle - position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
-						left_motor.backward();
-						right_motor.forward();
-						while(ongoing_movement && (destination_angle - position[2]) >= 0) { //Until the sign of the relative angle changes
-							position = odometer.getPosition(); //Update the position
-							Thread.yield(); //And yield
-						}
-					} else { //If the realtive angle is negative go clockwise
-						left_motor.forward();
-						right_motor.backward();
-						while(ongoing_movement && (destination_angle-position[2]) <= 0) { //Until the sign of the relative angle changes
-							position = odometer.getPosition(); //Update the position
-							Thread.yield(); //And yield
-						}
-					}
-
-					//The angle was reached, stop the motors
-					left_motor.stop();
-					right_motor.stop();
-					ongoing_movement = false;
-					moving = false;
-				}
-			});
-			ongoing_movement_thread.setDaemon(true);
-			ongoing_movement_thread.start();
-		} else {
-			//Convert modulo 2*pi (angle E [-2*pi, 2*pi])
-			angle = (angle)%(2*Math.PI);
-
-			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
-			//eg within pi of the current positon
-			while(angle < (position[2] - Math.PI)) angle += 2*Math.PI;
-			while(angle > (position[2] + Math.PI)) angle -= 2*Math.PI;
-			//NB this is the same method used in the lejos source code
-			//although this code was not copied from there
-
-			if((angle - position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
-				left_motor.backward();
-				right_motor.forward();
-				while((angle - position[2]) >= 0) { //Until the sign of the relative angle changes
-					position = odometer.getPosition(); //Update the position
-					Thread.yield(); //And yield
-				}
-			} else { //If the realtive angle is negative go clockwise
-				left_motor.forward();
-				right_motor.backward();
-				while((angle-position[2]) <= 0) { //Until the sign of the relative angle changes
-					position = odometer.getPosition(); //Update the position
-					Thread.yield(); //And yield
-				}
-			}
-
-			//The angle was reached, stop the motors
-			stop();
-		}
+		if(speed == 0) return; //Avoid silly input
+		movement_daemon.turnTo(angle, speed);
+		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
 
 	public synchronized void rotate(boolean direction, int speed) {
-		stopOngoingMovement();
+		stop();
 
 		left_motor.setSpeed(speed);
 		right_motor.setSpeed(speed);
@@ -232,16 +75,16 @@ public class BasicMovement implements Movement {
 		moving = true;
 
 		if(direction) {
-			left_motor.forward();
-			right_motor.backward();
-		} else {
 			left_motor.backward();
 			right_motor.forward();
+		} else {
+			left_motor.forward();
+			right_motor.backward();
 		}
 	}
 
 	public synchronized void forward(int speed) {
-		stopOngoingMovement();
+		stop();
 
 		left_motor.setSpeed(speed);
 		right_motor.setSpeed(speed);
@@ -253,7 +96,7 @@ public class BasicMovement implements Movement {
 	}
 
 	public synchronized void backward(int speed) {
-		stopOngoingMovement();
+		stop();
 
 		left_motor.setSpeed(speed);
 		right_motor.setSpeed(speed);
@@ -265,94 +108,113 @@ public class BasicMovement implements Movement {
 	}
 
 	public synchronized void stop() {
-		stopOngoingMovement();
-
+		if(movement_daemon.isActive()) movement_daemon.stop();
+		
 		left_motor.stop();
 		right_motor.stop();
 
 		moving = false;
 	}
 	
-	public void driveStraight(int direction, double distance, int speed) {
-		
-		turnTo(Math.PI*direction, speed);
-		double latch_corrdinate = 0;
-		double variable_coordinate = 0;
-		position = odometer.getPosition();
-		if(direction%2 == 0) {
-			latch_corrdinate = position[1];
-			variable_coordinate = position[0];
-		} else {
-			latch_corrdinate = position[0];
-			variable_coordinate = position[1];
-		}
-		System.out.println(latch_corrdinate);
-		System.out.print(variable_coordinate);
-		System.out.println("---");
-		
-		Controller controller = new PIDController((float)latch_corrdinate, 20f, 0f, 0f);
-		
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-			
-		}
-		
-		left_motor.forward();
-		right_motor.forward();
-		
-		if(direction == 0) {
-			while(position[0]-variable_coordinate < distance) {
-				position = odometer.getPosition();
-				int correction = (int)controller.output((float)position[1], 1f);
-				System.out.println(correction);
-				left_motor.setSpeed(speed-correction);
-				right_motor.setSpeed(speed+correction);
-			}
-		} else if(direction == 1) {
-			while(position[0]-variable_coordinate < distance) {
-				position = odometer.getPosition();
-				int correction = (int)controller.output((float)position[0], 1f);
-				left_motor.setSpeed(speed+correction);
-				right_motor.setSpeed(speed-correction);
-			}
-		} else if(direction == 2) {
-			while(variable_coordinate-position[0] < distance) {
-				position = odometer.getPosition();
-				int correction = (int)controller.output((float)position[1], 1f);
-				left_motor.setSpeed(speed-correction);
-				right_motor.setSpeed(speed+correction);
-			}
-		} else if(direction == 3) {
-			while(variable_coordinate-position[0] < distance) {
-				position = odometer.getPosition();
-				int correction = (int)controller.output((float)position[0], 1f);
-				left_motor.setSpeed(speed-correction);
-				right_motor.setSpeed(speed+correction);
-			}
-		}
-
-		left_motor.stop();
-		right_motor.stop();
-	}
-
-	synchronized void stopOngoingMovement() {
-		ongoing_movement = false;
-		while(ongoing_movement_thread != null && ongoing_movement_thread.isAlive()) Thread.yield();
-	}
 
 	public boolean isMoving() {
-		return moving;
+		return moving || movement_daemon.isActive();
 	}
 
-	double cos(double angle) {
-		return Math.cos(angle);
-	}
+	class MovementDaemon implements Runnable {
+		
+		Mode mode;
+		double target_distance, target_angle;
+		double[] initial_position;
+		double[] current_position;
+		
+		MovementDaemon() {
+			mode = Mode.INACTIVE;
+			initial_position = new double[3];
+			current_position = new double[3];
+		}
+		
+		public void run() {
+			while(movement_daemon_running) {
+				if(mode == Mode.INACTIVE) {
+					Thread.yield();
+				} else {
+					if(mode == Mode.ADVANCE) {
+						if(target_distance*target_distance < ((current_position[0]-initial_position[0])*(current_position[0]-initial_position[0])+(current_position[1]-initial_position[1])*(current_position[1]-initial_position[1]))) {
+							stop();
+						}
+					} else if(mode == Mode.ROTATE_CCW) {
+						if((target_angle - current_position[2]) <= 0) { //Until the sign of the relative angle changes
+							stop();
+						}
+						
+					} else if(mode == Mode.ROTATE_CW) {
+						if((target_angle - current_position[2]) >= 0) { //Until the sign of the relative angle changes
+							stop();
+						}
+					}
+					current_position = odometer.getPosition();
+					Thread.yield();
+				}
+			}
+		}
+		
+		void goForward(double distance, int speed) {
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
+			
+			initial_position = odometer.getPosition();
 
-	double sin(double angle) {
-		return Math.sin(angle);
+			target_distance = distance;
+			
+			if(distance > 0) {
+				left_motor.forward();
+				right_motor.forward();
+			} else {
+				left_motor.backward();
+				right_motor.backward();
+			}
+			
+			mode = Mode.ADVANCE;
+		}
+		
+		void turnTo(double angle, int speed) {
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
+
+			initial_position = odometer.getPosition();
+
+			//Convert modulo 2*pi (angle E [-2*pi, 2*pi])
+			target_angle = (angle)%(2*Math.PI);
+
+			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+			//eg within pi of the current positon
+			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
+			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
+			//NB this is the same method used in the lejos source code
+			//although this code was not copied from there
+
+			if((target_angle - initial_position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
+				left_motor.backward();
+				right_motor.forward();
+				mode = Mode.ROTATE_CCW;
+			} else { //If the realtive angle is negative go clockwise
+				left_motor.forward();
+				right_motor.backward();
+				mode = Mode.ROTATE_CW;
+			}
+		}
+	
+		void stop() {
+			mode = Mode.INACTIVE;
+			left_motor.stop();
+			right_motor.stop();
+		}
+		
+		boolean isActive() {
+			if(mode == Mode.INACTIVE) return false;
+			else return true;
+		}
 	}
 
 }

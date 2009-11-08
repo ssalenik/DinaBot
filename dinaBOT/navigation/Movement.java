@@ -16,7 +16,7 @@ public interface Movement {
 	 * <p>
 	 * Possible directions: 0 = positive x, 1 = positive y, 2 = negative x, 3 = negative y 
 	 *
-	 * @param direction the direction to go in
+	 * @param direction the direction to go in (interpreted modulo 4)
 	 * @param distance the distance to travel (in cm)
 	 * @param speed the speed to travel at
 	*/
