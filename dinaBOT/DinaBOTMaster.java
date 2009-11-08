@@ -8,7 +8,7 @@ import dinaBOT.comm.*;
 
 
 /**
- * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
+ * The DinaBOTMaster is the main class the master brick. It <b>is</b> the robot. It contains the main() for the master.
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
 */
@@ -23,7 +23,8 @@ public class DinaBOTMaster implements MechConstants {
 	
 	Odometer odometer;
 	Movement movement;
-	BTmaster BTconnect;
+	
+	BTmaster slave_connection;
 	
 	/**
 	 * This is the contructor for the DinaBOT master
@@ -31,34 +32,29 @@ public class DinaBOTMaster implements MechConstants {
 	*/
 	public DinaBOTMaster() {
 		odometer = new ArcOdometer(left_motor, right_motor);
-		movement = new BasicNavigator(odometer, left_motor, right_motor);
-		LCD.drawString("Going into constructor", 0, 0);
-		Button.waitForPress();
-		BTconnect = new BTmaster();
-		BTconnect.connect();
+		movement = new BasicMovement(odometer, left_motor, right_motor);
+
+		slave_connection = new BTmaster();
 	}
 	
 	/**
-	 * This is our move test method. It will be gone soon
+	 * This is a testing method for odometry, navigation and movement
 	 *
 	*/
-	public void moveTest() {	
-	/*	odometer.setDebug(true);
+	public void moveTest() {
+		//Configure your odometry
+		odometer.setDebug(true);
 		odometer.setPosition(new double[] {30.48,30.48, 0}, new boolean[] {true, true, false});
-	//	odometer.enableSnapping(false);
+		odometer.enableSnapping(false);
 	
+		//Pause so the user can remove his hand from the robot
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
 			
 		}
 		
-	//	for(int i = 0;i < 4*4;i++) {
-	//		movement.goForward(-UNIT_TILE, 150);
-	//		movement.turnTo(Math.PI, 150);
-	//		movement.goForward(-UNIT_TILE, 150);
-	//	}
-	
+		//Perform various tests
 		movement.rotate(false, 150);
 		
 		while(odometer.getPosition()[2] < 2*Math.PI) {
@@ -66,26 +62,32 @@ public class DinaBOTMaster implements MechConstants {
 		}
 		movement.stop();
 		
-	//	movement.driveStraight(0, UNIT_TILE*10, 150); */
+	//	movement.driveStraight(0, UNIT_TILE*10, 150);
 	}
 	
+	/**
+	 * This is a testing method for brick to brick communication (currently over bluetooth).
+	 *
+	*/
 	public void pickupTest() {
-		odometer.setPosition(new double[] {30.48,30.48,0}, new boolean[] {true,true, false});
-		
+		//Set up connection
+		System.out.println("Trying to connect ...");
+		slave_connection.connect();
+
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
+
 		}
-		if(BTconnect.requestPickup()) {
-			LCD.clear();
-			LCD.drawString("Success", 0, 0);
-		}
+		
+		System.out.println("Trying to pickup ...");
+		if(slave_connection.requestPickup()) System.out.println("Success ...");
 			
 	}
 	
 	
 	/**
-	 * This is where the static main method lies. This is where execution begins.
+	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
@@ -101,8 +103,10 @@ public class DinaBOTMaster implements MechConstants {
 			}
 		});
 		
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Initiate the DinaBOT Master
-		dinaBOTmaster.pickupTest(); //Run Test 
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
+		//Run some tests
+		//dinaBOTmaster.moveTest();
+		dinaBOTmaster.pickupTest();
 		
 		while(true); //Never quit
 	}

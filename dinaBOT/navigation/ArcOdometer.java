@@ -4,31 +4,59 @@ import java.lang.Math;
 
 import lejos.robotics.Encoder;
 import lejos.nxt.LCD;
-import dinaBOT.sensor.*;
+
+import dinaBOT.sensor.LineDetector;
 
 /**
+ * The ArcOdometer is our odometer implementation. It is based primarly on the theory presented in the tutorial slides prepared by Patrick Diez for the odometer lab. It conforms to the specification of the odometer interface. In addition to that theory, this odometer also implements a "grid snapping" system, which uses line cross events detected by the two lightsensors (located on the left and right of the robot in line with the axel) to compute correction for the x, y, theta position of the robot. This effectivly places an upper bound on the robot's positional error. This should make the robot capable of indefinetly moving around the course without ever increasing error. More detail about the grid snapping algorithm can be found in the project documentation.
+ * <p>
+ * This odometer implentation assumes a two wheeled robot (whos dimensions are imported from the {@link dinaBOT.mech.MechConstants}) which can rotate in place about the center of it's axel.
+ * <p>
+ * Angles are in radians, x-y coordinates in cm.
  *
- *
- *
+ * @author Gabriel Olteanu, Severin Smith, Vinh Phong Buu
+ * @see Odometer
+ * @see Navigation
+ * @see Movement
+ * @version 3
 */
 public class ArcOdometer implements Odometer {
 
-	/* -- Variables -- */
+	/* -- Class Variables -- */
 
+	/* Odometer */
+	
 	Encoder left_encoder, right_encoder;
 
 	double tacho_left, tacho_right;
 	
 	double[] position;
 	
+	/* Grid snapping */
+	
+	boolean snap_enable;
+
+	int snap_status;
+	
+	int snap_tacho_count;
+	LineDetector snap_detector;
+	
+	double snap_prev_direction;
+	
+	final int snap_saftey = 4;
+
+	/* Debug */
+	
 	boolean debug;
 	
-	int coor_corr_status;
-	int coor_corr_tacho;
-	Position coor_corr_position;
-	boolean coor_enable;
-	
+	/**
+	 * Creates a new ArcOdometer.
+	 *
+	 * @param left_encoder the tacho encoder for the left wheel of the robot
+	 * @param right_encoder the tacho encoder for the right wheel of the robot
+	*/
 	public ArcOdometer(Encoder left_encoder, Encoder right_encoder) {	
+		//Setup the odometer
 		this.left_encoder = left_encoder;
 		this.right_encoder = right_encoder;
 		
@@ -37,15 +65,21 @@ public class ArcOdometer implements Odometer {
 		
 		position = new double[3];
 		
+		//Register with the line detectors for grid snapping
+		LineDetector.left.registerListener(this);
+		LineDetector.right.registerListener(this);
+		snap_enable = false; //Grid snapping is currently disable by default until it is 100% tested
+		
+		//Start the odometer thread last
 		Thread odometer_thread = new Thread(this);
 		odometer_thread.setDaemon(true);
 		odometer_thread.start();
-		
-		LineDetector.left.registerListener(this);
-		LineDetector.right.registerListener(this);
-		coor_enable = false;
 	}
 	
+	/**
+	 * The run method contiuously polls the tacho counter and computes the updated position of the robot as a function of the change in the tacho counts of the left and right wheels
+	 *
+	*/
 	public void run() {
 		while(true) { //Forever
 			//Compute the change in tacho count (in radians)
@@ -55,21 +89,26 @@ public class ArcOdometer implements Odometer {
 			double dC = (d_tacho_right*WHEEL_RADIUS+d_tacho_left*WHEEL_RADIUS)/2; //Compute the arc length travelled
 			double dTheta = (d_tacho_right*WHEEL_RADIUS-d_tacho_left*WHEEL_RADIUS)/WHEEL_BASE; //Compute the change in angle
 			
-			//We are going to recursively modify the position array, we don't want it to be modified while we're doing so
+			//We are going to recursively modify the position of the robot, we don't want it to be modified while we're doing so
 			//So enter a synchronized block
 			synchronized(this) {
 				position[0] += dC*cos(position[2]+dTheta/2); //Compute the new X position
 				position[1] += dC*sin(position[2]+dTheta/2); //Compute the new Y position
 				position[2] += dTheta; //Compute the new angle
 			}
+			
 			//Update the latest left and right tacho counts
 			tacho_left += d_tacho_left;
 			tacho_right += d_tacho_right;
 		}
 	}
-	
+
 	/**
-	 * This method isn't synchronized by design. There is a tiny 
+	 * Returns the current position as a double array with a length of three. It will be filled with the x, y and theta components in that order respectively.
+	 * <p>
+	 * Angles are in radians, x-y coordinates in cm.
+	 * <p>
+	 * Please note that this method is <b>not</b> synchronized by design. There is a tiny 
 	 * risk that the position array will get updated while arraycopy
 	 * is running (this is HIGHLY unlikley given that array copy is
 	 * a native call, not a java call, so it probably executes in a
@@ -81,49 +120,158 @@ public class ArcOdometer implements Odometer {
 	 * the run method should this method be repeatedly polled
 	 * (which will probably happen). Such a bottle neck would significantly
 	 * reduce the speed and therefor the accuracy of our odometer.
+	 *
+	 * @return position the array with the current position values
+	 * @see #setPosition(double[] position, boolean[] update)
 	*/
 	public double[] getPosition() {
-		double[] tmp_array = new double[3];
+		double[] tmp_array = new double[3]; //Create a new array to return
 		try {
-			System.arraycopy(position, 0, tmp_array, 0, 3);
+			System.arraycopy(position, 0, tmp_array, 0, 3); //Copy the current position into the array
 		} catch(Exception e) {
 			System.out.println("Exception, ArcOdometer getPosition()");
 		}
-		return tmp_array;
+		return tmp_array; //And return
 	}
 	
+	/**
+	 * Updates the components of the odometer's position using the values in the <code>position</code> array if and only if the corresponding entry in the masking array <code>update</code> is true.
+	 * <p>
+	 * Angles are in radians, x-y coordinates in cm.
+	 * <p>
+	 * TODO Currently if you are performing a turnTo and you update the position of the odometer simulaneously you can enter an endless loop. This should be addressed
+	 *
+	 * @param position the array of update position values
+	 * @param update the masking array for updating position values
+	 * @see #getPosition()
+	*/
 	public synchronized void setPosition(double[] position, boolean[] update) {
 		try {
 			//Make sure the position and update arrays are of accepatable sizes
-			if(this.position.length == position.length && this.position.length == update.length) {	
-				for(int i = 0;i < this.position.length;i++) {
-					if(update[i]) this.position[i] = position[i]; //Update the necessary fields
-				}
+			if(this.position.length == position.length && this.position.length == update.length) {
+				//Update x and y
+				this.position[0] = position[0];
+				this.position[1] = position[1];
+				//Make the new theta as close as possible to the old theta for continuity
+				while(position[2] < (this.position[2] - 2*Math.PI)) position[2] += 2*Math.PI;
+				while(position[2] > (this.position[2] + 2*Math.PI)) position[2] -= 2*Math.PI;
+				//Update theta
+				this.position[2] = position[2];
 			}
 		} catch(Exception e) {
 			System.out.println("Exception, ArcOdometer getPosition()");
 		}
 	}
 
-	//Place sin and cos is a special methods in case we want to reimplement them later to make our code faster
 	
 	/**
+	 * Accepts notification of a new line cross event and performs grid snapping accordingly.
+	 * <p>
+	 * TODO Should perform small adjustement eg keep the theta in the same range it was previously + limit maximum correction (correct as average of odometer + snapping?)
 	 *
+	 * @param detector indicates the detector which is calling this method
+	*/
+	public void lineDetected(LineDetector detector) {
+		if(!snap_enable) return;
+		
+		//Compute the current heading between [0, 2*PI]
+		double current_heading = position[2]%(Math.PI*2);
+		if(current_heading < 0) current_heading += Math.PI*2;
+		
+		//Compute the current direction 0 = pos X, 1 = pos Y, 2 = neg X, 3 = neg Y
+		int current_direction = (int)Math.round(current_heading/(2*Math.PI)*4)%4;
+	
+		//If we have rotated to a new quadrant reset the snapping system so we don't carry line crosses from one quadrant into another
+		if(current_direction != snap_prev_direction) snap_status = 0;
+		snap_prev_direction = current_direction;
+		
+		//Compute the actual position of the left and right sensor
+		double l_sensor = 0;
+		double r_sensor = 0;
+	
+		if(current_direction%2 == 0) { //pos or neg X
+			l_sensor = (cos(position[2])*SENSOR_BASE/2+position[1])%UNIT_TILE;
+			r_sensor = (-cos(position[2])*SENSOR_BASE/2+position[1])%UNIT_TILE;
+		} else { //pos or neg Y
+			l_sensor = (sin(position[2])*SENSOR_BASE/2+position[0])%UNIT_TILE;
+			r_sensor = (-sin(position[2])*SENSOR_BASE/2+position[0])%UNIT_TILE;
+		}
+		
+		//If the sensor are in an unsafe area (where they could make erroneous readings, return
+		if(l_sensor < snap_saftey || l_sensor > UNIT_TILE-snap_saftey || r_sensor < snap_saftey || r_sensor > UNIT_TILE-snap_saftey) return;
+		
+		//If we haven't seen a line yet
+		if(snap_status == 0) {
+			snap_status = 1; //Update status to reflect a first line cross
+			snap_detector = detector; //Remember which sensor saw the first line cross
+			//And the tacho count of the cross
+			if(detector == LineDetector.left) snap_tacho_count = left_encoder.getTachoCount();
+			else snap_tacho_count = right_encoder.getTachoCount();
+		} else if(snap_status == 1) { //If we have already seen a line
+			if(snap_detector == detector) { //If it was the same one
+				snap_status = 1; //Make this new cross our first line cross
+				snap_detector = detector; //Remember the detector of our new first cross
+				//And the tacho count of the cross
+				if(detector == LineDetector.left) snap_tacho_count = left_encoder.getTachoCount();
+				else snap_tacho_count = right_encoder.getTachoCount();
+			} else { //If it's a different line
+				//Compute the change in tacho count of the first sensor to cross
+				int dtacho = -snap_tacho_count;
+				if(snap_detector == LineDetector.left) dtacho += left_encoder.getTachoCount();
+				else dtacho += right_encoder.getTachoCount();
+				
+				//And compute the real distance travelled
+				double distance_travelled = (double)dtacho/360.0*2.0*Math.PI*WHEEL_RADIUS;
+				
+				if(distance_travelled > 15) { //If the distance is unusually large
+					snap_status = 1; //Make this new cross our first line cross
+					snap_detector = detector; //Remember the detector of our new first cross
+					//And the tacho count of the cross
+					if(detector == LineDetector.left) snap_tacho_count = left_encoder.getTachoCount();
+					else snap_tacho_count = right_encoder.getTachoCount();
+				} else { //If the distance is reasonable
+					//Compute the new angle and x or y coordinate and perform the odometer correction
+					double theta = 0;
+					double offset_angle = Math.atan(distance_travelled/SENSOR_BASE);
+					if(snap_detector == LineDetector.left) theta = offset_angle-current_direction*Math.PI/2;
+					else theta = offset_angle+current_direction*Math.PI/2;
+					
+					if(current_direction%2 == 0) { //pos or neg X
+						double x = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.cos(theta);
+						setPosition(new double[] {x, 0, theta}, new boolean[] {true, false, true}); //Use setPosition to avoid synchronization problems
+					} else { //pos or neg Y
+						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.sin(theta);
+						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
+					}
+			
+					snap_status = 0; //Reset our state to 0: no lines seen
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Perform initial localization. Must be called adjacent to a corner (two walls).
 	 *
 	*/
-	double cos(double angle) {
-		return Math.cos(angle);
+	public void localize() {
+		
+	}
+	
+	/**
+	 * Enable or disable grid snapping (auto correction of the odometer with grid lines).
+	 *
+	 * @param enable enables grid snapping if set to true, disables it otherwise
+	*/
+	public void enableSnapping(boolean enable) {
+		snap_enable = enable;
 	}
 
 	/**
+	 * Set the state onscreen debug functionality of the odometer. This feature print the current odometer position to the screen of the NXT brick
 	 *
-	 *
+	 * @param state activates the debuging if and only if state is true, deactivates it otherwise
 	*/
-	double sin(double angle) {
-		return Math.sin(angle);
-	}
-
-
 	public void setDebug(boolean state) {
 		//Toggle the odometer printout thread for debugging
 		if(!debug && state) { //If it's not already running and we want to activate it
@@ -155,81 +303,20 @@ public class ArcOdometer implements Odometer {
 			//This will cause the run method of any running debug threads instantiated by this instance of ArcOdometer to return
 		}
 	}
-	
-	public void lineDetected(Position side) {
-		if(coor_enable) {
-			double current_ang = position[2]%(Math.PI*2);
-			if(current_ang < 0) current_ang += Math.PI*2;
-			if((current_ang > Math.PI/4 && current_ang < Math.PI*3/4) || (current_ang > Math.PI*5/4 && current_ang < Math.PI*7/4)) {
-				if((position[0]%UNIT_TILE)*sin(position[2]) > -12 && (position[0]%UNIT_TILE)*sin(position[2]) < 12);
-				else return;
-			} else {
-				if((position[1]%UNIT_TILE)*cos(position[2]) > -12 && (position[1]%UNIT_TILE)*cos(position[2]) < 12);
-				else return;
-			}
-			if(coor_corr_status == 0) {
-				coor_corr_status = 1;
-				coor_corr_position = side;
-				if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
-				else coor_corr_tacho = right_encoder.getTachoCount();
-			} else if(coor_corr_status == 1) {
-				if(coor_corr_position == side) {
-					coor_corr_status = 1;
-					coor_corr_position = side;
-					if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
-					else coor_corr_tacho = right_encoder.getTachoCount();
-				} else {
-					int dtacho = -coor_corr_tacho;
-					if(coor_corr_position == Position.LEFT) dtacho += left_encoder.getTachoCount();
-					else dtacho += right_encoder.getTachoCount();
-					double distanceTravelled = (double)dtacho/360.0*2.0*Math.PI*WHEEL_RADIUS;
-		
-					if(distanceTravelled > 15) {
-						coor_corr_status = 1;
-						coor_corr_position = side;
-						if(side == Position.LEFT) coor_corr_tacho = left_encoder.getTachoCount();
-						else coor_corr_tacho = right_encoder.getTachoCount();
-					} else {
-						double offsetAngle = Math.atan(distanceTravelled/SENSOR_BASE);
-						double base_angle = 0;
-						double current_dir = position[2]%(Math.PI*2);
-						if(current_dir < 0) current_dir += Math.PI*2;
-						if (current_dir > Math.PI/4 && current_dir < 3*Math.PI/4) {
-							base_angle = Math.PI/2;
-						} else if (current_dir > 3*Math.PI/4 && current_dir < 5*Math.PI/4) {
-							base_angle = Math.PI;
-						} else if (current_dir > 5*Math.PI/4 && current_dir < 7*Math.PI/4) {
-							base_angle = 3*Math.PI/2;
-						}
-						double final_angle = base_angle;
-						if(coor_corr_position == Position.LEFT) final_angle -= offsetAngle;
-						else final_angle += offsetAngle;
-						boolean x_or_y;
-						double new_position = 0;
 
-						if(base_angle == 0 || base_angle == Math.PI) {
-							x_or_y = true;
-							new_position = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.cos(final_angle);
-						} else {
-							x_or_y = false;
-							new_position = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distanceTravelled/2*Math.sin(final_angle);
-						}
-				
-				
-						setPosition(new double[] {new_position,new_position,final_angle}, new boolean[] {x_or_y, !x_or_y, true});
-						coor_corr_status = 0;
-					}
-				}
-			}
-		}
-	}
-	
-	public void localize() {
-		
-	}
-	
-	public void enableSnapping(boolean enabled) {
-		coor_enable = enabled;
+	/**
+	 * Return the cos of an angle in radians.
+	 *
+	*/
+	double cos(double angle) {
+		return Math.cos(angle);
 	}
 
+	/**
+	 * Return the sin of an angle in radians.
+	 *
+	*/
+	double sin(double angle) {
+		return Math.sin(angle);
+	}
 }

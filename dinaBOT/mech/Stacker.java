@@ -1,10 +1,10 @@
 package dinaBOT.mech;
 
 import lejos.nxt.Motor;
+
 import dinaBOT.mech.*;
 
 public class Stacker implements Stacking {
-
 
 	Motor claw;
 	Motor leftGate;

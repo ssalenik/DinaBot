@@ -1,16 +1,16 @@
 package dinaBOT.sensor;
 
-import lejos.nxt.*;
+import lejos.nxt.SensorPort;
+import lejos.nxt.LightSensor;
 
 public class LineDetector implements Runnable {
 		
-	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S1, true), LineDetectorListener.Position.LEFT);
-	public static final LineDetector right = new LineDetector(new LightSensor(SensorPort.S2, true), LineDetectorListener.Position.RIGHT);
+	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S1, true));
+	public static final LineDetector right = new LineDetector(new LightSensor(SensorPort.S2, true));
 
 	static final int THRESHOLD = 450;
 	
 	LightSensor sensor;
-	LineDetectorListener.Position position;
 
 	int previous_reading;
 	
@@ -19,9 +19,8 @@ public class LineDetector implements Runnable {
 	boolean running;
 	Thread line_detector_thread;
 	
-	private LineDetector(LightSensor sensor, LineDetectorListener.Position position) {
+	private LineDetector(LightSensor sensor) {
 		this.sensor = sensor;
-		this.position = position;
 		previous_reading = 0;
 		start();
 	}
@@ -31,7 +30,7 @@ public class LineDetector implements Runnable {
 	}
 	
 	void notifyListener() {
-		if(listener != null) listener.lineDetected(position);
+		if(listener != null) listener.lineDetected(this);
 	}
 	
 	public void registerListener(LineDetectorListener listener) {
