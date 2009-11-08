@@ -10,7 +10,7 @@ package dinaBOT.navigation;
  * @version 3
 */
 public interface Movement {
-	
+
 	/**
 	 * Makes the robot move forwards a given distance at a given speed in one of the cardinal directions while using the odometer to drive as straight as possible.
 	 * <p>
@@ -21,7 +21,7 @@ public interface Movement {
 	 * @param speed the speed to travel at
 	*/
 	public void driveStraight(int direction, double distance, int speed);
-	
+
 	/**
 	 * Move forward a given distance at a given speed.
 	 *
@@ -29,7 +29,7 @@ public interface Movement {
 	 * @param speed the speed to travel at
 	*/
 	public void goForward(double distance, int speed);
-	
+
 	/**
 	 * Move forward a given distance at a given speed, return immediately if requested.
 	 *
@@ -38,7 +38,7 @@ public interface Movement {
 	 * @param immediateReturn returns immediately if true, blocks otherwise
 	*/
 	public void goForward(double distance, int speed, boolean immediateReturn);
-	
+
 	/**
 	 * Rotate a given amount (relative change) at a given speed.
 	 *
@@ -55,7 +55,7 @@ public interface Movement {
 	 * @param immediateReturn returns immediately if true, blocks otherwise
 	*/
 	public void turn(double angle, int speed, boolean immediateReturn);
-	
+
 	/**
 	 * Rotate to a given heading (absolute change) at a given speed.
 	 *
@@ -72,7 +72,7 @@ public interface Movement {
 	 * @param immediateReturn returns immediately if true, blocks otherwise
 	*/
 	public void turnTo(double angle, int speed, boolean immediateReturn);
-	
+
 	/**
 	 * Move forward at a given speed. This is a non blocking method.
 	 *
@@ -100,14 +100,14 @@ public interface Movement {
 	 *
 	*/
 	public void stop();
-	
+
 	/**
 	 * Return if the robot is movement because of this movement controller
 	 *
 	 * @return true if the robot is moving false otherwise
 	*/
 	public boolean isMoving();
-	
+
 	/**
 	 * Shuts down the Movement object by killing any underlying thread and freeing up CPU ressources
 	 *

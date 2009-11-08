@@ -17,7 +17,7 @@ import dinaBOT.mech.MechConstants; //The odometer will need to know the robot di
  * @version 3
 */
 public interface Odometer extends Runnable, LineDetectorListener, MechConstants {
-	
+
 	/**
 	 * Returns the current position as a double array with a length of three. It will be filled with the x, y and theta components in that order respectively.
 	 * <p>
@@ -26,8 +26,8 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	 * @return position the array with the current position values
 	 * @see #setPosition(double[] position, boolean[] update)
 	*/
-	public double[] getPosition();	
-	
+	public double[] getPosition();
+
 	/**
 	 * Updates the components of the odometer's position using the values in the <code>position</code> array if and only if the corresponding entry in the masking array <code>update</code> is true.
 	 * <p>
@@ -38,25 +38,25 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	 * @see #getPosition()
 	*/
 	public void setPosition(double[] position, boolean[] update);
-	
+
 	/**
 	 * Perform initial localization. Must be called adjacent to a corner (two walls).
 	 *
 	*/
 	public void localize();
-	
+
 	/**
 	 * Enable or disable grid snapping (auto correction of the odometer with grid lines).
 	 *
 	 * @param enable enables grid snapping if set to true, disables it otherwise
 	*/
 	public void enableSnapping(boolean enable);
-		
+
 	/**
 	 * Set the state onscreen debug functionality of the odometer. This feature print the current odometer position to the screen of the NXT brick
 	 *
 	 * @param state activates the debuging if and only if state is true, deactivates it otherwise
 	*/
 	public void setDebug(boolean state);
-	
+
 }

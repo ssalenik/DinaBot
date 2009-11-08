@@ -25,57 +25,57 @@ public class ArcOdometer implements Odometer {
 	/* -- Class Variables -- */
 
 	/* Odometer */
-	
+
 	Encoder left_encoder, right_encoder;
 
 	double tacho_left, tacho_right;
-	
+
 	double[] position;
-	
+
 	/* Grid snapping */
-	
+
 	boolean snap_enable;
 
 	int snap_status;
-	
+
 	int snap_tacho_count;
 	LineDetector snap_detector;
-	
+
 	double snap_prev_direction;
-	
+
 	final int snap_saftey = 4;
 
 	/* Debug */
-	
+
 	boolean debug;
-	
+
 	/**
 	 * Creates a new ArcOdometer.
 	 *
 	 * @param left_encoder the tacho encoder for the left wheel of the robot
 	 * @param right_encoder the tacho encoder for the right wheel of the robot
 	*/
-	public ArcOdometer(Encoder left_encoder, Encoder right_encoder) {	
+	public ArcOdometer(Encoder left_encoder, Encoder right_encoder) {
 		//Setup the odometer
 		this.left_encoder = left_encoder;
 		this.right_encoder = right_encoder;
-		
+
 		left_encoder.resetTachoCount();
 		right_encoder.resetTachoCount();
-		
+
 		position = new double[3];
-		
+
 		//Register with the line detectors for grid snapping
 		LineDetector.left.registerListener(this);
 		LineDetector.right.registerListener(this);
 		snap_enable = false; //Grid snapping is currently disable by default until it is 100% tested
-		
+
 		//Start the odometer thread last
 		Thread odometer_thread = new Thread(this);
 		odometer_thread.setDaemon(true);
 		odometer_thread.start();
 	}
-	
+
 	/**
 	 * The run method contiuously polls the tacho counter and computes the updated position of the robot as a function of the change in the tacho counts of the left and right wheels
 	 *
@@ -85,10 +85,10 @@ public class ArcOdometer implements Odometer {
 			//Compute the change in tacho count (in radians)
 			double d_tacho_left = (double)left_encoder.getTachoCount()/360*(2*Math.PI)-tacho_left; 
 			double d_tacho_right = (double)right_encoder.getTachoCount()/360*(2*Math.PI)-tacho_right;
-		
+
 			double dC = (d_tacho_right*WHEEL_RADIUS+d_tacho_left*WHEEL_RADIUS)/2; //Compute the arc length travelled
 			double dTheta = (d_tacho_right*WHEEL_RADIUS-d_tacho_left*WHEEL_RADIUS)/WHEEL_BASE; //Compute the change in angle
-			
+
 			//We are going to recursively modify the position of the robot, we don't want it to be modified while we're doing so
 			//So enter a synchronized block
 			synchronized(this) {
@@ -96,7 +96,7 @@ public class ArcOdometer implements Odometer {
 				position[1] += dC*sin(position[2]+dTheta/2); //Compute the new Y position
 				position[2] += dTheta; //Compute the new angle
 			}
-			
+
 			//Update the latest left and right tacho counts
 			tacho_left += d_tacho_left;
 			tacho_right += d_tacho_right;
@@ -133,7 +133,7 @@ public class ArcOdometer implements Odometer {
 		}
 		return tmp_array; //And return
 	}
-	
+
 	/**
 	 * Updates the components of the odometer's position using the values in the <code>position</code> array if and only if the corresponding entry in the masking array <code>update</code> is true.
 	 * <p>
@@ -163,7 +163,7 @@ public class ArcOdometer implements Odometer {
 		}
 	}
 
-	
+
 	/**
 	 * Accepts notification of a new line cross event and performs grid snapping accordingly.
 	 * <p>
@@ -173,22 +173,22 @@ public class ArcOdometer implements Odometer {
 	*/
 	public void lineDetected(LineDetector detector) {
 		if(!snap_enable) return;
-		
+
 		//Compute the current heading between [0, 2*PI]
 		double current_heading = position[2]%(Math.PI*2);
 		if(current_heading < 0) current_heading += Math.PI*2;
-		
+
 		//Compute the current direction 0 = pos X, 1 = pos Y, 2 = neg X, 3 = neg Y
 		int current_direction = (int)Math.round(current_heading/(2*Math.PI)*4)%4;
-	
+
 		//If we have rotated to a new quadrant reset the snapping system so we don't carry line crosses from one quadrant into another
 		if(current_direction != snap_prev_direction) snap_status = 0;
 		snap_prev_direction = current_direction;
-		
+
 		//Compute the actual position of the left and right sensor
 		double l_sensor = 0;
 		double r_sensor = 0;
-	
+
 		if(current_direction%2 == 0) { //pos or neg X
 			l_sensor = (cos(position[2])*LIGHT_SENSOR_BASE/2+position[1])%UNIT_TILE;
 			r_sensor = (-cos(position[2])*LIGHT_SENSOR_BASE/2+position[1])%UNIT_TILE;
@@ -196,10 +196,10 @@ public class ArcOdometer implements Odometer {
 			l_sensor = (sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
 			r_sensor = (-sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
 		}
-		
+
 		//If the sensor are in an unsafe area (where they could make erroneous readings, return
 		if(l_sensor < snap_saftey || l_sensor > UNIT_TILE-snap_saftey || r_sensor < snap_saftey || r_sensor > UNIT_TILE-snap_saftey) return;
-		
+
 		//If we haven't seen a line yet
 		if(snap_status == 0) {
 			snap_status = 1; //Update status to reflect a first line cross
@@ -219,10 +219,10 @@ public class ArcOdometer implements Odometer {
 				int dtacho = -snap_tacho_count;
 				if(snap_detector == LineDetector.left) dtacho += left_encoder.getTachoCount();
 				else dtacho += right_encoder.getTachoCount();
-				
+
 				//And compute the real distance travelled
 				double distance_travelled = (double)dtacho/360.0*2.0*Math.PI*WHEEL_RADIUS;
-				
+
 				if(distance_travelled > 15) { //If the distance is unusually large
 					snap_status = 1; //Make this new cross our first line cross
 					snap_detector = detector; //Remember the detector of our new first cross
@@ -235,7 +235,7 @@ public class ArcOdometer implements Odometer {
 					double offset_angle = Math.atan(distance_travelled/LIGHT_SENSOR_BASE);
 					if(snap_detector == LineDetector.left) theta = offset_angle-current_direction*Math.PI/2;
 					else theta = offset_angle+current_direction*Math.PI/2;
-					
+
 					if(current_direction%2 == 0) { //pos or neg X
 						double x = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.cos(theta);
 						setPosition(new double[] {x, 0, theta}, new boolean[] {true, false, true}); //Use setPosition to avoid synchronization problems
@@ -243,21 +243,21 @@ public class ArcOdometer implements Odometer {
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.sin(theta);
 						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-			
+
 					snap_status = 0; //Reset our state to 0: no lines seen
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Perform initial localization. Must be called adjacent to a corner (two walls).
 	 *
 	*/
 	public void localize() {
-		
+
 	}
-	
+
 	/**
 	 * Enable or disable grid snapping (auto correction of the odometer with grid lines).
 	 *

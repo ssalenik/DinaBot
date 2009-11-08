@@ -9,7 +9,7 @@ package dinaBOT.navigation;
  * @version 1
 */
 public interface Navigation {
-	
+
 	/**
 	 * Request that the robot move to a specified set of coordiates on the grid. This is a high level method and should integrate pathing and obstacle avoidance considerations
 	 *
@@ -19,12 +19,12 @@ public interface Navigation {
 	 * @see #interrupt()
 	*/
 	public boolean goTo(double x, double y);
-	
+
 	/**
 	 * Interrupt an ongoing {@link #goTo(double x, double y)} call
 	 *
 	 * @see #goTo(double x, double y)
 	*/
 	public void interrupt();
-	
+
 }

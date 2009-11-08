@@ -13,7 +13,7 @@ import java.lang.Math;
  * @version 2
 */
 public class BasicMovement implements Movement {
-	
+
 	/* -- Static Variables -- */
 
 	//Possible states for the movement daemon to be in
@@ -28,7 +28,7 @@ public class BasicMovement implements Movement {
 	MovementDaemon movement_daemon;
 	Thread movement_daemon_thread;
 	boolean movement_daemon_running; //Run condition for the movement_daemon_thread
-	
+
 	boolean moving;
 
 	/**
@@ -44,9 +44,9 @@ public class BasicMovement implements Movement {
 
 		this.left_motor = left_motor;
 		this.right_motor = right_motor;
-		
+
 		moving = false; //We aren't moving initally
-		
+
 		//Create movement daemon
 		movement_daemon = new MovementDaemon();
 
@@ -72,7 +72,7 @@ public class BasicMovement implements Movement {
 		movement_daemon.goForward(distance, speed);
 		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
-	
+
 	public void turn(double angle, int speed) {
 		turn(angle, speed, false);
 	}
@@ -135,18 +135,18 @@ public class BasicMovement implements Movement {
 
 	public synchronized void stop() {
 		if(movement_daemon.isActive()) movement_daemon.stop();
-		
+
 		left_motor.stop();
 		right_motor.stop();
 
 		moving = false;
 	}
-	
+
 
 	public boolean isMoving() {
 		return moving || movement_daemon.isActive();
 	}
-	
+
 	public void shutdown() {
 		stop();
 		movement_daemon_running = false;
@@ -159,27 +159,27 @@ public class BasicMovement implements Movement {
 	 * The MovementDaemon can either be suspended (Mode.INACTIVE) when it is not in use. In this state the thread yields. Or it can be in one if the implmented other modes such as Mode.ROTATE_CCW, Mode.ROTATE_CW and Mode.ADVANCE in which case the thread is active. Within the BasicMovement class the status of the thread can be polled with isActive()
 	*/
 	class MovementDaemon implements Runnable {
-		
+
 		//The current mode of the MovementDaemon
 		Mode mode;
-		
+
 		//Stored information, used depending on the mode
 		double target_distance, target_angle;
 		double[] initial_position;
 		double[] current_position;
-		
+
 		/**
 		 * Create MovementDaemon
 		 *
 		*/
 		MovementDaemon() {
 			mode = Mode.INACTIVE; //Initially inactive
-			
+
 			//Setup the arrays
 			initial_position = new double[3];
 			current_position = new double[3];
 		}
-		
+
 		/**
 		 * Run method from Runnable. This method will suspend unless some complex movement is in progress
 		 *
@@ -197,7 +197,7 @@ public class BasicMovement implements Movement {
 						if((target_angle - current_position[2]) <= 0) { //Until the sign of the relative angle changes
 							stop();
 						}
-						
+
 					} else if(mode == Mode.ROTATE_CW) { //Rotate set angle clockwise
 						if((target_angle - current_position[2]) >= 0) { //Until the sign of the relative angle changes
 							stop();
@@ -208,7 +208,7 @@ public class BasicMovement implements Movement {
 				}
 			}
 		}
-		
+
 		/**
 		 * Initiate forward movement to a specified distance
 		 *
@@ -219,13 +219,13 @@ public class BasicMovement implements Movement {
 			//Set motor speed
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);
-			
+
 			//Remember start position
 			initial_position = odometer.getPosition();
 
 			//Remeber requested distance
 			target_distance = distance;
-			
+
 			//Start motors in correct direction 
 			if(distance > 0) {
 				left_motor.forward();
@@ -234,11 +234,11 @@ public class BasicMovement implements Movement {
 				left_motor.backward();
 				right_motor.backward();
 			}
-			
+
 			//Set mode
 			mode = Mode.ADVANCE;
 		}
-		
+
 		/**
 		 * Initiate forward rotation to an absolute angle
 		 *
@@ -273,7 +273,7 @@ public class BasicMovement implements Movement {
 				mode = Mode.ROTATE_CW;
 			}
 		}
-	
+
 		/**
 		 * Stop any ongoing movements
 		 *
@@ -284,7 +284,7 @@ public class BasicMovement implements Movement {
 			left_motor.stop();
 			right_motor.stop();
 		}
-		
+
 		/**
 		 * Returns the currect status of the MovementDaemon
 		 *

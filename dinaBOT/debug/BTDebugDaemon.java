@@ -27,22 +27,22 @@ class BTDebugDaemon implements Runnable {
 
 	static final int PROMPT_RESPONSE = 3;
 	static final int QUERY_RESPONSE = 3;
-	
+
 	/* Vars */
-	
+
 	boolean connected; //Indicates connection status
 	boolean running; //Controls thread execution
-	
+
 	Thread debug_daemon_thread; //Maintain connection, update odometry and battery levels
-	
+
 	BTConnection connection; //Actual BT Connection
-	
+
 	//I/O Streams
 	DataInputStream input_stream;
 	DataOutputStream output_stream;
-	
+
 	Odometer odometer; //Attached odometer if any
-	
+
 	/**
 	 * Construct a new BTDebugDaemon. There should only exist one static BTDebugDaemon in the {@link Debug} class. For this reason the constructor is protected.
 	 *
@@ -51,7 +51,7 @@ class BTDebugDaemon implements Runnable {
 		connected = false;
 		running = false;
 	}
-	
+
 	/**
 	 * Start the underlying thread that manages the connection and blocks for <code>timeout</code> ms waiting for the connection to establish.
 	 *
@@ -73,11 +73,11 @@ class BTDebugDaemon implements Runnable {
 				if(connected) return true;
 				Thread.yield();
 			}
-			
+
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Stop the underlying thread that manages the connection and closes the BT connection
 	 *
@@ -87,7 +87,7 @@ class BTDebugDaemon implements Runnable {
 		running = false;
 		closeConnection();
 	}
-	
+
 	/**
 	 * Register an odometer to regularly update the robot position on the penultimate debug console. Only one odometer may be register at any given time. Registering a new odometer overwrites the first.
 	 *
@@ -96,7 +96,7 @@ class BTDebugDaemon implements Runnable {
 	void registerOdometer(Odometer odometer) {
 		this.odometer = odometer;
 	}
-	
+
 	/**
 	 * Print a string to the penultimate debug console
 	 *
@@ -115,7 +115,7 @@ class BTDebugDaemon implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Print a string to the penultimate debug console followed by a new line
 	 *
@@ -134,7 +134,7 @@ class BTDebugDaemon implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Prompts the user via the penultimate debug console to answer a boolean value question.
 	 * <p>
@@ -150,9 +150,9 @@ class BTDebugDaemon implements Runnable {
 				synchronized(this) {
 					output_stream.writeInt(PROMPT);
 					output_stream.writeInt(s.length());
-					output_stream.writeChars(s);	
+					output_stream.writeChars(s);
 				}
-		
+
 				if(input_stream.readInt() == PROMPT_RESPONSE) return input_stream.readBoolean();
 				else input_stream.skip(input_stream.available());
 			} catch(IOException e) {
@@ -162,7 +162,7 @@ class BTDebugDaemon implements Runnable {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Prompts the user via the penultimate debug console to answer a String value question (this string could obviously also be evaluated to it's numerical value for number value questions).
 	 * <p>
@@ -178,9 +178,9 @@ class BTDebugDaemon implements Runnable {
 				synchronized(this) {
 					output_stream.writeInt(QUERY);
 					output_stream.writeInt(s.length());
-					output_stream.writeChars(s);			
+					output_stream.writeChars(s);
 				}
-		
+
 				if(input_stream.readInt() == QUERY_RESPONSE) {
 					int len = input_stream.readInt();
 					String response = "";
@@ -197,7 +197,7 @@ class BTDebugDaemon implements Runnable {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * The run method which is the target of the underlying thread that manages the connection and updates.
 	 *
@@ -212,7 +212,7 @@ class BTDebugDaemon implements Runnable {
 					output_stream = connection.openDataOutputStream();
 					connected = true;
 				}
-				
+
 			} else {
 				try {
 					synchronized(this) {
@@ -226,7 +226,7 @@ class BTDebugDaemon implements Runnable {
 					try {
 						Thread.sleep(250);
 					} catch(InterruptedException e) {
-						
+
 					}
 				} catch(IOException e) {
 					//The stream seems to have died, close up ...
@@ -235,7 +235,7 @@ class BTDebugDaemon implements Runnable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Close all aspects of the bluetooth connection, ignore errors
 	 *
@@ -244,23 +244,23 @@ class BTDebugDaemon implements Runnable {
 		try {
 			input_stream.close();
 		} catch(IOException e) {
-			
+
 		}
 
 		try {
 			output_stream.close();
 		} catch(IOException e) {
-			
+
 		}
 
 		connection.close();
-		
+
 		input_stream = null;
 		output_stream = null;
-		
+
 		connection = null;
 
 		connected = false;
 	}
-	
+
 }

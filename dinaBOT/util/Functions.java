@@ -14,9 +14,9 @@ public class Functions {
 	 *
 	*/
 	private Functions() {
-		
+
 	}
-	
+
 	/**
 	 * Constrains the value to the specified range.
 	 *
@@ -30,7 +30,7 @@ public class Functions {
 		if(value < min) return min;
 		return value;
 	}
-	
+
 	/**
 	 * Constrains the value to the specified range.
 	 *
@@ -44,7 +44,7 @@ public class Functions {
 		if(value < min) return min;
 		return value;
 	}
-	
+
 	/**
 	 * Maps and constrains the value to the specified range from another range.
 	 *
@@ -59,7 +59,7 @@ public class Functions {
 		double result = (value-low1)/(high1-low1)*(high2-low2)+low2;
 		return constrain(result, low2, high2);
 	}
-	
+
 	/**
 	 * Maps and constrains the value to the specified range from another range.
 	 *
@@ -74,5 +74,5 @@ public class Functions {
 		int result = (int)((double)(value-low1)/(double)(high1-low1)*(double)(high2-low2))+low2;
 		return constrain(result, low2, high2);
 	}
-	
+
 }

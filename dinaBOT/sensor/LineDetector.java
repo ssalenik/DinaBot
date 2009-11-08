@@ -12,26 +12,26 @@ import lejos.nxt.LightSensor;
  * @version 2
 */
 public class LineDetector implements Runnable {
-	
+
 	/* -- Static Variables -- */
-	
+
 	//The actual left and right line detectors
 	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S1, true));
 	public static final LineDetector right = new LineDetector(new LightSensor(SensorPort.S2, true));
-	
+
 	//The ghetto threshold I'm using
 	static final int THRESHOLD = 450;
-	
+
 	/* -- Instance Variables -- */
 	LightSensor sensor; //The light sensor associated with this LineDetector
 
 	int previous_reading; //The latest LightSensor value
-	
+
 	LineDetectorListener listener; //The current listner
-	
+
 	boolean running; //The run condition for line_detector_thread
 	Thread line_detector_thread;
-	
+
 	/**
 	 * Creates a new LineDetector
 	 *
@@ -41,20 +41,20 @@ public class LineDetector implements Runnable {
 		//Set up
 		this.sensor = sensor;
 		previous_reading = 0;
-		
+
 		//Start our thread polling sensor values
 		start();
 	}
-	
+
 	/**
 	 * Get the latest LightSensor reading
 	 *
-	 * @reading the latest LightSensor reading
+	 * @return the latest LightSensor reading
 	*/
 	public int getLatestReading() {
 		return previous_reading;
 	}
-	
+
 	/**
 	 * Package protected method which notifies the current listener of a line cross event.
 	 *
@@ -62,7 +62,7 @@ public class LineDetector implements Runnable {
 	void notifyListener() {
 		if(listener != null) listener.lineDetected(this);
 	}
-	
+
 	/**
 	 * Registers a listener to this LineDetector to be notified of line cross events. Only one listener can currently be registered at a time. Registering a new listener will replace any previously registered listeners.
 	 *
@@ -71,7 +71,7 @@ public class LineDetector implements Runnable {
 	public void registerListener(LineDetectorListener listener) {
 		this.listener = listener;
 	}
-	
+
 	/**
 	 * Start the line detector thread. If it is already running it will be stopped and restarted
 	 *
@@ -84,7 +84,7 @@ public class LineDetector implements Runnable {
 		line_detector_thread.setDaemon(true);
 		line_detector_thread.start();
 	}
-	
+
 	/**
 	 * Stops the line detector thread.
 	 *
@@ -96,7 +96,7 @@ public class LineDetector implements Runnable {
 			while(line_detector_thread != null && line_detector_thread.isAlive()) Thread.yield();
 		}
 	}
-	
+
 	/**
 	 * The run method from runnable. Constantly polls the light sensor and looks for line cross events
 	 *
@@ -106,7 +106,7 @@ public class LineDetector implements Runnable {
 			int new_reading = sensor.getNormalizedLightValue();
 			if(new_reading < THRESHOLD && previous_reading > THRESHOLD) notifyListener();
 			previous_reading = new_reading;
-		}		
+		}
 	}
-	
+
 }
