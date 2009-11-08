@@ -68,7 +68,7 @@ public class BasicMovement implements Movement {
 		turnTo(direction*Math.PI/2, speed);
 		
 		double target_theta = direction*Math.PI/2;
-		double initial_position = odometer.getPosition();
+		double[] initial_position = odometer.getPosition();
 		
 		left_motor.setSpeed(speed);
 		right_motor.setSpeed(speed);
@@ -76,7 +76,7 @@ public class BasicMovement implements Movement {
 		left_motor.forward();
 		right_motor.forward();
 		
-		double current_position = odometer.getPosition();
+		double[] current_position = odometer.getPosition();
 		
 		if(direction == 0) {
 			while(Math.abs(current_position[0]-initial_position[0]) < distance) {
