@@ -3,9 +3,23 @@ package dinaBOT.navigation;
 import lejos.nxt.Motor;
 import java.lang.Math;
 
+/**
+ * BasicMovement is a simple implementation of the specifications of the {@link Movement} interface. It provides simple movement paradigms for robot movement. This implementation assumes a robot with two wheels that can rotate about itself and who's position is accurately reflected by the associated {@link Odometer}.
+ *
+ * @author Severin Smith
+ * @see Odometer
+ * @see Movement
+ * @see Navigation
+ * @version 2
+*/
 public class BasicMovement implements Movement {
+	
+	/* -- Static Variables -- */
 
+	//Possible states for the movement daemon to be in
 	enum Mode { INACTIVE, ROTATE_CW, ROTATE_CCW, ADVANCE }
+
+	/* -- Instance Variables -- */
 
 	Odometer odometer;
 
@@ -13,27 +27,36 @@ public class BasicMovement implements Movement {
 
 	MovementDaemon movement_daemon;
 	Thread movement_daemon_thread;
-	boolean movement_daemon_running;
+	boolean movement_daemon_running; //Run condition for the movement_daemon_thread
 	
 	boolean moving;
 
+	/**
+	 * Create a BasicMovement instance with the given odometer and left and right motors
+	 *
+	*/
 	public BasicMovement(Odometer odometer, Motor left_motor, Motor right_motor) {
+		//Set up odometer and motors
 		this.odometer = odometer;
 
 		this.left_motor = left_motor;
 		this.right_motor = right_motor;
 		
-		moving = false;
+		moving = false; //We aren't moving initally
 		
-		movement_daemon_running = true;
+		//Create movement daemon
 		movement_daemon = new MovementDaemon();
+
+		//Start it's thread
+		movement_daemon_running = true;
+
 		movement_daemon_thread = new Thread(movement_daemon);
 		movement_daemon_thread.setDaemon(true);
 		movement_daemon_thread.start();
 	}
 
 	public synchronized void driveStraight(int direction, double distance, int speed) {
-		System.out.println("NOT IMPLEMENTED");
+		System.out.println("NOT IMPLEMENTED"); //Coming soon
 	}
 
 	public void goForward(double distance, int speed) {

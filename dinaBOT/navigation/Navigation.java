@@ -9,7 +9,7 @@ public interface Navigation {
 	 *
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return interrupted
 	*/
 	public boolean goTo(double x, double y);
 		

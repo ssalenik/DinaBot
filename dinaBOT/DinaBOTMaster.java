@@ -14,12 +14,12 @@ import dinaBOT.comm.*;
 */
 public class DinaBOTMaster implements MechConstants {
 	
-	/* Static Variables */
+	/* -- Static Variables -- */
 	
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
 	
-	/* Class Variables */
+	/* -- Instance Variables -- */
 	
 	Odometer odometer;
 	Movement movement;
