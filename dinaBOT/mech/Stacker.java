@@ -1,10 +1,10 @@
 package dinaBOT.mech;
 
 import lejos.nxt.Motor;
-
 import dinaBOT.mech.*;
 
 public class Stacker implements Stacking {
+
 
 	Motor claw;
 	Motor leftGate;
@@ -18,13 +18,22 @@ public class Stacker implements Stacking {
 	final int clawSpeed = 175;
 	final int gateSpeed = 175;
 
+	/**	Constructor for the Stacker - it takes 3 motors are parameters
+	 * 
+	 * @param leftGate motor corresponding to left gate
+	 * @param rightGate motor corresponding to right gate
+	 * @param claw motor corresponding to claw
+	 */
 	public Stacker(Motor leftGate, Motor rightGate, Motor claw){
 
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
 		this.claw = claw;			
 	}
-
+	
+	/**	This method executes the pickup mechanism
+	 * 
+	 */
 	public boolean activateMechanicalClaw() {
 				
 		claw.setSpeed(clawSpeed);		
@@ -56,6 +65,9 @@ public class Stacker implements Stacking {
 		return true;
 	}
 
+	/**	Opens the cage doors
+	 * 
+	 */
 	public void openDockingBay() {
 
 		leftGate.setSpeed(gateSpeed);
@@ -72,6 +84,9 @@ public class Stacker implements Stacking {
      //implement a method to make the robot move forward to get rid of the blocks
 	//to be implemented in master via BTB communication
 
+	/**	Closes the cage doors
+	 * 
+	 */
 	public void closeDockingBay() {
 
 		leftGate.setSpeed(gateSpeed);
@@ -87,6 +102,9 @@ public class Stacker implements Stacking {
 
 	}
 
+	/**	return true if the cage is closed and false otherwise
+	 * 
+	 */
 	public boolean getDockStatus() {
 
 		//checks if the cage is open
