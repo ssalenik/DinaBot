@@ -59,7 +59,49 @@ public class BasicMovement implements Movement {
 	}
 
 	public synchronized void driveStraight(int direction, double distance, int speed) {
-		System.out.println("NOT IMPLEMENTED"); //Coming soon
+		stop();
+		if(speed == 0 || distance == 0) return;
+		
+		direction = direction%4;
+		if(direction < 0) direction += 4;
+		
+		turnTo(direction*Math.PI/2, speed);
+		
+		double target_theta = direction*Math.PI/2;
+		double initial_position = odometer.getPosition();
+		
+		left_motor.setSpeed(speed);
+		right_motor.setSpeed(speed);
+		
+		left_motor.forward();
+		right_motor.forward();
+		
+		double current_position = odometer.getPosition();
+		
+		if(direction == 0) {
+			while(Math.abs(current_position[0]-initial_position[0]) < distance) {
+				target_theta = direction*Math.PI/2+(initial_position[1]-current_position[1])/10;
+				
+				if(Math.abs(current_position[2]-target_theta) < 0.035) continue;
+				
+				if(current_position[2] < target_theta) {
+					 right_motor.setSpeed(speed+10);
+					 left_motor.setSpeed(speed-0);
+				} else {
+					right_motor.setSpeed(speed-10);
+					left_motor.setSpeed(speed+10);
+				}
+				current_position = odometer.getPosition();
+			}
+		} else if(direction == 1) {
+			
+		} else if(direction == 2) {
+
+		} else if(direction == 3) {
+
+		}
+		
+		stop();
 	}
 
 	public void goForward(double distance, int speed) {
