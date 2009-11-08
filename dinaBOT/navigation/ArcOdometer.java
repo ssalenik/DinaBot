@@ -190,11 +190,11 @@ public class ArcOdometer implements Odometer {
 		double r_sensor = 0;
 	
 		if(current_direction%2 == 0) { //pos or neg X
-			l_sensor = (cos(position[2])*SENSOR_BASE/2+position[1])%UNIT_TILE;
-			r_sensor = (-cos(position[2])*SENSOR_BASE/2+position[1])%UNIT_TILE;
+			l_sensor = (cos(position[2])*LIGHT_SENSOR_BASE/2+position[1])%UNIT_TILE;
+			r_sensor = (-cos(position[2])*LIGHT_SENSOR_BASE/2+position[1])%UNIT_TILE;
 		} else { //pos or neg Y
-			l_sensor = (sin(position[2])*SENSOR_BASE/2+position[0])%UNIT_TILE;
-			r_sensor = (-sin(position[2])*SENSOR_BASE/2+position[0])%UNIT_TILE;
+			l_sensor = (sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
+			r_sensor = (-sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
 		}
 		
 		//If the sensor are in an unsafe area (where they could make erroneous readings, return
@@ -232,7 +232,7 @@ public class ArcOdometer implements Odometer {
 				} else { //If the distance is reasonable
 					//Compute the new angle and x or y coordinate and perform the odometer correction
 					double theta = 0;
-					double offset_angle = Math.atan(distance_travelled/SENSOR_BASE);
+					double offset_angle = Math.atan(distance_travelled/LIGHT_SENSOR_BASE);
 					if(snap_detector == LineDetector.left) theta = offset_angle-current_direction*Math.PI/2;
 					else theta = offset_angle+current_direction*Math.PI/2;
 					

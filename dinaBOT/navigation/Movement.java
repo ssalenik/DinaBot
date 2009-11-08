@@ -6,7 +6,7 @@ package dinaBOT.navigation;
  * @author Severin Smith
  * @see BasicMovement
  * @see Odometer
- * @see Movement
+ * @see Navigation
  * @version 3
 */
 public interface Movement {
@@ -107,5 +107,11 @@ public interface Movement {
 	 * @return true if the robot is moving false otherwise
 	*/
 	public boolean isMoving();
+	
+	/**
+	 * Shuts down the Movement object by killing any underlying thread and freeing up CPU ressources
+	 *
+	*/
+	public void shutdown();
 
 }
