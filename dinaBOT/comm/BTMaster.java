@@ -151,6 +151,49 @@ public class BTMaster implements CommConstants{
 	}
 	
 	/**
+	 * Sends the signal to receive the status of the cage to the slave brick and waits for an open or closed signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the cage is open and false if it's closed. 
+	 */			
+	public boolean getCageStatus() {
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(GET_CAGE_STATUS);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+	
+	/**
+	 * Sends the signal to make the slave brick "tap" the brick. It then returns a boolean if it was successful or not.
+	 *
+	 * @return Returns true if the tap was successful and false if it wasn't. 
+	 */				
+	public boolean tap() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(TAP);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+	
+	/**
 	 * Method to close the bluetooth connection properly. 
 	 * @return Returns true if the connection has closed, false otherwise.
 	 */	

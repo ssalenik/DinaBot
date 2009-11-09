@@ -61,6 +61,14 @@ public class DinaBOTSlave implements CommConstants{
 						success = true;
 						break;
 						
+					case GET_CAGE_STATUS:
+						success = stacker.getDockStatus();
+						break;
+					
+					case TAP:
+						success = stacker.tap();
+						break;
+						
 					case DISCONNECT:
 						success = true;
 						LCD.clear();
@@ -78,7 +86,7 @@ public class DinaBOTSlave implements CommConstants{
 			
 			else {
 				// I'm not sure why, but you have to make the thread wait for this minimum amount of time or else a null exception comes up
-				// This might be the result of the slave brick waiting for a connection that already exists.
+				// This might be the result of the slave brick waiting for a connection that already exists and there ends up being a null pointer.
 				try {
 					Thread.sleep(3500);
 				}

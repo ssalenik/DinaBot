@@ -76,6 +76,10 @@ public class Stacker implements Stacking {
 
 		return true;
 	}
+	
+	public boolean tap() {
+		return true;
+	}
 
 	/**	Opens the cage doors
 	 * 

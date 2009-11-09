@@ -14,6 +14,8 @@ public interface Stacking {
 	public void openDockingBay();
 
 	public void closeDockingBay();
+	
+	public boolean tap();
 
 	public boolean getDockStatus();
 
