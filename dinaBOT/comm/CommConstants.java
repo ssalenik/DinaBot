@@ -16,6 +16,8 @@ public interface CommConstants {
 	public static final byte PICKUP = 1;
 	public static final byte OPEN_CAGE = 2;
 	public static final byte CLOSE_CAGE = 3;
+	public static final byte DISCONNECT = 4;
+
 	
 
 }
