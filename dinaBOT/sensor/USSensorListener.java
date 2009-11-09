@@ -1,7 +1,8 @@
 package dinaBOT.sensor;
 
 public interface USSensorListener {
-
-	public void newValues(int[] new_values);
-
+	static enum Position {HIGH, LOW};
+	
+	public void newValues(int[] new_values, Position position);
+	
 }
