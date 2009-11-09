@@ -1,7 +1,7 @@
 package dinaBOT.detection;
 import lejos.nxt.*;
 
-public class BrickDetection {
+public class BrickDetection extends Thread {
 	
 	/*
 	 * So far I'm not really familiar on how the current US sensor poller
