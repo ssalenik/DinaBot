@@ -1,6 +1,8 @@
 package dinaBOT;
 
 import lejos.nxt.*;
+import java.util.Random;
+import java.lang.Math;
 
 import dinaBOT.navigation.*;
 import dinaBOT.mech.*;
@@ -34,7 +36,6 @@ public class DinaBOTMaster implements MechConstants {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 		slave_connection = new BTMaster();
-		System.out.println("Trying to connect ...");
 	}
 	
 	/**
@@ -44,8 +45,8 @@ public class DinaBOTMaster implements MechConstants {
 	public void moveTest() {
 		//Configure your odometry
 		odometer.setDebug(true);
-		odometer.setPosition(new double[] {30.48,30.48, 0}, new boolean[] {true, true, false});
-		odometer.enableSnapping(false);
+		odometer.setPosition(new double[] {UNIT_TILE*4, UNIT_TILE*4, 0}, new boolean[] {true, true, false});
+		odometer.enableSnapping(true);
 		
 		//Pause so the user can remove his hand from the robot
 		try {
@@ -53,16 +54,20 @@ public class DinaBOTMaster implements MechConstants {
 		} catch(Exception e) {
 			
 		}
+
+		Random rand = new Random();
 		
-		//Perform various tests
-		movement.rotate(false, 150);
-		
-		while(odometer.getPosition()[2] < 2*Math.PI) {
-			Thread.yield();
+		for(int i = 0;i < 16;i++) {
+			double x = odometer.getPosition()[0]/UNIT_TILE;
+			double y = odometer.getPosition()[0]/UNIT_TILE;
+			int direction = rand.nextInt(4);
+			if(x > 5.5) movement.turnTo(2*Math.PI/2, 70);
+			else if(x < 2.5) movement.turnTo(0*Math.PI/2, 70);
+			else if(y > 5.5) movement.turnTo(1*Math.PI/2, 70);
+			else if(y < 2.5) movement.turnTo(3*Math.PI/2, 70);
+			else movement.turnTo(direction*Math.PI/2, 70);
+			movement.goForward(UNIT_TILE*2, 200);
 		}
-		movement.stop();
-		
-		//	movement.driveStraight(0, UNIT_TILE*10, 150);
 	}
 	
 	/**
@@ -133,9 +138,7 @@ public class DinaBOTMaster implements MechConstants {
 	
 	
 	}
-	
-	
-	
+		
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -144,18 +147,20 @@ public class DinaBOTMaster implements MechConstants {
 	public static void main(String[] args) {
 		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
-										public void buttonPressed(Button b) {
-										System.exit(0);
-										} 
-										
-										public void buttonReleased(Button b) {
-										System.exit(0);
-										}
-										});
-		
+			public void buttonPressed(Button b) {
+			System.exit(0);
+			} 
+
+			public void buttonReleased(Button b) {
+			System.exit(0);
+			}
+		});
+
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
-		dinaBOTmaster.goFetch(40);
+	//	dinaBOTmaster.goFetch(40);
+		dinaBOTmaster.moveTest();
+		
 		while(true); //Never quit
 	}
 	

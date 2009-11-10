@@ -3,6 +3,8 @@ package dinaBOT.navigation;
 import lejos.nxt.Motor;
 import java.lang.Math;
 
+import dinaBOT.util.Functions;
+
 /**
  * BasicMovement is a simple implementation of the specifications of the {@link Movement} interface. It provides simple movement paradigms for robot movement. This implementation assumes a robot with two wheels that can rotate about itself and who's position is accurately reflected by the associated {@link Odometer}.
  *
@@ -70,6 +72,11 @@ public class BasicMovement implements Movement {
 		double target_theta = direction*Math.PI/2;
 		double[] initial_position = odometer.getPosition();
 		
+		//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+		//eg within pi of the current positon
+		while(target_theta < (initial_position[2] - Math.PI)) target_theta += 2*Math.PI;
+		while(target_theta > (initial_position[2] + Math.PI)) target_theta -= 2*Math.PI;
+		
 		left_motor.setSpeed(speed);
 		right_motor.setSpeed(speed);
 		
@@ -77,21 +84,14 @@ public class BasicMovement implements Movement {
 		right_motor.forward();
 		
 		double[] current_position = odometer.getPosition();
+		System.out.println(target_theta);
 		
 		if(direction == 0) {
 			while(Math.abs(current_position[0]-initial_position[0]) < distance) {
-				target_theta = direction*Math.PI/2+(initial_position[1]-current_position[1])/10;
-				
-				if(Math.abs(current_position[2]-target_theta) < 0.035) continue;
-				
-				if(current_position[2] < target_theta) {
-					 right_motor.setSpeed(speed+10);
-					 left_motor.setSpeed(speed-0);
-				} else {
-					right_motor.setSpeed(speed-10);
-					left_motor.setSpeed(speed+10);
-				}
 				current_position = odometer.getPosition();
+				right_motor.setSpeed(speed+(int)((current_position[2]-target_theta)*10));
+				left_motor.setSpeed(speed-(int)((current_position[2]-target_theta)*10));
+				Thread.yield();
 			}
 		} else if(direction == 1) {
 			
@@ -231,6 +231,7 @@ public class BasicMovement implements Movement {
 				if(mode == Mode.INACTIVE) { //If inactive yield
 					Thread.yield();
 				} else { //Otherwise execute correct action accoring to current mode
+					current_position = odometer.getPosition(); //Update position array
 					if(mode == Mode.ADVANCE) { //Advance set distance
 						if(target_distance*target_distance < ((current_position[0]-initial_position[0])*(current_position[0]-initial_position[0])+(current_position[1]-initial_position[1])*(current_position[1]-initial_position[1]))) {
 							stop();
@@ -245,7 +246,6 @@ public class BasicMovement implements Movement {
 							stop();
 						}
 					}
-					current_position = odometer.getPosition(); //Update position array
 					Thread.yield(); //Yield for a little while
 				}
 			}
@@ -278,7 +278,7 @@ public class BasicMovement implements Movement {
 			}
 
 			//Set mode
-			mode = Mode.ADVANCE;
+			mode = Mode.ADVANCE; 
 		}
 
 		/**

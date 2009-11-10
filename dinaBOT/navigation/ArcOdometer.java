@@ -150,13 +150,15 @@ public class ArcOdometer implements Odometer {
 			//Make sure the position and update arrays are of accepatable sizes
 			if(this.position.length == position.length && this.position.length == update.length) {
 				//Update x and y
-				this.position[0] = position[0];
-				this.position[1] = position[1];
-				//Make the new theta as close as possible to the old theta for continuity
-				while(position[2] < (this.position[2] - 2*Math.PI)) position[2] += 2*Math.PI;
-				while(position[2] > (this.position[2] + 2*Math.PI)) position[2] -= 2*Math.PI;
-				//Update theta
-				this.position[2] = position[2];
+				if(update[0]) this.position[0] = position[0];
+				if(update[1]) this.position[1] = position[1];
+				if(update[2]) {
+					//Make the new theta as close as possible to the old theta for continuity
+					while(position[2] < (this.position[2] - Math.PI)) position[2] += 2*Math.PI;
+					while(position[2] > (this.position[2] + Math.PI)) position[2] -= 2*Math.PI;
+					//Update theta
+					this.position[2] = position[2];
+				}
 			}
 		} catch(Exception e) {
 			System.out.println("Exception, ArcOdometer getPosition()");
@@ -196,10 +198,10 @@ public class ArcOdometer implements Odometer {
 			l_sensor = (sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
 			r_sensor = (-sin(position[2])*LIGHT_SENSOR_BASE/2+position[0])%UNIT_TILE;
 		}
-
+				
 		//If the sensor are in an unsafe area (where they could make erroneous readings, return
 		if(l_sensor < snap_saftey || l_sensor > UNIT_TILE-snap_saftey || r_sensor < snap_saftey || r_sensor > UNIT_TILE-snap_saftey) return;
-
+	
 		//If we haven't seen a line yet
 		if(snap_status == 0) {
 			snap_status = 1; //Update status to reflect a first line cross
@@ -231,10 +233,11 @@ public class ArcOdometer implements Odometer {
 					else snap_tacho_count = right_encoder.getTachoCount();
 				} else { //If the distance is reasonable
 					//Compute the new angle and x or y coordinate and perform the odometer correction
+
 					double theta = 0;
 					double offset_angle = Math.atan(distance_travelled/LIGHT_SENSOR_BASE);
-					if(snap_detector == LineDetector.left) theta = offset_angle-current_direction*Math.PI/2;
-					else theta = offset_angle+current_direction*Math.PI/2;
+					if(snap_detector == LineDetector.left) theta = current_direction*Math.PI/2-offset_angle;
+					else theta = current_direction*Math.PI/2+offset_angle;
 
 					if(current_direction%2 == 0) { //pos or neg X
 						double x = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.cos(theta);
@@ -243,7 +246,7 @@ public class ArcOdometer implements Odometer {
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+distance_travelled/2*Math.sin(theta);
 						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-
+					
 					snap_status = 0; //Reset our state to 0: no lines seen
 				}
 			}

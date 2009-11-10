@@ -16,7 +16,7 @@ public interface MechConstants {
 
 	//The distance from one light sensor to another 
 	//(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)
-	static final double LIGHT_SENSOR_BASE = 18;
+	static final double LIGHT_SENSOR_BASE = 22;
 
 	//The size of one tile on the course
 	static double UNIT_TILE = 30.48;
