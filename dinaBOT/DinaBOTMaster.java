@@ -44,7 +44,7 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void moveTest() {
 		//Configure your odometry
-		odometer.setDebug(true);
+		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE*4, UNIT_TILE*4, 0}, new boolean[] {true, true, false});
 		odometer.enableSnapping(true);
 		

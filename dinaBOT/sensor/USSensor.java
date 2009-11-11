@@ -7,7 +7,7 @@ import lejos.nxt.SensorPort;
 public class USSensor implements Runnable {
 	
 	public static USSensor high_sensor = new USSensor(SensorPort.S3, Position.HIGH);
-	public static USSensor low_sensor = new USSensor(SensorPort.S4, Position.LOW);
+	public static USSensor low_sensor = new USSensor(SensorPort.S1, Position.LOW);
 	
 	UltrasonicSensor sensor;
 	USSensorListener listener;
