@@ -20,6 +20,4 @@ public interface CommConstants {
 	public static final byte TAP = 5;
 	public static final byte DISCONNECT = 6;
 
-	
-
 }

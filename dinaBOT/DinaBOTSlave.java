@@ -106,26 +106,18 @@ public class DinaBOTSlave implements CommConstants{
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	 */
 	public static void main(String[] args) {
-		
+
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
-										public void buttonPressed(Button b) {
-										System.exit(0);
-										} 
-										
-										public void buttonReleased(Button b) {
-										System.exit(0);
-										}
-										});
+			public void buttonPressed(Button b) {
+				System.exit(0);
+			} 
+
+			public void buttonReleased(Button b) {
+				System.exit(0);
+			}
+		});
 		
 		DinaBOTSlave dinaBOTslave = new DinaBOTSlave();
-		try {
-			dinaBOTslave.obey();
-		}
-		catch(Exception e) {
-			LCD.clear();
-			LCD.drawString(e.toString(), 0, 0);
-			Button.waitForPress();
-		}
-		
+		dinaBOTslave.obey();
 	}
 }
