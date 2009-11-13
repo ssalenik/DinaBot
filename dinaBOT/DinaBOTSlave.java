@@ -4,6 +4,7 @@ import lejos.nxt.*;
 
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
+import dinaBOT.sound.*;
 
 /**
  * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
@@ -13,6 +14,7 @@ import dinaBOT.comm.*;
 
 public class DinaBOTSlave implements CommConstants{
 	
+	MusicPlayer music;
 	Stacking stacker;
 	BTSlave master_connection;
 	
@@ -78,6 +80,26 @@ public class DinaBOTSlave implements CommConstants{
 						LCD.clear();
 						LCD.drawString("About to closeConnection()", 0, 0);
 						break;						
+					
+					case PLAY_SONG:
+						success = music.play();
+						break;
+						
+					case PAUSE_SONG:
+						success = music.pause();
+						break;
+						
+					case ABORT_SONG:
+						success = music.abort();
+						break;
+						
+					case NEXT_SONG:
+						success = music.next();
+						break;
+						
+					case PREVIOUS_SONG:
+						success = music.previous();
+						break;
 						
 				}
 				if(master_connection.isConnected())

@@ -19,5 +19,10 @@ public interface CommConstants {
 	public static final byte GET_CAGE_STATUS = 4;
 	public static final byte TAP = 5;
 	public static final byte DISCONNECT = 6;
+	public static final byte PLAY_SONG = 10;
+	public static final byte PAUSE_SONG = 11;
+	public static final byte ABORT_SONG = 12;
+	public static final byte NEXT_SONG = 13;
+	public static final byte PREVIOUS_SONG = 14;
 
 }

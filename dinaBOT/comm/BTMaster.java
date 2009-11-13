@@ -215,4 +215,90 @@ public class BTMaster implements CommConstants{
 		
 	}
 	
+	public boolean playSong() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(PLAY_SONG);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+
+	public boolean pauseSong() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(PAUSE_SONG);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+
+	public boolean abortSong() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(ABORT_SONG);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+
+	public boolean nextSong() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(NEXT_SONG);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+
+	public boolean previousSong() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(PREVIOUS_SONG);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+	
+	
 }

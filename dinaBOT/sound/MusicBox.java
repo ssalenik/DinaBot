@@ -2,7 +2,7 @@ package dinaBOT.sound;
 
 import lejos.nxt.Sound;
 
-public class MusicBox extends Thread{
+public class MusicBox extends Thread implements MusicPlayer{
 
 	int[] frequencies;
 	int[] durations;
@@ -24,6 +24,18 @@ public class MusicBox extends Thread{
 		}
 	}
 	
+	public boolean abort(){
+		return true;
+	}
+	
+	public boolean next(){
+		return true;
+	}
+	
+	public boolean previous(){
+		return true;
+	}
+	
 	public void setSong(){
 		int id = songCount;
 		songCount++;
@@ -39,16 +51,17 @@ public class MusicBox extends Thread{
 		}
 	}
 	
-	public void pause(int id){
-		playStatus[id] = false;
+	public boolean pause(){
+		playStatus[1] = false;
+		return true;
 	}
 	
 	public void unpause(){
 		
 	}
 	
-	public void play(){
-		
+	public boolean play(){
+		return true;
 	}
 	
 	public void playNote(int id){

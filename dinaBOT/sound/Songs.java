@@ -24,7 +24,7 @@ public class Songs {
 		
 	
 	static final int[][] exampleChart = {	{1, 2, 3, 4},
-													{1, 2, 3, 4}	};
+											{1, 2, 3, 4}	};
 									
 	static final Song example = new Song(100, "Example", exampleChart);
 	
