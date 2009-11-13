@@ -7,11 +7,10 @@ import dinaBOT.comm.*;
 import dinaBOT.sound.*;
 
 /**
- * The DinaBOT class is the central class of our project. It ties everything togethere. It <b>is</b> the robot.
+ * The DinaBOTSlave is the main class the slave brick. It <b>is</b> the robot. It contains the main() for the slave.
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
- */
-
+*/
 public class DinaBOTSlave implements CommConstants{
 	
 	MusicPlayer music;
@@ -21,16 +20,20 @@ public class DinaBOTSlave implements CommConstants{
 	boolean stayConnected;
 	boolean listeningForInstructions = true;
 	
+	/**
+	 * This is the contructor for the DinaBOT slave
+	 *
+	*/
 	public DinaBOTSlave() {
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
 	}
+
 	/**
-	 * This is our Hello World method. It will be gone soon
+	 * Obey waits for new bluetooth commands and obey them. Finally it returns sucess or failure to the Master.
 	 *
-	 */
-	
+	*/
 	public void obey() {
 		
 		byte nextCommand = 0;
@@ -126,7 +129,7 @@ public class DinaBOTSlave implements CommConstants{
 	 * This is where the static main method lies. This is where execution begins.
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
-	 */
+	*/
 	public static void main(String[] args) {
 
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
