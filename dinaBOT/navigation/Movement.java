@@ -12,15 +12,13 @@ package dinaBOT.navigation;
 public interface Movement {
 
 	/**
-	 * Makes the robot move forwards a given distance at a given speed in one of the cardinal directions while using the odometer to drive as straight as possible.
-	 * <p>
-	 * Possible directions: 0 = positive x, 1 = positive y, 2 = negative x, 3 = negative y 
+	 * Makes the robot move to within 1cm of the target x and y position.
 	 *
-	 * @param direction the direction to go in (interpreted modulo 4)
-	 * @param distance the distance to travel (in cm)
+	 * @param x the x coordinate to go to
+	 * @param y the y coordinate to go to
 	 * @param speed the speed to travel at
 	*/
-	public void driveStraight(int direction, double distance, int speed);
+	public void goTo(double x, double y, int speed);
 
 	/**
 	 * Move forward a given distance at a given speed.
@@ -100,6 +98,18 @@ public interface Movement {
 	 *
 	*/
 	public void stop();
+	
+	/**
+	 * Suspend temporarily the current movement
+	 *
+	*/
+	public void suspend();
+	
+	/**
+	 * Resume any temporarily suspended action
+	 *
+	*/
+	public void resume();
 
 	/**
 	 * Return if the robot is movement because of this movement controller

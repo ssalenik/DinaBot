@@ -47,7 +47,7 @@ public class ArcOdometer implements Odometer {
 
 	/* Debug */
 
-	boolean debug;
+	boolean debug, safe;
 
 	/**
 	 * Creates a new ArcOdometer.
@@ -175,7 +175,9 @@ public class ArcOdometer implements Odometer {
 	*/
 	public synchronized void lineDetected(LineDetector detector) {
 		if(!snap_enable) return;
-
+		if(detector == LineDetector.left) System.out.println("L"+snap_status);
+		else System.out.println("R"+snap_status);
+		
 		//Compute the current heading between [0, 2*PI]
 		double current_heading = position[2]%(Math.PI*2);
 		if(current_heading < 0) current_heading += Math.PI*2;
@@ -200,9 +202,12 @@ public class ArcOdometer implements Odometer {
 		}
 		//If the sensor are in an unsafe area (where they could make erroneous readings, return
 		if(l_sensor < snap_saftey || l_sensor > UNIT_TILE-snap_saftey || r_sensor < snap_saftey || r_sensor > UNIT_TILE-snap_saftey) {
-			System.out.println("Unsafe");
+			safe = false;
 			return;
+		} else {
+			safe = true;
 		}
+
 		//If we haven't seen a line yet
 		if(snap_status == 0) {
 			snap_status = 1; //Update status to reflect a first line cross
@@ -247,7 +252,8 @@ public class ArcOdometer implements Odometer {
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+(distance_travelled-LIGHT_SENSOR_OFFSET)/2*Math.sin(theta);
 						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-					
+					System.out.println("Corrected");
+					System.out.println("---");
 					snap_status = 0; //Reset our state to 0: no lines seen
 				}
 			}
@@ -268,7 +274,7 @@ public class ArcOdometer implements Odometer {
 	 * @param enable enables grid snapping if set to true, disables it otherwise
 	*/
 	public void enableSnapping(boolean enable) {
-		snap_status = 0;
+		//snap_status = 0;
 		snap_enable = enable;
 	}
 
@@ -288,10 +294,11 @@ public class ArcOdometer implements Odometer {
 						while(debug) { //As long as the debug state is true
 							LCD.clear(); //Clear the screen
 							//Print X,Y and Theta
-							LCD.drawString("x = "+((Float)(float)position[0]).toString(),0,4);
-							LCD.drawString("y = "+((Float)(float)position[1]).toString(),0,5);
-							LCD.drawString("t = "+((Float)(float)(position[2]%(Math.PI*2)/(Math.PI*2)*360)).toString(),0,6);
-							LCD.drawString("snap = "+snap_enable,0,7);
+							LCD.drawString("x = "+((Float)(float)position[0]).toString(),0,3);
+							LCD.drawString("y = "+((Float)(float)position[1]).toString(),0,4);
+							LCD.drawString("t = "+((Float)(float)(position[2]%(Math.PI*2)/(Math.PI*2)*360)).toString(),0,5);
+							LCD.drawString("snap = "+snap_enable,0,6);
+							LCD.drawString("safe = "+safe,0,7);
 
 							try {
 								Thread.sleep(500); //Pause for 0.5 seconds

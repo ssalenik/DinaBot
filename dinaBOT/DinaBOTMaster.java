@@ -45,53 +45,39 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void moveTest() {
 		//Configure your odometry
-		odometer.setDebug(true);
-		odometer.setPosition(new double[] {UNIT_TILE,7*UNIT_TILE, 0}, new boolean[] {true, true, false});
+		odometer.setDebug(false);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE*7, 0}, new boolean[] {true, true, false});
 		odometer.enableSnapping(true);
+		
 		//Pause so the user can remove his hand from the robot
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
 		
 		}
-	
+		
+		//Add a convenient quit button
+		Button.ENTER.addButtonListener(new ButtonListener() {
+			public void buttonPressed(Button b) {
+				debug = !debug;
+			} 
+
+			public void buttonReleased(Button b) {
+			}
+		});
+		
+		
 		while(true) {
-			
-			//int[] ex = {1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,10,9,8,7,6,5,5,5,5,5,4,3,2,1,1,1}; //23
-			
-			//int[] why = {7,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,6,7};//22
-			
-			int[] ex = {11,11,5,5,1,1};
-			int[] why = {7,1,1,5,5,7};
+			int[] x = {1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,10,9,8,7,6,5,5,5,5,5,4,3,2,1,1,1};
+			int[] y = {7,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,6,7};
 			
 			for(int i = 0;i < ex.length;i++) {
-				goXY(ex[i],why[i]);
-				
+				if(debug) Button.waitForPress();
+				movement.goTo(x[i]*UNIT_TILE, y[i]*UNIT_TILE, 150);
 			}
-
 		}
 	}
-	
-	public void goXY(int x, int y) {
-		double[] position = odometer.getPosition();
-		double distance = Math.sqrt((x*UNIT_TILE-position[0])*(x*UNIT_TILE-position[0])+(y*UNIT_TILE-position[1])*(y*UNIT_TILE-position[1]));
-		double angle = Math.atan2((y*UNIT_TILE-position[1]),(x*UNIT_TILE-position[0]));
-		while(distance > 1) {
-			odometer.enableSnapping(false);
-			movement.turnTo(angle,100);
-			odometer.enableSnapping(true);
-			
-			
-			if(distance < 5) movement.goForward(distance, 200);
-			else movement.goForward(5, 200);
-			
-			position = odometer.getPosition();
-			distance = Math.sqrt((x*UNIT_TILE-position[0])*(x*UNIT_TILE-position[0])+(y*UNIT_TILE-position[1])*(y*UNIT_TILE-position[1]));
-			angle = Math.atan2((y*UNIT_TILE-position[1]),(x*UNIT_TILE-position[0]));
-		}
 		
-	}
-	
 	/**
 	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
 	 *

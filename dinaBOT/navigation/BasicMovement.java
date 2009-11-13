@@ -19,7 +19,7 @@ public class BasicMovement implements Movement {
 	/* -- Static Variables -- */
 
 	//Possible states for the movement daemon to be in
-	enum Mode { INACTIVE, ROTATE_CW, ROTATE_CCW, ADVANCE }
+	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE }
 
 	/* -- Instance Variables -- */
 
@@ -60,48 +60,24 @@ public class BasicMovement implements Movement {
 		movement_daemon_thread.start();
 	}
 
-	public synchronized void driveStraight(int direction, double distance, int speed) {
-		stop();
-		if(speed == 0 || distance == 0) return;
+	public synchronized void goTo(double x, double y, int speed) {
+		double[] position = odometer.getPosition();
 		
-		direction = direction%4;
-		if(direction < 0) direction += 4;
+		double distance = Math.sqrt((x-position[0])*(x-position[0])+(y-position[1])*(y-position[1]));
+		double angle = Math.atan2((y-position[1]),(x-position[0]));
 		
-		turnTo(direction*Math.PI/2, speed);
-		
-		double target_theta = direction*Math.PI/2;
-		double[] initial_position = odometer.getPosition();
-		
-		//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
-		//eg within pi of the current positon
-		while(target_theta < (initial_position[2] - Math.PI)) target_theta += 2*Math.PI;
-		while(target_theta > (initial_position[2] + Math.PI)) target_theta -= 2*Math.PI;
-		
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
-		
-		left_motor.forward();
-		right_motor.forward();
-		
-		double[] current_position = odometer.getPosition();
-		System.out.println(target_theta);
-		
-		if(direction == 0) {
-			while(Math.abs(current_position[0]-initial_position[0]) < distance) {
-				current_position = odometer.getPosition();
-				right_motor.setSpeed(speed+(int)((current_position[2]-target_theta)*10));
-				left_motor.setSpeed(speed-(int)((current_position[2]-target_theta)*10));
-				Thread.yield();
-			}
-		} else if(direction == 1) {
+		while(distance > 1) {
+			odometer.enableSnapping(false);
+			turnTo(angle,100);
+			odometer.enableSnapping(true);
 			
-		} else if(direction == 2) {
-
-		} else if(direction == 3) {
-
+			if(distance < 5) goForward(distance, 200);
+			else goForward(5, 200);
+			
+			position = odometer.getPosition();
+			distance = Math.sqrt((x-position[0])*(x-position[0])+(y-position[1])*(y-position[1]));
+			angle = Math.atan2((y-position[1]),(x-position[0]));
 		}
-		
-		stop();
 	}
 
 	public void goForward(double distance, int speed) {
@@ -184,6 +160,13 @@ public class BasicMovement implements Movement {
 		moving = false;
 	}
 
+	public void resume() {
+		movement_daemon.resume();
+	}
+	
+	public void suspend() {
+		movement_daemon.suspend();
+	}
 
 	public boolean isMoving() {
 		return moving || movement_daemon.isActive();
@@ -203,8 +186,10 @@ public class BasicMovement implements Movement {
 	class MovementDaemon implements Runnable {
 
 		//The current mode of the MovementDaemon
-		Mode mode;
-
+		Mode mode, suspended_mode;
+		
+		int l_mode, r_mode;
+		
 		//Stored information, used depending on the mode
 		double target_distance, target_angle;
 		double[] initial_position;
@@ -216,7 +201,11 @@ public class BasicMovement implements Movement {
 		*/
 		MovementDaemon() {
 			mode = Mode.INACTIVE; //Initially inactive
-
+			suspended_mode = Mode.INACTIVE;
+			
+			l_mode = 3;
+			r_mode = 3;
+			
 			//Setup the arrays
 			initial_position = new double[3];
 			current_position = new double[3];
@@ -228,7 +217,7 @@ public class BasicMovement implements Movement {
 		*/
 		public void run() {
 			while(movement_daemon_running) { //While we're not shutting down
-				if(mode == Mode.INACTIVE) { //If inactive yield
+				if(mode == Mode.INACTIVE || mode == Mode.SUSPENDED) { //If inactive yield
 					Thread.yield();
 				} else { //Otherwise execute correct action accoring to current mode
 					current_position = odometer.getPosition(); //Update position array
@@ -335,6 +324,26 @@ public class BasicMovement implements Movement {
 		boolean isActive() { //Return status
 			if(mode == Mode.INACTIVE) return false;
 			else return true;
+		}
+		
+		void suspend() {
+			l_mode = left_motor.getMode();
+			r_mode = right_motor.getMode();
+			
+			left_motor.stop();
+			right_motor.stop();
+			
+			suspended_mode = mode;
+			mode = Mode.SUSPENDED;
+		}
+		
+		void resume() {
+			if(l_mode == 1) left_motor.forward();
+			else if(l_mode == 2) left_motor.backward();
+			if(r_mode == 1) right_motor.forward();
+			else if(r_mode == 2) right_motor.backward();
+			
+			mode = suspended_mode;
 		}
 	}
 
