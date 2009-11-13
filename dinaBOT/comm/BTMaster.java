@@ -215,6 +215,11 @@ public class BTMaster implements CommConstants{
 		
 	}
 	
+	/**
+	 * Sends the signal to start playing a song in the musicBox to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the song starting succeeded and false if it didn't. 
+	 */	
 	public boolean playSong() {
 		
 		boolean success = false;
@@ -232,6 +237,11 @@ public class BTMaster implements CommConstants{
 		return success;
 	}
 
+	/**
+	 * Sends the signal to pause a song in the musicBox to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the song pausing succeeded and false if it didn't. 
+	 */	
 	public boolean pauseSong() {
 		
 		boolean success = false;
@@ -249,6 +259,11 @@ public class BTMaster implements CommConstants{
 		return success;
 	}
 
+	/**
+	 * Sends the signal to stop and reset a song in the musicBox to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the song stopping succeeded and false if it didn't. 
+	 */	
 	public boolean abortSong() {
 		
 		boolean success = false;
@@ -266,6 +281,11 @@ public class BTMaster implements CommConstants{
 		return success;
 	}
 
+	/**
+	 * Sends the signal to skip to the next song in the musicBox to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the song skipping succeeded and false if it didn't. 
+	 */	
 	public boolean nextSong() {
 		
 		boolean success = false;
@@ -282,7 +302,12 @@ public class BTMaster implements CommConstants{
 		
 		return success;
 	}
-
+	
+	/**
+	 * Sends the signal to skip to the previous song in the musicBox to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the song skipping succeeded and false if it didn't. 
+	 */	
 	public boolean previousSong() {
 		
 		boolean success = false;

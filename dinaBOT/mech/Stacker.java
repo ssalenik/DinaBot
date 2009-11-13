@@ -3,9 +3,9 @@ package dinaBOT.mech;
 import lejos.nxt.Motor;
 
 /**
- * Description here
+ * This is the class for all the methods that control the claw and cage.
  *
- * @author Gabriel Olteanu
+ * @author Gabriel Olteanu, François Ouellet Delorme
  * @see Stacking
  * @version 1
 */
@@ -25,7 +25,8 @@ public class Stacker implements Stacking {
 	
 	int brickCount = 0;
 
-	/**	Constructor for the Stacker - it takes 3 motors are parameters
+	/**	
+	 * Constructor for the Stacker - it takes 3 motors as parameters
 	 * 
 	 * @param leftGate motor corresponding to left gate
 	 * @param rightGate motor corresponding to right gate
@@ -37,8 +38,10 @@ public class Stacker implements Stacking {
 		this.claw = claw;
 	}
 	
-	/**	This method executes the pickup mechanism
+	/**	
+	 * This method executes the pickup mechanism
 	 * 
+	 * @return Returns true if the pickup succeeded.
 	 */
 	public boolean activateMechanicalClaw() {
 
@@ -77,7 +80,10 @@ public class Stacker implements Stacking {
 		return true;
 	}
 	
-	/**	Closes the claws on the block to align it
+	/**	
+	 * Closes the claws on the block to align it
+	 * 
+	 * @return Returns true if the tapping succeeded.
 	 * 
 	 */
 	public boolean tap() {
@@ -90,7 +96,8 @@ public class Stacker implements Stacking {
 		return true;
 	}
 
-	/**	Opens the cage doors
+	/**	
+	 * Opens the cage doors
 	 * 
 	 */
 	public void openDockingBay() {
@@ -109,7 +116,8 @@ public class Stacker implements Stacking {
 	//implement a method to make the robot move forward to get rid of the blocks
 	//to be implemented in master via BTB communication
 
-	/**	Closes the cage doors
+	/**	
+	 * Closes the cage doors
 	 * 
 	 */
 	public void closeDockingBay() {
@@ -127,8 +135,10 @@ public class Stacker implements Stacking {
 
 	}
 	
-	/**	return true if the cage is closed and false otherwise
+	/**	
+	 * return true if the cage is closed and false otherwise
 	 * 
+	 * @return true if the cage is closed and false otherwise
 	 */
 	public boolean getDockStatus() {
 		//checks if the cage is open
