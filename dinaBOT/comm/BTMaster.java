@@ -107,9 +107,31 @@ public class BTMaster implements CommConstants{
 	}
 	
 	/**
+	 * Sends the signal for request tap to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the tap succeeded and false if it didn't. 
+	 */
+	public boolean requestTap() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(TAP);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+	
+	/**
 	 * Sends the signal for open cage to the slave brick and waits for a success or failure signal from it. It then returns that signal.
 	 *
-	 * @return Returns true if the pickup succeeded and false if it didn't. 
+	 * @return Returns true if the cage opening succeeded and false if it didn't. 
 	 */	
 	public boolean openCage() {
 		
@@ -131,7 +153,7 @@ public class BTMaster implements CommConstants{
 	/**
 	 * Sends the signal for close cage to the slave brick and waits for a success or failure signal from it. It then returns that signal.
 	 *
-	 * @return Returns true if the pickup succeeded and false if it didn't. 
+	 * @return Returns true if the cage closing succeeded and false if it didn't. 
 	 */		
 	public boolean closeCage() {
 		
@@ -160,28 +182,6 @@ public class BTMaster implements CommConstants{
 		
 		try{
 			dataOut.writeByte(GET_CAGE_STATUS);
-			dataOut.flush();
-			success = dataIn.readBoolean();
-		}
-		catch(IOException ioe) {
-			LCD.clear();
-			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
-		}
-		
-		return success;
-	}
-	
-	/**
-	 * Sends the signal to make the slave brick "tap" the brick. It then returns a boolean if it was successful or not.
-	 *
-	 * @return Returns true if the tap was successful and false if it wasn't. 
-	 */				
-	public boolean tap() {
-		
-		boolean success = false;
-		
-		try{
-			dataOut.writeByte(TAP);
 			dataOut.flush();
 			success = dataIn.readBoolean();
 		}

@@ -77,7 +77,16 @@ public class Stacker implements Stacking {
 		return true;
 	}
 	
+	/**	Closes the claws on the block to align it
+	 * 
+	 */
 	public boolean tap() {
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawRotation + 165);
+		claw.stop();
+		try {Thread.sleep(500);} catch(Exception e) {}
+		claw.rotateTo(0);
+		claw.flt();
 		return true;
 	}
 

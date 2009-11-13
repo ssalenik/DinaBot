@@ -1,6 +1,7 @@
 package dinaBOT;
 
 import lejos.nxt.*;
+
 import java.util.Random;
 import java.lang.Math;
 
@@ -89,6 +90,30 @@ public class DinaBOTMaster implements MechConstants {
 			angle = Math.atan2((y*UNIT_TILE-position[1]),(x*UNIT_TILE-position[0]));
 		}
 		
+	}
+	
+	/**
+	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
+	 *
+	 */
+	public void tapTest(){
+		
+		movement.goForward(10, 200);
+		movement.turnTo(50, 70);
+		if(slave_connection.requestTap()) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
+		}
+		movement.goForward(10, 200);
+		if(slave_connection.requestTap()) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
+		}
+		movement.goForward(5, 200);
+		if(slave_connection.requestTap()) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
+		}
 	}
 	
 	/**
