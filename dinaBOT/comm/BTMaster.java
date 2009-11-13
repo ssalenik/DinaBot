@@ -9,7 +9,7 @@ import lejos.nxt.comm.*;
  * The BTMaster class is the class that handles communication from the master brick to the slave brick. It establishes a bluetooth connection and then
  * creates both a data input stream and data output stream. Through the output stream, it sends out byte encoded signals for commands and waits for the 
  * response delivered in the input stream to do anything else. 
- * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
+ * @author Alexandre Courtemanche, François Ouellet-Delorme
  */
 
 public class BTMaster implements CommConstants{

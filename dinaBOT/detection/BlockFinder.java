@@ -1,4 +1,4 @@
-package BlockAquisition;
+package dinaBOT.detection;
 
 import lejos.nxt.*;
 import dinaBOT.mech.MechConstants;
@@ -13,7 +13,7 @@ import dinaBOT.sensor.*;
 public class BlockFinder implements USSensorListener{
 
 	//Robot Constants
-	private ArcOdometer odometer;
+	private Odometer odometer;
 	private BasicMovement mover;
 	protected static Motor LeftWheel = Motor.A;
 	protected static Motor RightWheel = Motor.B;
@@ -68,7 +68,7 @@ public class BlockFinder implements USSensorListener{
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
 	 */
-	public BlockFinder(ArcOdometer odometer) {
+	public BlockFinder(Odometer odometer) {
 		this.odometer = odometer;
 		this.mover = new BasicMovement (odometer, LeftWheel, RightWheel);
 		lowUS.registerListener(this);

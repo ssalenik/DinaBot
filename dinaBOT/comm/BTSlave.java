@@ -10,7 +10,7 @@ import lejos.nxt.comm.*;
  * connection. When connected, it will establish an data input stream to receive information about the commands it needs to do, and it will establish
  * a data output stream to send information about the success of the methods it has initiated.
  *
- * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
+ * @author Alexandre Courtemanche
  */
 
 public class BTSlave implements CommConstants {

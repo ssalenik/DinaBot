@@ -8,7 +8,7 @@ import java.lang.Math;
 import dinaBOT.navigation.*;
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
-
+import dinaBOT.detection.*;
 
 /**
  * The DinaBOTMaster is the main class the master brick. It <b>is</b> the robot. It contains the main() for the master.
@@ -67,6 +67,87 @@ public class DinaBOTMaster implements MechConstants {
 		}
 	}
 		
+	/**
+	 * This is demo method for our professor meeting on November 18th. It will ask for the input offsets for how much it will displace the pellet when 
+	 * it picks it up. It then does a 360 sweep around it to find the styrofoam pellet. When it finds it picks it up and displaces it for a certain offset 
+	 * value.
+	 */	
+	public void profDemo() {
+		
+		int offsetX = 0, offsetY = 0;
+		boolean enterPressed = false;
+		
+		BlockFinder blockFind = new BlockFinder(odometer);
+		
+		LCD.clear();
+		LCD.drawString(offsetX + "   " + offsetY, 0,0);
+		
+		while( !enterPressed ) {
+			int buttonID = Button.waitForPress();
+			switch (buttonID) {
+				case Button.ID_LEFT:
+					offsetX--;
+					LCD.clear();
+					LCD.drawString(offsetX + "   " + offsetY, 0,0);
+					break;
+				case Button.ID_RIGHT:
+					offsetX++;
+					LCD.clear();
+					LCD.drawString(offsetX + "   " + offsetY, 0,0);
+					break;
+				case Button.ID_ENTER:
+					enterPressed = true;
+					break;
+			}
+		}
+		
+		try {
+			LCD.clear();
+			LCD.drawString("Loading...", 0,0);
+			Thread.sleep(1000);
+		}
+		catch (Exception e) {
+			LCD.clear();
+			LCD.drawString("Error sleeping.", 0, 0);
+		}
+		
+		LCD.clear();
+		LCD.drawString(offsetX + "   " + offsetY,0,0 );
+		
+		enterPressed = false;
+		
+		while( !enterPressed ) {
+			int buttonID = Button.waitForPress();
+			switch (buttonID) {
+				case Button.ID_LEFT:
+					offsetY--;
+					LCD.clear();
+					LCD.drawString(offsetX + "   " + offsetY,0,0 );
+					break;
+				case Button.ID_RIGHT:
+					offsetY++;
+					LCD.clear();
+					LCD.drawString(offsetX + "   " + offsetY, 0,0 );
+					break;
+				case Button.ID_ENTER:
+					enterPressed = true;
+					break;					
+			}
+		}
+		
+		try {
+			Thread.sleep(2000);
+			LCD.drawString("Loading main program...", 0,0);
+		}
+		catch (Exception e) {
+			LCD.clear();
+			LCD.drawString("Error sleeping.", 0, 0);
+		}
+		
+		
+		
+	}
+	
 	/**
 	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
 	 *
@@ -180,7 +261,7 @@ public class DinaBOTMaster implements MechConstants {
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
 	//	dinaBOTmaster.goFetch(40);
-		dinaBOTmaster.moveTest();
+		dinaBOTmaster.profDemo();
 		
 		while(true); //Never quit
 	}
