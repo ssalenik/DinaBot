@@ -1,5 +1,6 @@
 package BlockAquisition;
 
+import lejos.nxt.Button;
 import lejos.nxt.Motor;
 import lejos.nxt.Sound;
 import dinaBOT.mech.MechConstants;
@@ -47,7 +48,11 @@ public class BlockFinder implements USSensorListener{
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
 	public final double SWEEP_ARC = Math.PI;
-
+	/**
+	 * Maximum allowed difference between high and low sensor values to assume both are reading the same object
+	 */
+	public final int MAX_BANDWIDTH = 5;
+	
 	//Fields
 	double angleA;
 	double angleB;
@@ -89,7 +94,8 @@ public class BlockFinder implements USSensorListener{
 
 		//Turn to the direction where the block was first seen
 		mover.turnTo(blockAngle+SWEEP_ARC/2, TURN_SPEED);
-
+		Button.waitForPress();
+		
 		//Look left to right
 		//Or try later: find sum of convsecutive "short" distances in the left
 		mover.turn(-SWEEP_ARC, TURN_SPEED, true);
@@ -98,38 +104,41 @@ public class BlockFinder implements USSensorListener{
 			minHigh = high_Readings[0];
 
 			if(minLow < MAX_BLOCK_DISTANCE 
-					&& minLow != minHigh
+					&& Math.abs(minLow - minHigh) > MAX_BANDWIDTH
 					&& minLow < blockDistance_A) {
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
-				mover.stop();
+				//mover.stop();
 				Sound.twoBeeps();
 			}
+			
 		}
-
-		//Get to the other side
-		mover.turn(SWEEP_ARC, TURN_SPEED, false);
 		
+		Button.waitForPress();
+
 		//Look right to left
 		//or later, Try find sum of consecutive "short" distances in the right
 		//+ region where short distances are seen
 		//
-		mover.turn(-SWEEP_ARC, TURN_SPEED, true);
+		mover.turn(SWEEP_ARC, TURN_SPEED, true);
 		while (mover.isMoving()) {
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 
 			if( minLow < MAX_BLOCK_DISTANCE 
-					&& minLow != minHigh
+					&& Math.abs(minLow - minHigh) > MAX_BANDWIDTH
 					&& minLow < blockDistance_B) {
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
-				mover.stop();
+				//mover.stop();
 				Sound.twoBeeps();
 			}
+				
 		}
+		
+		Button.waitForPress();
 		
 		//Duplicate angle if either is missed
 		//TODO: Maybe try to have a "resweep" to retry the latching or simply "surrender" and retry
@@ -144,7 +153,6 @@ public class BlockFinder implements USSensorListener{
 			blockDistance_B = 0;
 		}
 
-
 		//To the bisecting angle !
 		//IF the same pallet was seen in both cases
 		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
@@ -156,7 +164,6 @@ public class BlockFinder implements USSensorListener{
 		}
 
 	}
-
 
 	public void newValues(int[] new_values, Position position) {
 		if (position == USSensorListener.Position.LOW) {
