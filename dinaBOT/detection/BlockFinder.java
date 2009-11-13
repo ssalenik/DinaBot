@@ -1,15 +1,14 @@
 package BlockAquisition;
 
-import lejos.nxt.Button;
-import lejos.nxt.Motor;
-import lejos.nxt.Sound;
+import lejos.nxt.*;
 import dinaBOT.mech.MechConstants;
 import dinaBOT.navigation.*;
 import dinaBOT.sensor.*;
 
 /**
  * This class contains all methods required to navigate an area, locate blocks, and navigate properly towards them.
- *
+ * 
+ * @author Vinh Phong Buu
  */
 public class BlockFinder implements USSensorListener{
 
@@ -47,12 +46,18 @@ public class BlockFinder implements USSensorListener{
 	/**
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
-	public final double SWEEP_ARC = Math.PI;
-	/**
-	 * Maximum allowed difference between high and low sensor values to assume both are reading the same object
-	 */
-	public final int MAX_BANDWIDTH = 5;
+	//public final double SWEEP_ARC = Math.PI;
 	
+	/**
+	 * USED FOR DEMO
+	 */
+	public final double SEARCH_ARC = 2*Math.PI;
+	double SWEEP_ARC = SEARCH_ARC;
+	/**
+	 * Difference allowed between high and low sensor values to assume both are seeing the same object.
+	 */
+	public final int BANDWIDTH = 5;
+
 	//Fields
 	double angleA;
 	double angleB;
@@ -78,7 +83,7 @@ public class BlockFinder implements USSensorListener{
 	 *
 	 *
 	 *@param blockAngle The orientation of the robot when the block was seen 
-	 *during search (in radians)
+	 *during search (in radians).
 	 *
 	 */
 	public void sweep(double blockAngle) {
@@ -94,8 +99,8 @@ public class BlockFinder implements USSensorListener{
 
 		//Turn to the direction where the block was first seen
 		mover.turnTo(blockAngle+SWEEP_ARC/2, TURN_SPEED);
-		Button.waitForPress();
-		
+		//Button.waitForPress();
+
 		//Look left to right
 		//Or try later: find sum of convsecutive "short" distances in the left
 		mover.turn(-SWEEP_ARC, TURN_SPEED, true);
@@ -104,55 +109,55 @@ public class BlockFinder implements USSensorListener{
 			minHigh = high_Readings[0];
 
 			if(minLow < MAX_BLOCK_DISTANCE 
-					&& Math.abs(minLow - minHigh) > MAX_BANDWIDTH
+					&& Math.abs(minLow - minHigh) > BANDWIDTH
 					&& minLow < blockDistance_A) {
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
-				//mover.stop();
-				Sound.twoBeeps();
+				//Sound.twoBeeps();
 			}
-			
 		}
-		
-		Button.waitForPress();
 
 		//Look right to left
 		//or later, Try find sum of consecutive "short" distances in the right
 		//+ region where short distances are seen
-		//
+		
 		mover.turn(SWEEP_ARC, TURN_SPEED, true);
 		while (mover.isMoving()) {
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 
 			if( minLow < MAX_BLOCK_DISTANCE 
-					&& Math.abs(minLow - minHigh) > MAX_BANDWIDTH
+					&& Math.abs(minLow - minHigh) > BANDWIDTH
 					&& minLow < blockDistance_B) {
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
-				//mover.stop();
-				Sound.twoBeeps();
+				//Sound.twoBeeps();
 			}
-				
-		}
-		
-		Button.waitForPress();
-		
-		//Duplicate angle if either is missed
-		//TODO: Maybe try to have a "resweep" to retry the latching or simply "surrender" and retry
-		// at a different location
-		if (angleA == 0 && angleB != 0) {
-			angleA = angleB;
-			blockDistance_A = 0;
-			blockDistance_B = 0;
-		} else if (angleA != 0 && angleB == 0) {
-			angleB = angleA;
-			blockDistance_A = 0;
-			blockDistance_B = 0;
+
 		}
 
+		//Duplicate angle if either is missed
+		//But make sure it definitely is a pallet
+		
+		if (angleA == 0 && angleB != 0) {
+			mover.turnTo(angleB, TURN_SPEED);
+			while(mover.isMoving());
+			if (Math.abs(low_Readings[0]-high_Readings[0]) > BANDWIDTH ) {
+				angleA = angleB;
+				blockDistance_A = blockDistance_B;
+			}
+		} else if (angleA != 0 && angleB == 0) {
+			mover.turnTo(angleA, TURN_SPEED);
+			while(mover.isMoving());
+			if (Math.abs(low_Readings[0] - high_Readings[0]) > BANDWIDTH) {
+				angleB = angleA;
+				blockDistance_B = blockDistance_A;
+			}
+		}
+		
+		
 		//To the bisecting angle !
 		//IF the same pallet was seen in both cases
 		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
