@@ -4,6 +4,11 @@ if [ $# -eq 1 -o $# -eq 2 ]
 	then
 	echo "Setup ..."
 	
+	if [ -f log.txt ]
+		then
+		rm log.txt
+	fi
+		
 	if ! mkdir bin
 		then
 		exit 1
@@ -23,8 +28,8 @@ if [ $# -eq 1 -o $# -eq 2 ]
 			rm -rf bin
 			exit 1
 		fi
-		
-		if ! nxjlink dinaBOT/DinaBOTMaster -cp ./ -o ../DinaBOTMaster.nxj
+
+		if ! nxjlink dinaBOT/DinaBOTMaster -cp ./ -o ../DinaBOTMaster.nxj -v > ../log.txt
 			then
 			cd ..
 			rm -rf bin
@@ -52,7 +57,7 @@ if [ $# -eq 1 -o $# -eq 2 ]
 			exit 1
 		fi
 		
-		if ! nxjlink dinaBOT/DinaBOTSlave -cp ./ -o ../DinaBOTSlave.nxj
+		if ! nxjlink dinaBOT/DinaBOTSlave -cp ./ -o ../DinaBOTSlave.nxj -v > ../log.txt
 			then
 			cd ..
 			rm -rf bin

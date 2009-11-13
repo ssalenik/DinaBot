@@ -173,10 +173,7 @@ public class ArcOdometer implements Odometer {
 	 *
 	 * @param detector indicates the detector which is calling this method
 	*/
-	public synchronized void lineDetected(LineDetector detector) {
-		if(detector == LineDetector.left) System.out.println("L"+snap_status);
-		else System.out.println("R"+snap_status);
-		
+	public synchronized void lineDetected(LineDetector detector) {		
 		if(!snap_enable) return;
 		
 		//Compute the current heading between [0, 2*PI]
@@ -253,8 +250,7 @@ public class ArcOdometer implements Odometer {
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+(distance_travelled-LIGHT_SENSOR_OFFSET)/2*Math.sin(theta);
 						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-					System.out.println("Corrected");
-					System.out.println("---");
+
 					snap_status = 0; //Reset our state to 0: no lines seen
 				}
 			}
@@ -274,7 +270,7 @@ public class ArcOdometer implements Odometer {
 	 *
 	 * @param enable enables grid snapping if set to true, disables it otherwise
 	*/
-	public void enableSnapping(boolean enable) {
+	public synchronized void enableSnapping(boolean enable) {
 		//snap_status = 0;
 		snap_enable = enable;
 	}
