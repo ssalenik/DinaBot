@@ -12,11 +12,13 @@ public interface MechConstants {
 	static final double WHEEL_RADIUS = 2.659;
 
 	//The distance from on wheel to the other
-	static final double WHEEL_BASE = 12.7435;
+//	static final double WHEEL_BASE = 12.7435;
+	static final double WHEEL_BASE = 13.1;
 
 	//The distance from one light sensor to another 
 	//(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)
-	static final double LIGHT_SENSOR_BASE = 22;
+	static final double LIGHT_SENSOR_BASE = 16;
+	static final double LIGHT_SENSOR_OFFSET = 1;
 
 	//The size of one tile on the course
 	static double UNIT_TILE = 30.48;

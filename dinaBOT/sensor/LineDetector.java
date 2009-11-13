@@ -16,8 +16,8 @@ public class LineDetector implements Runnable {
 	/* -- Static Variables -- */
 
 	//The actual left and right line detectors
-	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S2, true));
-	public static final LineDetector right = new LineDetector(new LightSensor(SensorPort.S4, true));
+	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S4, true));
+	public static final LineDetector right = new LineDetector(new LightSensor(SensorPort.S2, true));
 
 	//The ghetto threshold I'm using
 	static final int THRESHOLD = 450;

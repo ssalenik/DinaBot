@@ -44,30 +44,51 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void moveTest() {
 		//Configure your odometry
-		odometer.setDebug(false);
-		odometer.setPosition(new double[] {UNIT_TILE*4, UNIT_TILE*4, 0}, new boolean[] {true, true, false});
+		odometer.setDebug(true);
+		odometer.setPosition(new double[] {UNIT_TILE,7*UNIT_TILE, 0}, new boolean[] {true, true, false});
 		odometer.enableSnapping(true);
-		
 		//Pause so the user can remove his hand from the robot
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
-			
-		}
-
-		Random rand = new Random();
 		
-		for(int i = 0;i < 16;i++) {
-			double x = odometer.getPosition()[0]/UNIT_TILE;
-			double y = odometer.getPosition()[0]/UNIT_TILE;
-			int direction = rand.nextInt(4);
-			if(x > 5.5) movement.turnTo(2*Math.PI/2, 70);
-			else if(x < 2.5) movement.turnTo(0*Math.PI/2, 70);
-			else if(y > 5.5) movement.turnTo(1*Math.PI/2, 70);
-			else if(y < 2.5) movement.turnTo(3*Math.PI/2, 70);
-			else movement.turnTo(direction*Math.PI/2, 70);
-			movement.goForward(UNIT_TILE*2, 200);
 		}
+	
+		while(true) {
+			
+			//int[] ex = {1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,10,9,8,7,6,5,5,5,5,5,4,3,2,1,1,1}; //23
+			
+			//int[] why = {7,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,6,7};//22
+			
+			int[] ex = {11,11,5,5,1,1};
+			int[] why = {7,1,1,5,5,7};
+			
+			for(int i = 0;i < ex.length;i++) {
+				goXY(ex[i],why[i]);
+				
+			}
+
+		}
+	}
+	
+	public void goXY(int x, int y) {
+		double[] position = odometer.getPosition();
+		double distance = Math.sqrt((x*UNIT_TILE-position[0])*(x*UNIT_TILE-position[0])+(y*UNIT_TILE-position[1])*(y*UNIT_TILE-position[1]));
+		double angle = Math.atan2((y*UNIT_TILE-position[1]),(x*UNIT_TILE-position[0]));
+		while(distance > 1) {
+			odometer.enableSnapping(false);
+			movement.turnTo(angle,100);
+			odometer.enableSnapping(true);
+			
+			
+			if(distance < 5) movement.goForward(distance, 200);
+			else movement.goForward(5, 200);
+			
+			position = odometer.getPosition();
+			distance = Math.sqrt((x*UNIT_TILE-position[0])*(x*UNIT_TILE-position[0])+(y*UNIT_TILE-position[1])*(y*UNIT_TILE-position[1]));
+			angle = Math.atan2((y*UNIT_TILE-position[1]),(x*UNIT_TILE-position[0]));
+		}
+		
 	}
 	
 	/**
