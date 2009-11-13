@@ -56,23 +56,12 @@ public class DinaBOTMaster implements MechConstants {
 		
 		}
 		
-		//Add a convenient quit button
-		Button.ENTER.addButtonListener(new ButtonListener() {
-			public void buttonPressed(Button b) {
-				debug = !debug;
-			} 
-
-			public void buttonReleased(Button b) {
-			}
-		});
-		
 		
 		while(true) {
 			int[] x = {1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,10,9,8,7,6,5,5,5,5,5,4,3,2,1,1,1};
 			int[] y = {7,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,6,7};
 			
-			for(int i = 0;i < ex.length;i++) {
-				if(debug) Button.waitForPress();
+			for(int i = 0;i < x.length;i++) {
 				movement.goTo(x[i]*UNIT_TILE, y[i]*UNIT_TILE, 150);
 			}
 		}

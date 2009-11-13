@@ -174,9 +174,10 @@ public class ArcOdometer implements Odometer {
 	 * @param detector indicates the detector which is calling this method
 	*/
 	public synchronized void lineDetected(LineDetector detector) {
-		if(!snap_enable) return;
 		if(detector == LineDetector.left) System.out.println("L"+snap_status);
 		else System.out.println("R"+snap_status);
+		
+		if(!snap_enable) return;
 		
 		//Compute the current heading between [0, 2*PI]
 		double current_heading = position[2]%(Math.PI*2);
