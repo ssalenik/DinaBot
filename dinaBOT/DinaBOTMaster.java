@@ -256,11 +256,12 @@ public class DinaBOTMaster implements MechConstants {
 		
 		path = pather.generatePath(0.0, 0.0, 0, 2*UNIT_TILE, 2*UNIT_TILE);
 		
-		/*
-		for(int i = 0; i < path.length; i++) {
-			movement.goTo(path[i][0], path[i][1], 150);
+		if( path != null) {
+			for(int i = 0; i < path.length; i++) {
+				movement.goTo(path[i][0], path[i][1], 150);
+			}
 		}
-		*/
+		
 			
 	}
 		

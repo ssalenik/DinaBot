@@ -40,15 +40,29 @@ public class ManhattanPather implements Pathing, MechConstants{
 		
 		updateMap(pather);	//sends coords of obstacles to path
 		
-		//determine starting coordinate
+		// determine starting coordinate
+		// ensures coords fit into the grid
 		start = new int[2];
+		
 		start[0] = (int)Math.round( x1/nodeDist );
+		if( start[0] < 0) start[0] = 0;
+		else if( start[0] > rez - 1) start[0] = rez - 1;
+		
 		start[1] = (int)Math.round( y1/nodeDist );
+		if( start[1] < 0) start[1] = 0;
+		else if( start[1] > rez - 1) start[1] = rez - 1;
 		
 		//determine ending coordinate
+		// again, ensures coords fit into the grid
 		end = new int[2];
+		
 		end[0] = (int)Math.round( x2/nodeDist );
+		if( end[0] < 0) end[0] = 0;
+		else if( end[0] > rez - 1) end[0] = rez - 1;
+		
 		end[1] = (int)Math.round( y2/nodeDist );
+		if( end[1] < 0) end[1] = 0;
+		else if( end[1] > rez - 1) end[1] = rez - 1;
 		
 		//determine current direction (closest)
 		heading = (180*heading/Math.PI)%360;
