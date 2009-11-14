@@ -240,6 +240,29 @@ public class DinaBOTMaster implements MechConstants {
 	
 	
 	}
+	
+	// stepan's pathing test  WIP!!1
+	public void pathTest() {
+		Map mapper = new Map(12);
+		Pathing pather = new ManhattanPather(mapper, movement);
+		double[][] path;
+		double[] position;
+		
+		odometer.enableSnapping(true);
+		odometer.setDebug(true);
+		
+		position = odometer.getPosition();
+		
+		
+		path = pather.generatePath(0.0, 0.0, 0, 2*UNIT_TILE, 2*UNIT_TILE);
+		
+		/*
+		for(int i = 0; i < path.length; i++) {
+			movement.goTo(path[i][0], path[i][1], 150);
+		}
+		*/
+			
+	}
 		
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick

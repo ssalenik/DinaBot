@@ -2,6 +2,6 @@ package dinaBOT.navigation;
 
 public interface Pathing {
 
-	public Path generatePath(double x1, double y1, double x2, double y2);
+	public double[][] generatePath(double x1, double y1, double heading, double x2, double y2);
 
 }
