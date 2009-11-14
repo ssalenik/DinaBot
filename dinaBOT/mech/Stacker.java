@@ -17,7 +17,8 @@ public class Stacker implements Stacking {
 
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;
-	final int clawRotation = -250;
+	final int clawPickupAngle = 250;
+	final int clawTapAngle = 80;
 	
 	final int clawSpeed = 175;
 	final int gateSpeed = 175;
@@ -36,6 +37,33 @@ public class Stacker implements Stacking {
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
 		this.claw = claw;
+	}
+	
+	private void openclaw(int angle, int speed){
+		claw.setSpeed(speed);
+		int currentAngle = claw.getTachoCount();
+		claw.rotateTo(currentAngle + angle);
+	}
+	
+	/**	
+	 * Closes/lifts the claw by turning the motor by the specified angle
+	 * 
+	 * @param angle angle by which the motor should turn to close
+	 * 
+	 */
+	private void closeClaw(int angle, int speed){
+		claw.setSpeed(speed);
+		int currentAngle = claw.getTachoCount();
+		claw.rotateTo(currentAngle - angle);
+	}
+	
+	/**	
+	 * Opens the claw completely and sets its tachometer to 0
+	 * 
+	 */
+	private void resetClaw(){
+		openclaw(90, clawSpeed);
+		claw.resetTachoCount();
 	}
 	
 	/**	
@@ -57,7 +85,7 @@ public class Stacker implements Stacking {
 			rightGate.rotate(gatesPickUpRotation-10);
 		}
 		
-		claw.rotateTo(clawRotation);
+		claw.rotateTo(clawPickupAngle);
 		claw.stop();
 
 		try{
@@ -87,13 +115,19 @@ public class Stacker implements Stacking {
 	 * 
 	 */
 	public boolean tap() {
-		claw.setSpeed(clawSpeed);
-		claw.rotateTo(clawRotation + 165);
+		
+		closeClaw(clawTapAngle, clawSpeed);
 		claw.stop();
+		
 		try {Thread.sleep(500);} catch(Exception e) {}
-		claw.rotateTo(0);
+		
+		resetClaw();
 		claw.flt();
+		
+		try {Thread.sleep(500);} catch(Exception e) {}
+		
 		return true;
+		
 	}
 
 	/**	
