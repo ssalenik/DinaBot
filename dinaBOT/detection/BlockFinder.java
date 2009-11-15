@@ -15,8 +15,8 @@ public class BlockFinder implements USSensorListener{
 	//Robot Constants
 	private Odometer odometer;
 	private BasicMovement mover;
-	protected static Motor LeftWheel = Motor.A;
-	protected static Motor RightWheel = Motor.B;
+	public static Motor LeftWheel = Motor.A;
+	public static Motor RightWheel = Motor.B;
 	protected USSensor lowUS = USSensor.low_sensor;
 	protected USSensor highUS = USSensor.high_sensor;
 
@@ -46,7 +46,7 @@ public class BlockFinder implements USSensorListener{
 	/**
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
-	public final double SWEEP_ARC = Math.PI;
+	public final double SWEEP_ARC = Math.PI/2;
 	
 	/**
 	 * Minimum difference allowed between high and low sensor values to assume both are seeing the same object.
