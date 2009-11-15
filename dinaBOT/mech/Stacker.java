@@ -3,26 +3,26 @@ package dinaBOT.mech;
 import lejos.nxt.Motor;
 
 /**
- * This is the class for all the methods that control the claw and cage.
+ * This is the class for all the methods that control the stacking processes which use the claw and cage.
  *
  * @author Gabriel Olteanu, François Ouellet Delorme
  * @see Stacking
- * @version 1
+ * @version 2
 */
 public class Stacker implements Stacking {
 
-	Motor claw;
 	Motor leftGate;
 	Motor rightGate;
-
+	Claw claw;
+	
+	//in degrees
+	final int clawOpenAngle = 35;
+	final int clawClosedAngle = 21;
+	
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;
-	final int clawPickupAngle = 250;
-	final int clawTapAngle = 80;
-	
-	final int clawSpeed = 175;
-	final int gateSpeed = 175;
 
+	final int gateSpeed = 175;
 	
 	int brickCount = 0;
 
@@ -33,47 +33,19 @@ public class Stacker implements Stacking {
 	 * @param rightGate motor corresponding to right gate
 	 * @param claw motor corresponding to claw
 	 */
-	public Stacker(Motor leftGate, Motor rightGate, Motor claw){
+	public Stacker(Motor leftGate, Motor rightGate, Motor clawMotor){
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
-		this.claw = claw;
-	}
-	
-	private void openclaw(int angle, int speed){
-		claw.setSpeed(speed);
-		int currentAngle = claw.getTachoCount();
-		claw.rotateTo(currentAngle + angle);
-	}
-	
-	/**	
-	 * Closes/lifts the claw by turning the motor by the specified angle
-	 * 
-	 * @param angle angle by which the motor should turn to close
-	 * 
-	 */
-	private void closeClaw(int angle, int speed){
-		claw.setSpeed(speed);
-		int currentAngle = claw.getTachoCount();
-		claw.rotateTo(currentAngle - angle);
-	}
-	
-	/**	
-	 * Opens the claw completely and sets its tachometer to 0
-	 * 
-	 */
-	private void resetClaw(){
-		openclaw(90, clawSpeed);
-		claw.resetTachoCount();
+		this.claw = new Claw(clawMotor);
 	}
 	
 	/**	
 	 * This method executes the pickup mechanism
 	 * 
-	 * @return Returns true if the pickup succeeded.
+	 * @return true if the pickup succeeded.
 	 */
 	public boolean activateMechanicalClaw() {
 
-		claw.setSpeed(clawSpeed);
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
 
@@ -81,21 +53,17 @@ public class Stacker implements Stacking {
 		rightGate.resetTachoCount();
 
 		if(brickCount < 2) {
-			leftGate.rotate(gatesPickUpRotation-10, true);
-			rightGate.rotate(gatesPickUpRotation-10);
+			leftGate.rotate(gatesPickUpRotation/(brickCount+1), true);
+			rightGate.rotate(gatesPickUpRotation/(brickCount+1));
 		}
 		
-		claw.rotateTo(clawPickupAngle);
+		claw.close(clawOpenAngle);
+		claw.lift(190);
 		claw.stop();
 
-		try{
-			Thread.sleep(1000);
-		} catch(Exception e) {
+		try {Thread.sleep(1000);} catch(Exception e) {} 
 
-		} 
-
-		claw.rotateTo(0);
-
+		claw.reset();
 		claw.flt();
 
 		if(brickCount < 2) {
@@ -109,19 +77,19 @@ public class Stacker implements Stacking {
 	}
 	
 	/**	
-	 * Closes the claws on the block to align it
+	 * Attempts to align the block at right angles from the robot by closing the claws on it.
 	 * 
-	 * @return Returns true if the tapping succeeded.
+	 * @return true if the tapping succeeded.
 	 * 
 	 */
 	public boolean tap() {
 		
-		closeClaw(clawTapAngle, clawSpeed);
+		claw.close(clawOpenAngle);
 		claw.stop();
 		
 		try {Thread.sleep(500);} catch(Exception e) {}
 		
-		resetClaw();
+		claw.reset();
 		claw.flt();
 		
 		try {Thread.sleep(500);} catch(Exception e) {}
@@ -170,7 +138,7 @@ public class Stacker implements Stacking {
 	}
 	
 	/**	
-	 * return true if the cage is closed and false otherwise
+	 * Checks whether the cage doors are closed or open
 	 * 
 	 * @return true if the cage is closed and false otherwise
 	 */
