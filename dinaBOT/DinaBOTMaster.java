@@ -74,10 +74,19 @@ public class DinaBOTMaster implements MechConstants {
 	 */	
 	public void profDemo() {
 		
+		int newX=0, newY=0;
+		int TURN_SPEED = 50;
+		double[] foundBlockPos;
+		double SWEEP_OFFSET = Math.PI/2;
+		boolean foundBlock = false;
 		int offsetX = 0, offsetY = 0;
 		boolean enterPressed = false;
 		
 		BlockFinder blockFind = new BlockFinder(odometer);
+		
+		LCD.clear();
+		//Keep trying to connect
+		while(!slave_connection.connect());
 		
 		LCD.clear();
 		LCD.drawString(offsetX + "   " + offsetY, 0,0);
@@ -144,7 +153,29 @@ public class DinaBOTMaster implements MechConstants {
 			LCD.drawString("Error sleeping.", 0, 0);
 		}
 		
+		//Continuously sweep for block
+		while (!foundBlock) {
+			foundBlock = blockFind.sweep(odometer.getPosition()[2]);
+			if(!foundBlock) {
+				movement.turnTo(odometer.getPosition()[2]+ SWEEP_OFFSET, TURN_SPEED);	
+			}
+		}
 		
+		//Once pellet is found
+		LCD.clear();
+		LCD.drawString("Pellet found!",0,0);
+		
+		/* Here is where the position of the pellet and the future position of the pellet are calculated
+		 */
+		foundBlockPos = odometer.getPosition();
+		double blockAngle = foundBlockPos[2];
+		// Not sure if this is sin or cos, it depends if the starting orientation of the robot is on the x-axis or the y-axis
+		newX = (MechConstants.BLOCK_DISTANCE* Math.sin(blockAngle)) + offsetX;
+		newY = (MechConstants.BLOCK_DISTANCE* Math.cos(blockAngle)) + offsetY;
+		
+		Math.atan(newX/newY);
+		
+		slave_connection.requestTap();
 		
 	}
 	

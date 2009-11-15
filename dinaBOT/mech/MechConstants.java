@@ -3,7 +3,7 @@ package dinaBOT.mech;
 /**
  * This interface is a collection of static final constants which reflect the physical dimensions of the robot and the arena.
  * <p>
- * All measures must but in cm and in radians
+ * All measures must be in cm and in radians
  *
 */
 public interface MechConstants {
@@ -19,7 +19,10 @@ public interface MechConstants {
 	//(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)
 	static final double LIGHT_SENSOR_BASE = 16;
 	static final double LIGHT_SENSOR_OFFSET = 1;
-
+	
+	//The distance from a block to the center of the robot (in cm)
+	static final double BLOCK_DISTANCE = 12; //This is an approximation since the robot might not have the block exactly at this distance each time.
+	
 	//The size of one tile on the course
 	static double UNIT_TILE = 30.48;
 

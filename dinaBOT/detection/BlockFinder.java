@@ -51,7 +51,7 @@ public class BlockFinder implements USSensorListener{
 	/**
 	 * USED FOR DEMO
 	 */
-	public final double SEARCH_ARC = 2*Math.PI;
+	public final double SEARCH_ARC = Math.PI/2;
 	double SWEEP_ARC = SEARCH_ARC;
 	/**
 	 * Difference allowed between high and low sensor values to assume both are seeing the same object.
@@ -86,7 +86,7 @@ public class BlockFinder implements USSensorListener{
 	 *during search (in radians).
 	 *
 	 */
-	public void sweep(double blockAngle) {
+	public boolean sweep(double blockAngle) {
 
 		double initialOrientation = odometer.getPosition()[2];
 		LeftWheel.setSpeed(TURN_SPEED);
@@ -163,9 +163,11 @@ public class BlockFinder implements USSensorListener{
 		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
 			mover.turnTo((angleA+angleB)/2, TURN_SPEED);
 			mover.goForward( (blockDistance_A+blockDistance_B)/2, MOVE_SPEED);
+			return true;
 		} else {
 			//Fail-safe technique for now.
 			mover.turnTo(initialOrientation, TURN_SPEED);
+			return false;
 		}
 
 	}
