@@ -46,17 +46,12 @@ public class BlockFinder implements USSensorListener{
 	/**
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
-	//public final double SWEEP_ARC = Math.PI;
+	public final double SWEEP_ARC = Math.PI;
 	
 	/**
-	 * USED FOR DEMO
+	 * Minimum difference allowed between high and low sensor values to assume both are seeing the same object.
 	 */
-	public final double SEARCH_ARC = Math.PI/2;
-	double SWEEP_ARC = SEARCH_ARC;
-	/**
-	 * Difference allowed between high and low sensor values to assume both are seeing the same object.
-	 */
-	public final int BANDWIDTH = 5;
+	public final int BANDWIDTH = 7;
 
 	//Fields
 	double angleA;
@@ -114,7 +109,7 @@ public class BlockFinder implements USSensorListener{
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
-				//Sound.twoBeeps();
+				Sound.twoBeeps();
 			}
 		}
 
@@ -133,7 +128,7 @@ public class BlockFinder implements USSensorListener{
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
-				//Sound.twoBeeps();
+				Sound.twoBeeps();
 			}
 
 		}
