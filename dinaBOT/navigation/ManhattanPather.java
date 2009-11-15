@@ -6,20 +6,56 @@ import dinaBOT.mech.*;
 import java.lang.Math;
 import java.util.ArrayList;
 
+/**
+ * The ManhattanPather class is basically a wrapper class for the Astar pathfinding class.
+ * 
+ * ManhattanPather allows you to find the shortest path between two given points.  It uses the Astar class to do this; however, it takes care of deciding which node the robot is currently at, which node it is going to, and that the Astar algorithm uses the most updated verion of the map.
+ * 
+ * It is called "ManhattanPather" becuase the path found always travels along the grid, never diagonally.
+ * 
+ * @author Stepan Salenikovich
+ * @see Astar
+ * @see Map
+ * @version 1
+ */
 public class ManhattanPather implements Pathing, MechConstants{
-	static Map mapper;
-	static Movement movement;
+	Map mapper;
+	Movement movement;
+	
+	int rez;
 		
 	static final int NORTH = 90;
 	static final int SOUTH = 270;
 	static final int EAST = 0;
 	static final int WEST = 180;
 	
+	
+	
+	/**
+	 * creates a new ManhattanPather
+	 *
+	 * @param mapper the Map object that you wish the ManhattanPather to check for the map.
+	 * @param movement the movement object that you wish the ManhattanPather to use.
+	*/
 	public ManhattanPather(Map mapper, Movement movement) {
 		this.mapper = mapper;
 		this.movement = movement;
-	}
 		
+		this.rez = mapper.getRez();
+	}
+	
+	
+	/**
+	 * Generates the shortest path from (x1,y1) to (x2,y2) taking into acount the initial heading.  As in Astar, all the nodes of the shortest path are adjacent.
+	 *
+	 * @param x1 the initial x position in cm.
+	 * @param y1 the initial y position in cm.
+	 * @param heading the initial heading in rads.
+	 * @param x2 the final desired x position in cm.
+	 * @param y2 the final desired y position in cm.
+	 * 
+	 * @return a 2D array of the nodes of the shortest path in order from start to destination (not including the start node)
+	*/	
 	public double[][] generatePath(double x1, double y1, double heading, double x2, double y2) {
 		int rez;
 		double nodeDist;
@@ -30,9 +66,7 @@ public class ManhattanPather implements Pathing, MechConstants{
 		int[][] rawPath;
 		int i, j;
 		int nodes;
-		
-		rez = 12;	//should be done via constructor later?
-		
+				
 		nodeDist = UNIT_TILE;
 		
 		

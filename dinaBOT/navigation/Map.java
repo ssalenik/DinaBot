@@ -16,4 +16,10 @@ public class Map {
 	public int getRez() {
 		return this.rez;
 	}
+	
+	public boolean editMap(int x, int y, int value) {
+		this.map[x][y] = value;
+		
+		return true;	//sucess
+	}
 }

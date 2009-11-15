@@ -1,14 +1,32 @@
 package dinaBOT.navigation;
-/*
- * A* algo adapted from http://www.policyalmanac.org/games/aStarTutorial.htm
- * author: S.Salenikovich
- * uses only arrays and array lists
- */
 
 import java.lang.Math;
 
+/**
+ * The Astar class is an implementation of the A* pathfinding algorithm mostly following the tutorial found at {@link http://www.policyalmanac.org/games/aStarTutorial.htm}.
+ * <p>
+ * It is implemented using only multi-dimensional arrays of integers (as opposed to linked-lists of objects) for the purposes of reducing the memory footprint of the algorithm on the NXT and because not all the built-in abstract collection classes (eg: ArrayList) in leJOS seem to be bug-free yet.
+ * <p>
+ * The algorithm is first given a resolution so it can define a square grid.  The total number of nodes (or squares) is the resolution squared.  The grid is then populated with obstacles.  Finally it is given an inital position and heading on the grid and a destination.  It then finds the shortest Manhattan path (ie: only moving parallel to the x or y axis of the grid; no diagonal movement allowed) from the initial position to the destination.  Consecutive nodes in the path are always adjacent; the path is not allowed to go over obstacles with a certain value (thus potentially no obstacles); changing direction (ie: turning) to go form one node to another costs more than continuing in the same direction; continuing in the same direction when going form one node to another always costs the same. If no path is possible, a null pointer is returned.
+ * <p>
+ * NOTE: currently you should create a new Astar object and feed it the obstacle information each you wish to generate a path.  Generating a path more than once from the same Astar object will give undefined results.
+ * 
+ * @author Stepan Salenikovich
+ * @see Pathing
+ * @see Map
+ * @version 1
+ */
 public class Astar {
-	// pathing info
+	/* -- Class Variables -- */
+	
+	/* algo critical arrays */
+	
+	/**
+	 * Stores all the information the algorithm needs about each node when finding a path.  Except for number of nodes, the information is always specific to the path currently being found and changes throughout the algorithm.
+	 * <p>
+	 * Note: this array basically replaces the need for having to create a node class and thus an object for every node.  See the source code comments to see what information is stored at where.
+	 */
+	
 	int[][][] pathInfo;	// array containing all information for pathfinding
 				/*
 				pathInfo[x][y][0] = status:
@@ -25,18 +43,21 @@ public class Astar {
 				
 				simple, eh?
 				*/
+	
+	
+	int[][] open;	// array used to store the list of nodes currently "open"
+	int open_idx;	// index (of first dimension of open) of the next node to be stored
+					// implicitly indicates the number of nodes currently store in open or if open is empty
+					
+	int open_limit;	// max number of nodes which can be stored in open
+	
 
 	int rez;	// resolution of map
-	//static int[][] map;	// array containing all obstacle information
 	
+
 	
-	//ArrayList<int[]> open;	// open list
-	//since ArrayList doesn't seem to work in leJOS
-	int[][] open;
-	int open_idx;
-	int open_limit;
+	/* constants ... should probably be put in MechConstants or something similar */
 	
-	// constants
 	static final int OBSTACLE = 2;	// value which is considered unpassable
 	static final int NORTH = 90;
 	static final int SOUTH = 270;
@@ -44,15 +65,20 @@ public class Astar {
 	static final int WEST = 180;
 
 
-
-	public Astar(int rez) {
+	/**
+	 * creates a new Astar path
+	 *
+	 * @param resolution the number of nodes on each axis; total number of nodes is the resolution squared.
+	*/
+	public Astar(int resolution) {
 		int i, j;
+		this.rez = resolution;
+		
 		pathInfo = new int [rez][rez][6];
-		//open = new ArrayList<int[]>();
 		open_limit = rez*rez;
 		open = new int[open_limit][2];
 		open_idx = 0;
-		this.rez = rez;
+
 		
 		for(i = 0; i < rez; i++) {
 			for(j = 0; j < rez; j++) {
@@ -67,10 +93,13 @@ public class Astar {
 		
 	}
 
-	// ----- public methods ----- //
-
-	// returns shortest path from start to end taking into acount initial direction
-	// path does not include the starting node
+	/**
+	 * Calculates and returns the shortest path from the start node to the end node.
+	 *
+	 * @param start the start node coordinates
+	 * @param direction the initial direciton (NORTH, SOUTH, EAST, or WEST)
+	 * @param end the end node coordinates
+	*/
 	public int[][] getPath( int[] start, int direction, int[] end ) {
 		int[] startInfo, nodeInfo;
 		int[] curr;
@@ -78,7 +107,7 @@ public class Astar {
 		boolean path = true;
 		int[][] result;
 		int i;
-
+		
 		// check that end isn't start
 		if( (start[0] == end[0]) && (start[1] == end[1]) ) {
 			result = new int[1][2];
@@ -148,11 +177,15 @@ public class Astar {
 		
 	}
 
-
+	/**
+	 * Adds the given obstacle value to the given node.
+	 * 
+	 * @param obstacle coordinates of the node with the obstacle.
+	 * @param value value of the obstacle (should be at least 2)
+	 */
 	void addObstacle( int[] obstacle, int value ) {
 		pathInfo[obstacle[0]][obstacle[1]][0] = value;
 	}
-
 
 
 	// ------ open list methods ------- //
