@@ -77,12 +77,12 @@ public class Stacker implements Stacking {
 	}
 	
 	/**	
-	 * Attempts to align the block at right angles from the robot by closing the claws on it.
+	 * Attempts to align the block at right angles from the robot by closing the claw on it.
 	 * 
-	 * @return true if the tapping succeeded.
+	 * @return true if the closing succeeded.
 	 * 
 	 */
-	public boolean tap() {
+	public boolean touch() {
 		
 		claw.reset();
 
@@ -90,6 +90,18 @@ public class Stacker implements Stacking {
 		claw.stop();
 		
 		try {Thread.sleep(500);} catch(Exception e) {}
+		
+		return true;
+		
+	}
+	
+	/**	
+	 * Assumes the claw is touching the block and opens the claw to release the block.
+	 * 
+	 * @return true if the opening succeeded.
+	 * 
+	 */
+	public boolean untouch() {
 		
 		claw.reset();
 		claw.flt();
