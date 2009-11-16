@@ -17,9 +17,9 @@ public class Stacker implements Stacking {
 	
 	//in degrees
 	final int clawOpenAngle = 0;
-	final int clawStraightAngle = 50;
-	final int clawClosedAngle = 80;
-	final int clawTopAngle = 230;
+	final int clawStraightAngle = -60;
+	final int clawClosedAngle = -80;
+	final int clawTopAngle = -230;
 	
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;
@@ -40,6 +40,10 @@ public class Stacker implements Stacking {
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
 		this.claw = claw;
+		
+		leftGate.resetTachoCount();
+		rightGate.resetTachoCount();
+		claw.resetTachoCount();
 	}
 	
 	/**	
@@ -85,7 +89,7 @@ public class Stacker implements Stacking {
 	 * @return true if the closing succeeded.
 	 * 
 	 */
-	public boolean touch() {
+	public boolean hold() {
 		
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(clawStraightAngle);
@@ -101,7 +105,7 @@ public class Stacker implements Stacking {
 	 * @return true if the opening succeeded.
 	 * 
 	 */
-	public boolean untouch() {
+	public boolean release() {
 		
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(clawOpenAngle);
@@ -111,6 +115,14 @@ public class Stacker implements Stacking {
 		
 	}
 
+
+	public boolean tap() {
+		hold();
+		release();
+		
+		return true;
+	}
+	
 	/**	
 	 * Opens the cage doors
 	 * 

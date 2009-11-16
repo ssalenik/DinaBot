@@ -15,7 +15,7 @@ import dinaBOT.detection.*;
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
  */
-public class DinaBOTMaster implements MechConstants {
+public class DinaBOTMaster implements MechConstants, CommConstants {
 	
 	/* -- Static Variables -- */
 	
@@ -40,70 +40,33 @@ public class DinaBOTMaster implements MechConstants {
 	}
 	
 	/**
-	 * This is a testing method for odometry, navigation and movement
-	 *
-	 */
-	public void moveTest() {
-		//Configure your odometry
-		odometer.setDebug(false);
-		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE*7, 0}, new boolean[] {true, true, false});
-		odometer.enableSnapping(true);
-		
-		//Pause so the user can remove his hand from the robot
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-		
-		}
-		
-		
-		while(true) {
-			int[] x = {1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,10,9,8,7,6,5,5,5,5,5,4,3,2,1,1,1};
-			int[] y = {7,7,7,7,7,7,7,7,7,7,7,6,5,4,3,2,1,1,1,1,1,1,1,2,3,4,5,5,5,5,5,6,7};
-			
-			for(int i = 0;i < x.length;i++) {
-				movement.goTo(x[i]*UNIT_TILE, y[i]*UNIT_TILE, 150);
-			}
-		}
-	}
-		
-	/**
 	 * This is demo method for our professor meeting on November 18th. It will ask for the input offsets for how much it will displace the pellet when 
 	 * it picks it up. It then does a 360 sweep around it to find the styrofoam pellet. When it finds it picks it up and displaces it for a certain offset 
 	 * value.
-	 */	
-	public void profDemo() {
-		
-		double newX=0, newY=0;
-		int TURN_SPEED = 50;
-		int TAP_DISTANCE = 10;
-		double[] foundBlockPos;
+	 */
+	public void milestoneDemo() {
+		//User Input
+		double offsetX = 0, offsetY = 0;
+		boolean enterPressed = false;
+	
+		//Sweeping
 		double SWEEP_OFFSET = Math.PI/2;
 		boolean foundBlock = false;
-		int offsetX = 0, offsetY = 0;
-		boolean enterPressed = false;
 		
 		BlockFinder blockFind = new BlockFinder(odometer, movement);
 		
-		LCD.clear();
-		//Keep trying to connect
-		while(!slave_connection.connect());
+		/* User Input */
 		
-		LCD.clear();
-		LCD.drawString(offsetX + "   " + offsetY, 0,0);
-		
-		while( !enterPressed ) {
+		while(!enterPressed) {
+			LCD.clear();
+			LCD.drawString(offsetX + "   " + offsetY, 0,0);
 			int buttonID = Button.waitForPress();
-			switch (buttonID) {
+			switch(buttonID) {
 				case Button.ID_LEFT:
 					offsetX--;
-					LCD.clear();
-					LCD.drawString(offsetX + "   " + offsetY, 0,0);
 					break;
 				case Button.ID_RIGHT:
 					offsetX++;
-					LCD.clear();
-					LCD.drawString(offsetX + "   " + offsetY, 0,0);
 					break;
 				case Button.ID_ENTER:
 					enterPressed = true;
@@ -111,33 +74,18 @@ public class DinaBOTMaster implements MechConstants {
 			}
 		}
 		
-		try {
-			LCD.clear();
-			LCD.drawString("Loading...", 0,0);
-			Thread.sleep(1000);
-		}
-		catch (Exception e) {
-			LCD.clear();
-			LCD.drawString("Error sleeping.", 0, 0);
-		}
-		
-		LCD.clear();
-		LCD.drawString(offsetX + "   " + offsetY,0,0 );
-		
 		enterPressed = false;
 		
-		while( !enterPressed ) {
+		while(!enterPressed) {
+			LCD.clear();
+			LCD.drawString(offsetX + "   " + offsetY,0,0 );
 			int buttonID = Button.waitForPress();
 			switch (buttonID) {
 				case Button.ID_LEFT:
 					offsetY--;
-					LCD.clear();
-					LCD.drawString(offsetX + "   " + offsetY,0,0 );
 					break;
 				case Button.ID_RIGHT:
 					offsetY++;
-					LCD.clear();
-					LCD.drawString(offsetX + "   " + offsetY, 0,0 );
 					break;
 				case Button.ID_ENTER:
 					enterPressed = true;
@@ -148,184 +96,80 @@ public class DinaBOTMaster implements MechConstants {
 		try {
 			Thread.sleep(2000);
 			LCD.drawString("Loading main program...", 0,0);
-		}
-		catch (Exception e) {
-			LCD.clear();
-			LCD.drawString("Error sleeping.", 0, 0);
+		} catch(Exception e) {
+
 		}
 		
 		//Continuously sweep for block
-		while (!foundBlock) {
+		while(!foundBlock) {
 			foundBlock = blockFind.sweep(odometer.getPosition()[2]);
-			if(!foundBlock) {
-				movement.turnTo(odometer.getPosition()[2]+ SWEEP_OFFSET, TURN_SPEED);	
-			}
+			if(!foundBlock) movement.turn(SWEEP_OFFSET, SPEED_ROTATE);	
 		}
 		
 		//Once pellet is found
 		LCD.clear();
 		LCD.drawString("Pellet found!",0,0);
 		
-		/* Here is where the position of the pellet and the future position of the pellet are calculated
-		 */
+		//Align + Pickup
+		alignBrick();
 		
-		/*slave_connection.requestTap();
+		if(slave_connection.request(PICKUP)) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
+		}
 		
-		movement.rotate(true, 100);
-
-		movement.goForward(MechConstants.BLOCK_DISTANCE, 150);
 		
-		slave_connection.requestTap();
-
-		slave_connection.requestPickup();*/
-		
-		tapTest();
-
-		double [] startOdo = {0,0,0};
-		boolean [] boolOdo = {true,true,true};
-		
-		odometer.setPosition(startOdo, boolOdo);
-		
+		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
 		
 		Button.waitForPress();
 
-		movement.goTo((double)offsetX + BLOCK_DISTANCE, (double)offsetY, 75);				
+		movement.goTo(offsetX + BLOCK_DISTANCE, offsetY, SPEED_MED);				
 		
-		slave_connection.openCage();
+		slave_connection.request(OPEN_CAGE);
 		
-		movement.goForward(30, 75);
+		movement.goForward(30, SPEED_MED);
 		
-		slave_connection.closeCage();
-		
-		/*
-		newX = (( TAP_DISTANCE + TAP_DISTANCE + MechConstants.BLOCK_DISTANCE) * Math.sin(blockAngle)) + offsetX;
-		newY = (( TAP_DISTANCE + TAP_DISTANCE + MechConstants.BLOCK_DISTANCE) * Math.cos(blockAngle)) + offsetY;
-		
-		double newDistance = Math.sqrt( ( newX * newX ) + (newY * newY) );
-		
-		slave_connection.requestTap();
-		
-		movement.goForward(TAP_DISTANCE, 150);
-		
-		slave_connection.requestPickup();
-		
-		movement.turnTo( Math.atan(newX/newY), TURN_SPEED );
-		
-		movement.goForward(newDistance, 50);
-		
-		slave_connection.openCage();*/
-	
+		slave_connection.request(CLOSE_CAGE);	
 	}
 	
 	/**
 	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
 	 *
 	 */
-	public void tapTest(){
+	public void alignBrick() {
 		
-		slave_connection.connect();
-		
-		movement.goForward(10, 150);
-		movement.turn(Math.PI/6, 70);
-		movement.turn(-2 * Math.PI/6, 70);
-		
-		try {Thread.sleep(500);} catch(Exception e) {}
-		
-		if(slave_connection.requestTouch()) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-		
-		movement.turn(Math.PI/6, 70);
-		movement.goForward(-10, 150);
-		
-		if(slave_connection.requestUntouch()) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-		movement.goForward(10, 150);
-		
-		if(slave_connection.requestTouch()) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-		
-		movement.goForward(-10, 150);
-
-		if(slave_connection.requestUntouch()) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-		
-	}
-	
-	/**
-	 * This is a testing method for brick to brick communication (currently over bluetooth).
-	 *
-	 */
-	public void pickupTest() {
-		
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-			
-		}
-		LCD.clear();
-		LCD.drawString("Trying to pickup ...", 0, 0);
-		if(slave_connection.requestPickup()) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-		
-	}
-	
-	public void openAndCloseConnectTest() {
-		
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
-		}
-		
-		slave_connection.connect();
-
-		movement.goForward(40,150);
-		pickupTest();
-		//Button.waitForPress();
-		
-		slave_connection.disconnect();
+		double forward_distance = 5;
 				
-		//Button.waitForPress();
-		movement.goForward(-40,150);
-		slave_connection.connect();
+		movement.goForward(forward_distance, SPEED_MED);
 		
-		slave_connection.openCage();
+		movement.turn(Math.PI/3, SPEED_ROTATE);
 		
-		movement.goForward(40,150);
-		
-		slave_connection.closeCage();
-	}
+		movement.goForward(forward_distance, SPEED_MED);
 	
-	public void goFetch(int distance) {
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {
+		if(slave_connection.request(HOLD)) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
 		}
+				
+		movement.goForward(-forward_distance, SPEED_MED);
 		
-		slave_connection.connect();
-		
-		movement.goForward(distance,150);
-		
-		pickupTest();		
-		
-		movement.goForward(-distance,150);
-		
-		slave_connection.openCage();
-		
-		movement.goForward(distance,150);
-		
-		slave_connection.closeCage();
+		movement.turn(-Math.PI/3, SPEED_ROTATE);
 	
-	
+		for(int i = 0;i < 2;i++) {
+			if(slave_connection.request(HOLD)) {
+				LCD.clear();
+				LCD.drawString("Success ...", 0, 0);
+			}
+		
+			movement.goForward(-forward_distance, SPEED_MED);
+		
+			if(slave_connection.request(RELEASE)) {
+				LCD.clear();
+				LCD.drawString("Success ...", 0, 0);
+			}
+		
+			movement.goForward(forward_distance, SPEED_MED);
+		}
 	}
 	
 	// stepan's pathing and mapping test  WORKS!!
@@ -399,6 +243,10 @@ public class DinaBOTMaster implements MechConstants {
 			}
 		}	
 	}
+	
+	public void connect() {
+		while(!slave_connection.connect());
+	}
 		
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
@@ -419,9 +267,9 @@ public class DinaBOTMaster implements MechConstants {
 
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
-	//	dinaBOTmaster.goFetch(40);
-		dinaBOTmaster.tapTest();
-		//dinaBOTmaster.profDemo();
+		dinaBOTmaster.connect();
+		//dinaBOTmaster.alignBrick();
+		dinaBOTmaster.milestoneDemo();
 		
 		while(true); //Never quit
 	}

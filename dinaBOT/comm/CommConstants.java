@@ -13,13 +13,19 @@ public interface CommConstants {
 
 	/* -- Protocol Constants -- */
 	public static final byte DO_NOTHING = 0;
-	public static final byte PICKUP = 1;
-	public static final byte OPEN_CAGE = 2;
-	public static final byte CLOSE_CAGE = 3;
-	public static final byte GET_CAGE_STATUS = 4;
-	public static final byte TOUCH = 5;
-	public static final byte UNTOUCH = 6;
-	public static final byte DISCONNECT = 7;
+	
+	public static final byte OPEN_CAGE = 1;
+	public static final byte CLOSE_CAGE = 2;
+	public static final byte GET_CAGE_STATUS = 3;
+	
+	public static final byte PICKUP = 4;
+	public static final byte TAP = 5;
+	public static final byte HOLD = 6;
+	public static final byte RELEASE = 7;
+	
+	public static final byte DISCONNECT = 8;
+	
+	//Sound
 	public static final byte PLAY_SONG = 10;
 	public static final byte PAUSE_SONG = 11;
 	public static final byte ABORT_SONG = 12;
