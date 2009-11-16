@@ -180,15 +180,16 @@ public class DinaBOTMaster implements MechConstants {
 		slave_connection.requestPickup();*/
 		
 		tapTest();
-		
+
 		double [] startOdo = {0,0,0};
 		boolean [] boolOdo = {true,true,true};
-
+		
 		odometer.setPosition(startOdo, boolOdo);
+		
 		
 		Button.waitForPress();
 
-		movement.goTo((double)offsetX, (double)offsetY, 75);				
+		movement.goTo((double)offsetX + BLOCK_DISTANCE, (double)offsetY, 75);				
 		
 		slave_connection.openCage();
 		
@@ -222,17 +223,20 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void tapTest(){
 		
+		slave_connection.connect();
+		
 		movement.goForward(10, 150);
-		movement.turn(60, 70);
-		movement.turn(-120, 70);
+		movement.turn(Math.PI/6, 70);
+		movement.turn(-2 * Math.PI/6, 70);
 		
 		try {Thread.sleep(500);} catch(Exception e) {}
 		
 		if(slave_connection.requestTouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
-		}		
-		movement.turn(60, 70);
+		}
+		
+		movement.turn(Math.PI/6, 70);
 		movement.goForward(-10, 150);
 		
 		if(slave_connection.requestUntouch()) {
@@ -245,6 +249,7 @@ public class DinaBOTMaster implements MechConstants {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
+		
 		movement.goForward(-10, 150);
 
 		if(slave_connection.requestUntouch()) {
@@ -415,8 +420,8 @@ public class DinaBOTMaster implements MechConstants {
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
 	//	dinaBOTmaster.goFetch(40);
-		//dinaBOTmaster.tapTest();
-		dinaBOTmaster.profDemo();
+		dinaBOTmaster.tapTest();
+		//dinaBOTmaster.profDemo();
 		
 		while(true); //Never quit
 	}
