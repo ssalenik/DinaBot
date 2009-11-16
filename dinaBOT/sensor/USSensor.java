@@ -10,7 +10,8 @@ public class USSensor implements Runnable {
 	public static USSensor low_sensor = new USSensor(SensorPort.S1, Position.LOW);
 	
 	UltrasonicSensor sensor;
-	USSensorListener listener;
+	USSensorListener[] listeners;
+	int listeners_pointer;
 	
 	Thread us_sensor_thread;
 	boolean running;
@@ -20,6 +21,9 @@ public class USSensor implements Runnable {
 	
 	public USSensor(SensorPort port, Position position) {
 		sensor = new UltrasonicSensor(port);
+		
+		listeners = new UltrasonicSensor[3];
+		listeners_pointer = 0;
 		
 		latest_values = new int[8];
 		this.position = position;
@@ -37,16 +41,19 @@ public class USSensor implements Runnable {
 				
 			}
 			sensor.getDistances(latest_values);
-			notifyListener();
+			notifyListeners();
 		}
 	}
 	
-	void notifyListener() {
-		listener.newValues(latest_values, position);
+	void notifyListeners() {
+		for(int i = 0;i < listeners.length;i++) {
+			listeners[i].newValues(latest_values, position);
+		}
 	}
 	
 	public void registerListener(USSensorListener listener) {
-		this.listener = listener;
+		this.listeners[listeners_pointer%listeners.length] = listener;
+		listeners_pointer++;
 	}
 	
 	public void start() {

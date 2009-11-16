@@ -27,4 +27,10 @@ public interface Navigation {
 	*/
 	public void interrupt();
 
+	/**
+	 * 
+	 *
+	 *
+	*/
+	public void softInterrupt(int x, int y);
 }

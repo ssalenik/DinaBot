@@ -159,7 +159,7 @@ public class Map implements MechConstants, USSensorListener {
 		}
 	}
 	
-	//NEEDS TO BE SYNCHRONISED!!!
+	//Do not pass reference
 	public boolean editMap(int x, int y, int value) {
 		this.map[x][y] = value;
 		

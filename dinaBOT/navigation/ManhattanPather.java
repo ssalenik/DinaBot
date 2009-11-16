@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * @see Map
  * @version 1
  */
-public class ManhattanPather implements Pathing, MechConstants{
+public class ManhattanPather implements Pathing, MechConstants {
 	Map mapper;
 	Movement movement;
 	
