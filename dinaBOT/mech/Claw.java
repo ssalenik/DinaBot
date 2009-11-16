@@ -28,7 +28,7 @@ public class Claw {
 	/**	
 	 * Opens the claw by the specified angle
 	 * 
-	 * @param angle angle by which the claw should open/drop
+	 * @param angle angle by which the claw should open
 	 * 
 	 */
 	public void open(int angle){
