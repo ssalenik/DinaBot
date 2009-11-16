@@ -106,13 +106,15 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		
 		//Duplicate angle if either is missed
 		//But make sure it definitely is a pallet by checking the second data column
-		phase = 3;
+		phase = 0;
 		if (angleA == 0 && angleB != 0) {
-			mover.turnTo(angleB, TURN_SPEED);
 			missedAngle = 'A';
+			mover.turnTo(angleB, TURN_SPEED);
+			phase = 3;
 		} else if (angleA != 0 && angleB == 0) {
-			mover.turnTo(angleA, TURN_SPEED);
 			missedAngle = 'B';
+			mover.turnTo(angleA, TURN_SPEED);
+			phase = 3;
 		}
 		
 		//To the bisecting angle !
