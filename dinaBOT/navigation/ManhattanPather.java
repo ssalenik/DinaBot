@@ -57,7 +57,6 @@ public class ManhattanPather implements Pathing, MechConstants{
 	 * @return a 2D array of the nodes of the shortest path in order from start to destination (not including the start node)
 	*/	
 	public double[][] generatePath(double x1, double y1, double heading, double x2, double y2) {
-		int rez;
 		double nodeDist;
 		Astar pather;
 		int[] start, end;
@@ -129,19 +128,23 @@ public class ManhattanPather implements Pathing, MechConstants{
 	
 	private void updateMap(Astar pather) {
 		int[][] map;
-		int rez;
+		int i = 0, j = 0;
 		
 		map = mapper.getMap();
-		rez = mapper.getRez();
 		
-		for(int i = 0; i < rez; i++) {
-			for(int j = 0; j < rez; j++) {
+		try {
+		for(i = 0; i < rez; i++) {
+			for(j = 0; j < rez; j++) {
 				if(map[i][j] != 0) {
 					pather.addObstacle(new int[] {i, j}, 2);
 				}
 			}
 		}
+		} catch (Exception e) {
+			LCD.drawString("out of bounds: " + i + "," + j, 0, 0);
+		}
 		
 	}
+	
 	
 }
