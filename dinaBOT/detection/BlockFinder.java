@@ -83,7 +83,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	 *during search (in radians).
 	 *
 	 */
-	public boolean sweep(double blockAngle, int phase) {
+	public boolean sweep(double blockAngle) {
 
 		double initialOrientation = odometer.getPosition()[2];
 		LeftWheel.setSpeed(TURN_SPEED);
