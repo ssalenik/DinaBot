@@ -12,7 +12,7 @@ public interface MechConstants {
 	static final double WHEEL_RADIUS = 2.659;
 
 	//The distance from on wheel to the other
-//	static final double WHEEL_BASE = 12.7435;
+	//static final double WHEEL_BASE = 12.7435;
 	static final double WHEEL_BASE = 13.1;
 
 	//The distance from one light sensor to another 
@@ -20,10 +20,17 @@ public interface MechConstants {
 	static final double LIGHT_SENSOR_BASE = 16;
 	static final double LIGHT_SENSOR_OFFSET = 1;
 	
-	//The distance from a block to the center of the robot (in cm)
-	static final double BLOCK_DISTANCE = 12; //This is an approximation since the robot might not have the block exactly at this distance each time.
+	//The distance from the sensor to the center of the cage (in cm)
+	static final double BLOCK_DISTANCE = 9; 
 	
 	//The size of one tile on the course
 	static double UNIT_TILE = 30.48;
-
+	
+	
+	//SPEEDS
+	
+	static final int SPEED_ROTATE = 60;
+	static final int SPEED_SLOW = 75;
+	static final int SPEED_MED = 150;
+	static final int SPEED_FAST = 225;
 }
