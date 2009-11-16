@@ -70,6 +70,8 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		this.mover = mover;
 		lowUS.registerListener(this);
 		highUS.registerListener(this);
+		low_Readings = new int[8];
+		high_Readings = new int[8];
 	}
 
 	/**
