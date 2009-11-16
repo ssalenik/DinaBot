@@ -272,28 +272,76 @@ public class DinaBOTMaster implements MechConstants {
 	
 	}
 	
-	// stepan's pathing test  WIP!!1
+	// stepan's pathing and mapping test  WORKS!!
 	public void pathTest() {
-		Map mapper = new Map(12);
+		Map mapper = new Map(odometer, 12, 45, UNIT_TILE);
 		Pathing pather = new ManhattanPather(mapper, movement);
 		double[][] path;
 		double[] position;
-		
+				
 		odometer.enableSnapping(true);
 		odometer.setDebug(true);
 		
-		position = odometer.getPosition();
+		//Pause so the user can remove his hand from the robot
+		try {
+			Thread.sleep(1000);
+		} catch(Exception e) {
 		
+		}
 		
-		path = pather.generatePath(0.0, 0.0, 0, 2*UNIT_TILE, 2*UNIT_TILE);
+		//position = odometer.getPosition();
+		
+		//obstacles
+		/*
+		mapper.editMap(2, 0, 2);
+		mapper.editMap(2, 1, 2);
+		mapper.editMap(3, 0, 2);
+		mapper.editMap(3, 1, 2);
+		
+		path = pather.generatePath(0.0, 0.0, 0, 3*UNIT_TILE, 3*UNIT_TILE);
 		
 		if( path != null) {
 			for(int i = 0; i < path.length; i++) {
 				movement.goTo(path[i][0], path[i][1], 150);
 			}
 		}
+		* */
 		
-			
+		// go to 6,0
+		double[] end = new double[] {5*UNIT_TILE, 5*UNIT_TILE};
+		
+		position = odometer.getPosition();
+		
+		path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
+		
+		if( path != null) {
+			for(int i = 0; i < path.length; i++) {
+				if( mapper.obstacleCheck() ) {
+					position = odometer.getPosition();
+					path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
+					i = 0;
+				}
+				movement.goTo(path[i][0], path[i][1], 150);
+			}
+		}
+		
+		// go back to 0,0
+		end =  new double[] {0*UNIT_TILE, 0*UNIT_TILE};
+		
+		position = odometer.getPosition();
+		
+		path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
+		
+		if( path != null) {
+			for(int i = 0; i < path.length; i++) {
+				if( mapper.obstacleCheck() ) {
+					position = odometer.getPosition();
+					path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
+					i = 0;
+				}
+				movement.goTo(path[i][0], path[i][1], 150);
+			}
+		}	
 	}
 		
 	/**
