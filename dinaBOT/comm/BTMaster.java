@@ -107,16 +107,16 @@ public class BTMaster implements CommConstants{
 	}
 	
 	/**
-	 * Sends the signal for request tap to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 * Sends the signal for request touch to the slave brick and waits for a success or failure signal from it. It then returns that signal.
 	 *
 	 * @return Returns true if the tap succeeded and false if it didn't. 
 	 */
-	public boolean requestTap() {
+	public boolean requestTouch() {
 		
 		boolean success = false;
 		
 		try{
-			dataOut.writeByte(TAP);
+			dataOut.writeByte(TOUCH);
 			dataOut.flush();
 			success = dataIn.readBoolean();
 		}
@@ -127,6 +127,29 @@ public class BTMaster implements CommConstants{
 		
 		return success;
 	}
+	
+	/**
+	 * Sends the signal for request untouch to the slave brick and waits for a success or failure signal from it. It then returns that signal.
+	 *
+	 * @return Returns true if the tap succeeded and false if it didn't. 
+	 */
+	public boolean requestUntouch() {
+		
+		boolean success = false;
+		
+		try{
+			dataOut.writeByte(UNTOUCH);
+			dataOut.flush();
+			success = dataIn.readBoolean();
+		}
+		catch(IOException ioe) {
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
+		}
+		
+		return success;
+	}
+	
 	
 	/**
 	 * Sends the signal for open cage to the slave brick and waits for a success or failure signal from it. It then returns that signal.

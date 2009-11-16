@@ -70,8 +70,12 @@ public class DinaBOTSlave implements CommConstants{
 						success = stacker.getDockStatus();
 						break;
 					
-					case TAP:
-						success = stacker.tap();
+					case TOUCH:
+						success = stacker.touch();
+						break;
+						
+					case UNTOUCH:
+						success = stacker.untouch();
 						break;
 						
 					case DISCONNECT:

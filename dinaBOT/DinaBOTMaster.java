@@ -182,9 +182,11 @@ public class DinaBOTMaster implements MechConstants {
 		tapTest();
 		
 		double [] startOdo = {0,0,0};
-		boolean [] boolOdo = {false,false,false};
+		boolean [] boolOdo = {true,true,true};
 
 		odometer.setPosition(startOdo, boolOdo);
+		
+		Button.waitForPress();
 
 		movement.goTo((double)offsetX, (double)offsetY, 75);				
 		
@@ -226,15 +228,22 @@ public class DinaBOTMaster implements MechConstants {
 		movement.turn(75, 70);
 		movement.turn(-150, 70);
 		//movement.turn(75, 70);
-		if(slave_connection.requestTap()) {
+		if(slave_connection.requestTouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
+		
+		if(slave_connection.requestUntouch()) {
+			LCD.clear();
+			LCD.drawString("Success ...", 0, 0);
+		}
+		
 		movement.goForward(4, 200);
-		if(slave_connection.requestTap()) {
+		if(slave_connection.requestTouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
+		
 		movement.goForward(2, 200);
 		if(slave_connection.requestPickup()) {
 			LCD.clear();
