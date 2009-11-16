@@ -62,8 +62,8 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		this.mover = mover;
 		lowUS.registerListener(this);
 		highUS.registerListener(this);
-		low_Readings = new int[8];
-		high_Readings = new int[8];
+		low_Readings = new int[]{255,255,255,255,255,255,255,255};
+		high_Readings = new int[]{255,255,255,255,255,255,255,255};
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		mover.turnTo(blockAngle+SWEEP_ARC/2, SPEED_ROTATE);
 		
 		//Clockwise sweep
-		phase =1;
+		phase = 1;
 		mover.turn(-SWEEP_ARC, SPEED_ROTATE, false);
 		
 		//Counter-clockwise sweep
@@ -202,7 +202,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				
 			
 			case 3:
-				//Get missing angle
+				/*//Get missing angle
 				if (position == USSensorListener.Position.LOW) {
 					this.low_Readings = new_values;
 					if (data_acquired) {
@@ -219,7 +219,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 						}
 						data_acquired = true;
 					}
-				}
+				}*/
 								
 				break;
 			}
