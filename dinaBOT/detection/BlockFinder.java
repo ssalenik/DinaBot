@@ -28,7 +28,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	/**
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
-	public final double SWEEP_ARC = Math.PI/2;
+	public final double SWEEP_ARC = 7*Math.PI/8;
 
 	/**
 	 * Minimum difference allowed between high and low sensor values to assume both are seeing the same object.
