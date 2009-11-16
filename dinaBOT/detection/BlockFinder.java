@@ -10,7 +10,7 @@ import dinaBOT.sensor.*;
  * 
  * @author Vinh Phong Buu
  */
-public class BlockFinder implements USSensorListener{
+public class BlockFinder implements USSensorListener, MechConstants{
 
 	//Robot Constants
 	private Odometer odometer;
@@ -20,16 +20,6 @@ public class BlockFinder implements USSensorListener{
 	protected USSensor lowUS = USSensor.low_sensor;
 	protected USSensor highUS = USSensor.high_sensor;
 
-	/**
-	 * Radius of a robot wheel = {@value}
-	 * @see MechConstants#WHEEL_RADIUS
-	 */
-	public final double WHEEL_RADIUS = MechConstants.WHEEL_RADIUS;
-	/**
-	 * Wheel base of the robot = {@value}
-	 * @see MechConstants#WHEEL_BASE
-	 */
-	public final double BOT_BASE = MechConstants.WHEEL_BASE;
 	/**
 	 * Speed used when turning = {@value}
 	 */
@@ -47,11 +37,11 @@ public class BlockFinder implements USSensorListener{
 	 * Size in degrees of the arc the robot should sweep = {@value}
 	 */
 	public final double SWEEP_ARC = Math.PI/2;
-	
+
 	/**
 	 * Minimum difference allowed between high and low sensor values to assume both are seeing the same object.
 	 */
-	public final int BANDWIDTH = 7;
+	public final int DETECTION_THRESHOLD = 7;
 
 	//Fields
 	double angleA;
@@ -63,9 +53,9 @@ public class BlockFinder implements USSensorListener{
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
 	 */
-	public BlockFinder(Odometer odometer) {
+	public BlockFinder(Odometer odometer, BasicMovement mover) {
 		this.odometer = odometer;
-		this.mover = new BasicMovement (odometer, LeftWheel, RightWheel);
+		this.mover = mover;
 		lowUS.registerListener(this);
 		highUS.registerListener(this);
 	}
@@ -104,55 +94,65 @@ public class BlockFinder implements USSensorListener{
 			minHigh = high_Readings[0];
 
 			if(minLow < MAX_BLOCK_DISTANCE 
-					&& Math.abs(minLow - minHigh) > BANDWIDTH
-					&& minLow < blockDistance_A) {
+					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+					&& minLow < blockDistance_A
+					&& low_Readings[1] < 100) {
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
 				Sound.twoBeeps();
+				LCD.drawInt(minLow, 0, 0);
+				LCD.drawInt(minHigh, 0, 2);
+				LCD.drawInt(low_Readings[1], 0, 1);
 			}
 		}
 
 		//Look right to left
 		//or later, Try find sum of consecutive "short" distances in the right
 		//+ region where short distances are seen
-		
+
 		mover.turn(SWEEP_ARC, TURN_SPEED, true);
 		while (mover.isMoving()) {
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 
 			if( minLow < MAX_BLOCK_DISTANCE 
-					&& Math.abs(minLow - minHigh) > BANDWIDTH
-					&& minLow < blockDistance_B) {
+					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+					&& minLow < blockDistance_B
+					&& low_Readings[1] < 100) {
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
 				Sound.twoBeeps();
+				LCD.drawInt(minLow, 0, 3);
+				LCD.drawInt(minHigh, 0, 5);
+				LCD.drawInt(low_Readings[1], 0, 4);
 			}
 
 		}
 
 		//Duplicate angle if either is missed
-		//But make sure it definitely is a pallet
-		
+		//But make sure it definitely is a pallet by checking the second data column
+
 		if (angleA == 0 && angleB != 0) {
 			mover.turnTo(angleB, TURN_SPEED);
 			while(mover.isMoving());
-			if (Math.abs(low_Readings[0]-high_Readings[0]) > BANDWIDTH ) {
+			if (Math.abs(low_Readings[0]-high_Readings[0]) > DETECTION_THRESHOLD
+					&& low_Readings[1] < 100){
 				angleA = angleB;
 				blockDistance_A = blockDistance_B;
 			}
 		} else if (angleA != 0 && angleB == 0) {
 			mover.turnTo(angleA, TURN_SPEED);
 			while(mover.isMoving());
-			if (Math.abs(low_Readings[0] - high_Readings[0]) > BANDWIDTH) {
+			if (Math.abs(low_Readings[0] - high_Readings[0]) > DETECTION_THRESHOLD
+					&& low_Readings[1] < 100) {
 				angleB = angleA;
 				blockDistance_B = blockDistance_A;
 			}
 		}
-		
-		
+
+
 		//To the bisecting angle !
 		//IF the same pallet was seen in both cases
 		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
