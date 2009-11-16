@@ -59,7 +59,8 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	int blockDistance_B = 255;
 	int minLow =0;
 	int minHigh=0;
-
+	int missedAngle;
+	
 	/**
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
@@ -106,10 +107,11 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		phase = 3;
 		if (angleA == 0 && angleB != 0) {
 			mover.turnTo(angleB, TURN_SPEED);
+			missedAngle = 'A';
 		} else if (angleA != 0 && angleB == 0) {
 			mover.turnTo(angleA, TURN_SPEED);
+			missedAngle = 'B';
 		}
-		
 		
 		//To the bisecting angle !
 		// or back to start in case of FAIL
@@ -124,30 +126,6 @@ public class BlockFinder implements USSensorListener, MechConstants{
 			return false;
 		}
 		
-		
-		//FOR NOW, DISABLED
-		/*
-		//Duplicate angle if either is missed
-		//But make sure it definitely is a pallet by checking the second data column
-
-		if (angleA == 0 && angleB != 0) {
-			mover.turnTo(angleB, TURN_SPEED);
-			while(mover.isMoving());
-			if (Math.abs(low_Readings[0]-high_Readings[0]) > DETECTION_THRESHOLD
-					&& low_Readings[1] < 100){
-				angleA = angleB;
-				blockDistance_A = blockDistance_B;
-			}
-		} 
-			while(mover.isMoving());
-			if (Math.abs(low_Readings[0] - high_Readings[0]) > DETECTION_THRESHOLD
-					&& low_Readings[1] < 100) {
-				angleB = angleA;
-				blockDistance_B = blockDistance_A;
-			}
-		}
-		*/
-
 	}
 
 	public void findEdgeA() {
@@ -191,6 +169,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				break;
 			
 			case 1:
+				//Latching A
 				if (position == USSensorListener.Position.LOW) {
 					this.low_Readings = new_values;
 					if (data_acquired) {
@@ -211,6 +190,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				break;
 
 			case 2:
+				//Latching B
 				if (position == USSensorListener.Position.LOW) {
 					this.low_Readings = new_values;
 					if (data_acquired) {
@@ -228,6 +208,32 @@ public class BlockFinder implements USSensorListener, MechConstants{
 					minHigh = high_Readings[0];
 					findEdgeB();
 				}
+				break;
+				
+			
+			case 3:
+				//Get missing angle
+				if (position == USSensorListener.Position.LOW) {
+					this.low_Readings = new_values;
+					if (data_acquired) {
+						data_acquired = false;
+					}
+				} else if (position == USSensorListener.Position.HIGH) {
+					this.high_Readings = new_values;
+					if (!data_acquired) {
+						data_acquired = true;
+					}
+				}
+				
+				if (data_acquired) {
+					if (missedAngle == 'A') {
+						findEdgeA();
+					}
+					if (missedAngle == 'B') {
+						findEdgeB();
+					}
+				}
+				
 				break;
 			}
 
