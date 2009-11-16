@@ -222,30 +222,32 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void tapTest(){
 		
-		slave_connection.connect();
+		movement.goForward(10, 150);
+		movement.turn(60, 70);
+		movement.turn(-120, 70);
 		
-		movement.goForward(10, 200);
-		movement.turn(75, 70);
-		movement.turn(-150, 70);
-		//movement.turn(75, 70);
+		try {Thread.sleep(500);} catch(Exception e) {}
+		
 		if(slave_connection.requestTouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
-		}
+		}		
+		movement.turn(60, 70);
+		movement.goForward(-10, 150);
 		
 		if(slave_connection.requestUntouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
+		movement.goForward(10, 150);
 		
-		movement.goForward(4, 200);
 		if(slave_connection.requestTouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
-		
-		movement.goForward(2, 200);
-		if(slave_connection.requestPickup()) {
+		movement.goForward(-10, 150);
+
+		if(slave_connection.requestUntouch()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
