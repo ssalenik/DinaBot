@@ -13,16 +13,19 @@ public class Stacker implements Stacking {
 
 	Motor leftGate;
 	Motor rightGate;
-	Claw claw;
+	Motor claw;
 	
 	//in degrees
-	final int clawOpenAngle = 30;
-	final int clawClosedAngle = 17;
+	final int clawOpenAngle = 0;
+	final int clawStraightAngle = 50;
+	final int clawClosedAngle = 80;
+	final int clawTopAngle = 230;
 	
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;
 
 	final int gateSpeed = 175;
+	final int clawSpeed = 175;	
 	
 	int brickCount = 0;
 
@@ -33,10 +36,10 @@ public class Stacker implements Stacking {
 	 * @param rightGate motor corresponding to right gate
 	 * @param claw motor corresponding to claw
 	 */
-	public Stacker(Motor leftGate, Motor rightGate, Motor clawMotor){
+	public Stacker(Motor leftGate, Motor rightGate, Motor claw){
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
-		this.claw = new Claw(clawMotor);
+		this.claw = claw;
 	}
 	
 	/**	
@@ -48,6 +51,7 @@ public class Stacker implements Stacking {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
+		claw.setSpeed(clawSpeed);
 
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
@@ -57,13 +61,12 @@ public class Stacker implements Stacking {
 			rightGate.rotate(gatesPickUpRotation/(brickCount+1));
 		}
 		
-		claw.close(clawOpenAngle);
-		claw.lift(190);
+		claw.rotateTo(clawTopAngle);
 		claw.stop();
 
 		try {Thread.sleep(1000);} catch(Exception e) {} 
 
-		claw.reset();
+		claw.rotateTo(clawOpenAngle);
 		claw.flt();
 
 		if(brickCount < 2) {
@@ -84,12 +87,9 @@ public class Stacker implements Stacking {
 	 */
 	public boolean touch() {
 		
-		claw.reset();
-
-		claw.close(clawOpenAngle);
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawStraightAngle);
 		claw.stop();
-		
-		try {Thread.sleep(500);} catch(Exception e) {}
 		
 		return true;
 		
@@ -103,10 +103,9 @@ public class Stacker implements Stacking {
 	 */
 	public boolean untouch() {
 		
-		claw.reset();
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawOpenAngle);
 		claw.flt();
-		
-		try {Thread.sleep(500);} catch(Exception e) {}
 		
 		return true;
 		
