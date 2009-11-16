@@ -21,14 +21,6 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	protected USSensor highUS = USSensor.high_sensor;
 
 	/**
-	 * Speed used when turning = {@value}
-	 */
-	public final int TURN_SPEED = 50;
-	/**
-	 * Speed used when moving linearly = {@value}
-	 */
-	public final int MOVE_SPEED = 120;
-	/**
 	 * Maximum distance at which a block may be located in order to be detected = {@value}
 	 */
 	public final int MAX_BLOCK_DISTANCE = 50;
@@ -88,32 +80,30 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	public boolean sweep(double blockAngle) {
 
 		double initialOrientation = odometer.getPosition()[2];
-		LeftWheel.setSpeed(TURN_SPEED);
-		RightWheel.setSpeed(TURN_SPEED);
 		angleA = initialOrientation;
 		angleB = initialOrientation;
 
 		//Turn to the direction where the block was first seen
-		mover.turnTo(blockAngle+SWEEP_ARC/2, TURN_SPEED);
+		mover.turnTo(blockAngle+SWEEP_ARC/2, SPEED_ROTATE);
 		
 		//Clockwise sweep
 		phase =1;
-		mover.turn(-SWEEP_ARC, TURN_SPEED, false);
+		mover.turn(-SWEEP_ARC, SPEED_ROTATE, false);
 		
 		//Counter-clockwise sweep
 		phase = 2;
-		mover.turn(SWEEP_ARC, TURN_SPEED, false);
+		mover.turn(SWEEP_ARC, SPEED_ROTATE, false);
 		
 		//Duplicate angle if either is missed
 		//But make sure it definitely is a pallet by checking the second data column
 		phase = 0;
-		if (angleA == 0 && angleB != 0) {
+		if (angleA == 0) {
 			missedAngle = 'A';
-			mover.turnTo(angleB, TURN_SPEED);
+			mover.turnTo(angleB, SPEED_ROTATE);
 			phase = 3;
-		} else if (angleA != 0 && angleB == 0) {
+		} else if (angleB == 0) {
 			missedAngle = 'B';
-			mover.turnTo(angleA, TURN_SPEED);
+			mover.turnTo(angleA, SPEED_ROTATE);
 			phase = 3;
 		}
 		
@@ -121,12 +111,12 @@ public class BlockFinder implements USSensorListener, MechConstants{
 		// or back to start in case of FAIL
 		phase = 0;
 		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
-			mover.turnTo((angleA+angleB)/2, TURN_SPEED);
-			mover.goForward( (blockDistance_A+blockDistance_B)/2, MOVE_SPEED);
+			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
+			mover.goForward( (blockDistance_A+blockDistance_B)/2, SPEED_MED);
 			return true;
 		} else {
 			//Fail-safe technique for now.
-			mover.turnTo(initialOrientation, TURN_SPEED);
+			mover.turnTo(initialOrientation, SPEED_ROTATE);
 			return false;
 		}
 		
@@ -182,15 +172,13 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				} else if (position == USSensorListener.Position.HIGH) {
 					this.high_Readings = new_values;
 					if (!data_acquired) {
+						minLow = low_Readings[0];
+						minHigh = high_Readings[0];
+						findEdgeA();
 						data_acquired = true;
 					}
 				}
 				
-				if (data_acquired) {
-					minLow = low_Readings[0];
-					minHigh = high_Readings[0];
-					findEdgeA();
-				}
 				break;
 
 			case 2:
@@ -203,15 +191,13 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				} else if (position == USSensorListener.Position.HIGH) {
 					this.high_Readings = new_values;
 					if (!data_acquired) {
+						minLow = low_Readings[0];
+						minHigh = high_Readings[0];
+						findEdgeB();
 						data_acquired = true;
 					}
 				}
 				
-				if (data_acquired) {
-					minLow = low_Readings[0];
-					minHigh = high_Readings[0];
-					findEdgeB();
-				}
 				break;
 				
 			
@@ -225,19 +211,16 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				} else if (position == USSensorListener.Position.HIGH) {
 					this.high_Readings = new_values;
 					if (!data_acquired) {
+						if (missedAngle == 'A') {
+							findEdgeA();
+						}
+						if (missedAngle == 'B') {
+							findEdgeB();
+						}
 						data_acquired = true;
 					}
 				}
-				
-				if (data_acquired) {
-					if (missedAngle == 'A') {
-						findEdgeA();
-					}
-					if (missedAngle == 'B') {
-						findEdgeB();
-					}
-				}
-				
+								
 				break;
 			}
 
