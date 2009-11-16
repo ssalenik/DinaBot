@@ -49,6 +49,17 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	int[] low_Readings;
 	int[] high_Readings;
 
+	//True when data sets for low & high are acquired
+	boolean data_acquired = false;
+
+	//Current phase of operation
+	int phase =0;
+
+	int blockDistance_A = 255;
+	int blockDistance_B = 255;
+	int minLow =0;
+	int minHigh=0;
+
 	/**
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
@@ -71,27 +82,75 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	 *during search (in radians).
 	 *
 	 */
-	public boolean sweep(double blockAngle) {
+	public boolean sweep(double blockAngle, int phase) {
 
 		double initialOrientation = odometer.getPosition()[2];
 		LeftWheel.setSpeed(TURN_SPEED);
 		RightWheel.setSpeed(TURN_SPEED);
 		angleA = initialOrientation;
 		angleB = initialOrientation;
-		int blockDistance_A = 255;
-		int blockDistance_B = 255;
-		int minLow, minHigh;
 
 		//Turn to the direction where the block was first seen
 		mover.turnTo(blockAngle+SWEEP_ARC/2, TURN_SPEED);
-		//Button.waitForPress();
+		
+		//Clockwise sweep
+		phase =1;
+		mover.turn(-SWEEP_ARC, TURN_SPEED, false);
+		
+		//Counter-clockwise sweep
+		phase = 2;
+		mover.turn(SWEEP_ARC, TURN_SPEED, false);
+		
+		//Duplicate angle if either is missed
+		//But make sure it definitely is a pallet by checking the second data column
+		phase = 3;
+		if (angleA == 0 && angleB != 0) {
+			mover.turnTo(angleB, TURN_SPEED);
+		} else if (angleA != 0 && angleB == 0) {
+			mover.turnTo(angleA, TURN_SPEED);
+		}
+		
+		
+		//To the bisecting angle !
+		// or back to start in case of FAIL
+		phase = 0;
+		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
+			mover.turnTo((angleA+angleB)/2, TURN_SPEED);
+			mover.goForward( (blockDistance_A+blockDistance_B)/2, MOVE_SPEED);
+			return true;
+		} else {
+			//Fail-safe technique for now.
+			mover.turnTo(initialOrientation, TURN_SPEED);
+			return false;
+		}
+		
+		
+		//FOR NOW, DISABLED
+		/*
+		//Duplicate angle if either is missed
+		//But make sure it definitely is a pallet by checking the second data column
 
-		//Look left to right
-		//Or try later: find sum of convsecutive "short" distances in the left
-		mover.turn(-SWEEP_ARC, TURN_SPEED, true);
-		while (mover.isMoving()) {
-			minLow = low_Readings[0];
-			minHigh = high_Readings[0];
+		if (angleA == 0 && angleB != 0) {
+			mover.turnTo(angleB, TURN_SPEED);
+			while(mover.isMoving());
+			if (Math.abs(low_Readings[0]-high_Readings[0]) > DETECTION_THRESHOLD
+					&& low_Readings[1] < 100){
+				angleA = angleB;
+				blockDistance_A = blockDistance_B;
+			}
+		} 
+			while(mover.isMoving());
+			if (Math.abs(low_Readings[0] - high_Readings[0]) > DETECTION_THRESHOLD
+					&& low_Readings[1] < 100) {
+				angleB = angleA;
+				blockDistance_B = blockDistance_A;
+			}
+		}
+		*/
+
+	}
+
+	public void findEdgeA() {
 
 			if(minLow < MAX_BLOCK_DISTANCE 
 					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
@@ -105,17 +164,10 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				LCD.drawInt(minHigh, 0, 2);
 				LCD.drawInt(low_Readings[1], 0, 1);
 			}
-		}
-
-		//Look right to left
-		//or later, Try find sum of consecutive "short" distances in the right
-		//+ region where short distances are seen
-
-		mover.turn(SWEEP_ARC, TURN_SPEED, true);
-		while (mover.isMoving()) {
-			minLow = low_Readings[0];
-			minHigh = high_Readings[0];
-
+	}
+				
+	public void	findEdgeB() {
+		
 			if( minLow < MAX_BLOCK_DISTANCE 
 					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 					&& minLow < blockDistance_B
@@ -128,51 +180,63 @@ public class BlockFinder implements USSensorListener, MechConstants{
 				LCD.drawInt(minHigh, 0, 5);
 				LCD.drawInt(low_Readings[1], 0, 4);
 			}
-
 		}
 
-		//Duplicate angle if either is missed
-		//But make sure it definitely is a pallet by checking the second data column
-
-		if (angleA == 0 && angleB != 0) {
-			mover.turnTo(angleB, TURN_SPEED);
-			while(mover.isMoving());
-			if (Math.abs(low_Readings[0]-high_Readings[0]) > DETECTION_THRESHOLD
-					&& low_Readings[1] < 100){
-				angleA = angleB;
-				blockDistance_A = blockDistance_B;
-			}
-		} else if (angleA != 0 && angleB == 0) {
-			mover.turnTo(angleA, TURN_SPEED);
-			while(mover.isMoving());
-			if (Math.abs(low_Readings[0] - high_Readings[0]) > DETECTION_THRESHOLD
-					&& low_Readings[1] < 100) {
-				angleB = angleA;
-				blockDistance_B = blockDistance_A;
-			}
-		}
-
-
-		//To the bisecting angle !
-		//IF the same pallet was seen in both cases
-		if (Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
-			mover.turnTo((angleA+angleB)/2, TURN_SPEED);
-			mover.goForward( (blockDistance_A+blockDistance_B)/2, MOVE_SPEED);
-			return true;
-		} else {
-			//Fail-safe technique for now.
-			mover.turnTo(initialOrientation, TURN_SPEED);
-			return false;
-		}
-
-	}
 
 	public void newValues(int[] new_values, Position position) {
-		if (position == USSensorListener.Position.LOW) {
-			this.low_Readings = new_values;
-		} else if (position == USSensorListener.Position.HIGH) {
-			this.high_Readings = new_values;
-		}
+
+			switch (phase) {
+			case 0:
+				//Do nothing
+				break;
+			
+			case 1:
+				if (position == USSensorListener.Position.LOW) {
+					this.low_Readings = new_values;
+					if (data_acquired) {
+						data_acquired = false;
+					}
+				} else if (position == USSensorListener.Position.HIGH) {
+					this.high_Readings = new_values;
+					if (!data_acquired) {
+						data_acquired = true;
+					}
+				}
+				
+				if (data_acquired) {
+					minLow = low_Readings[0];
+					minHigh = high_Readings[0];
+					findEdgeA();
+				}
+				break;
+
+			case 2:
+				if (position == USSensorListener.Position.LOW) {
+					this.low_Readings = new_values;
+					if (data_acquired) {
+						data_acquired = false;
+					}
+				} else if (position == USSensorListener.Position.HIGH) {
+					this.high_Readings = new_values;
+					if (!data_acquired) {
+						data_acquired = true;
+					}
+				}
+				
+				if (data_acquired) {
+					minLow = low_Readings[0];
+					minHigh = high_Readings[0];
+					findEdgeB();
+				}
+				break;
+			}
+
+			
+			
+			
+			
+
+		
 	}
 
 
