@@ -14,7 +14,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 
 	//Robot Constants
 	private Odometer odometer;
-	private BasicMovement mover;
+	private Movement mover;
 	public static Motor LeftWheel = Motor.A;
 	public static Motor RightWheel = Motor.B;
 	protected USSensor lowUS = USSensor.low_sensor;
@@ -53,7 +53,7 @@ public class BlockFinder implements USSensorListener, MechConstants{
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
 	 */
-	public BlockFinder(Odometer odometer, BasicMovement mover) {
+	public BlockFinder(Odometer odometer, Movement mover) {
 		this.odometer = odometer;
 		this.mover = mover;
 		lowUS.registerListener(this);

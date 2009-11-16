@@ -74,15 +74,16 @@ public class DinaBOTMaster implements MechConstants {
 	 */	
 	public void profDemo() {
 		
-		int newX=0, newY=0;
+		double newX=0, newY=0;
 		int TURN_SPEED = 50;
+		int TAP_DISTANCE = 10;
 		double[] foundBlockPos;
 		double SWEEP_OFFSET = Math.PI/2;
 		boolean foundBlock = false;
 		int offsetX = 0, offsetY = 0;
 		boolean enterPressed = false;
 		
-		BlockFinder blockFind = new BlockFinder(odometer);
+		BlockFinder blockFind = new BlockFinder(odometer, movement);
 		
 		LCD.clear();
 		//Keep trying to connect
@@ -167,16 +168,50 @@ public class DinaBOTMaster implements MechConstants {
 		
 		/* Here is where the position of the pellet and the future position of the pellet are calculated
 		 */
-		foundBlockPos = odometer.getPosition();
-		double blockAngle = foundBlockPos[2];
-		// Not sure if this is sin or cos, it depends if the starting orientation of the robot is on the x-axis or the y-axis
-		newX = (MechConstants.BLOCK_DISTANCE* Math.sin(blockAngle)) + offsetX;
-		newY = (MechConstants.BLOCK_DISTANCE* Math.cos(blockAngle)) + offsetY;
 		
-		Math.atan(newX/newY);
+		/*slave_connection.requestTap();
+		
+		movement.rotate(true, 100);
+
+		movement.goForward(MechConstants.BLOCK_DISTANCE, 150);
+		
+		slave_connection.requestTap();
+
+		slave_connection.requestPickup();*/
+		
+		tapTest();
+		
+		double [] startOdo = {0,0,0};
+		boolean [] boolOdo = {false,false,false};
+
+		odometer.setPosition(startOdo, boolOdo);
+
+		movement.goTo((double)offsetX, (double)offsetY, 75);				
+		
+		slave_connection.openCage();
+		
+		movement.goForward(30, 75);
+		
+		slave_connection.closeCage();
+		
+		/*
+		newX = (( TAP_DISTANCE + TAP_DISTANCE + MechConstants.BLOCK_DISTANCE) * Math.sin(blockAngle)) + offsetX;
+		newY = (( TAP_DISTANCE + TAP_DISTANCE + MechConstants.BLOCK_DISTANCE) * Math.cos(blockAngle)) + offsetY;
+		
+		double newDistance = Math.sqrt( ( newX * newX ) + (newY * newY) );
 		
 		slave_connection.requestTap();
 		
+		movement.goForward(TAP_DISTANCE, 150);
+		
+		slave_connection.requestPickup();
+		
+		movement.turnTo( Math.atan(newX/newY), TURN_SPEED );
+		
+		movement.goForward(newDistance, 50);
+		
+		slave_connection.openCage();*/
+	
 	}
 	
 	/**
@@ -185,22 +220,27 @@ public class DinaBOTMaster implements MechConstants {
 	 */
 	public void tapTest(){
 		
+		slave_connection.connect();
+		
 		movement.goForward(10, 200);
-		movement.turnTo(50, 70);
+		movement.turn(75, 70);
+		movement.turn(-150, 70);
+		//movement.turn(75, 70);
 		if(slave_connection.requestTap()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
-		movement.goForward(10, 200);
+		movement.goForward(4, 200);
 		if(slave_connection.requestTap()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
-		movement.goForward(5, 200);
-		if(slave_connection.requestTap()) {
+		movement.goForward(2, 200);
+		if(slave_connection.requestPickup()) {
 			LCD.clear();
 			LCD.drawString("Success ...", 0, 0);
 		}
+		
 	}
 	
 	/**
@@ -364,6 +404,7 @@ public class DinaBOTMaster implements MechConstants {
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
 	//	dinaBOTmaster.goFetch(40);
+		//dinaBOTmaster.tapTest();
 		dinaBOTmaster.profDemo();
 		
 		while(true); //Never quit
