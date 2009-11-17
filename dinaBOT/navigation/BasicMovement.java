@@ -26,12 +26,12 @@ public class BasicMovement implements Movement {
 	Odometer odometer;
 
 	Motor left_motor, right_motor;
-
+	
 	MovementDaemon movement_daemon;
 	Thread movement_daemon_thread;
 	boolean movement_daemon_running; //Run condition for the movement_daemon_thread
 
-	boolean moving;
+	boolean moving, inter;
 
 	/**
 	 * Create a new BasicMovement instance with the given odometer and left and right motors.
@@ -64,11 +64,16 @@ public class BasicMovement implements Movement {
 		goTo(x, y, speed, false);
 	}
 
-	public synchronized void goTo(double x, double y, int speed, boolean returnImmediately) {
+	public void goTo(double x, double y, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0) return;
 		double[] current_position = odometer.getPosition();
+		inter = false;
 		turnTo(Math.atan2((y-current_position[1]),(x-current_position[0])), 60);
+		if(inter) {
+			inter = false;
+			return;
+		}
 		movement_daemon.goTo(x, y, speed);
 		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
@@ -77,7 +82,7 @@ public class BasicMovement implements Movement {
 		goForward(distance, speed, false);
 	}
 
-	public synchronized void goForward(double distance, int speed, boolean returnImmediately) {
+	public void goForward(double distance, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0 || distance == 0) return; //Avoid silly input
 		movement_daemon.goForward(distance, speed);
@@ -96,14 +101,15 @@ public class BasicMovement implements Movement {
 		turnTo(angle, speed, false);
 	}
 
-	public synchronized void turnTo(double angle, int speed, boolean returnImmediately) {
+	public void turnTo(double angle, int speed, boolean returnImmediately) {
 		stop();
+		inter = false;
 		if(speed == 0) return; //Avoid silly input
 		movement_daemon.turnTo(angle, speed);
 		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
 
-	public synchronized void rotate(boolean direction, int speed) {
+	public void rotate(boolean direction, int speed) {
 		stop();
 
 		left_motor.setSpeed(speed);
@@ -120,7 +126,7 @@ public class BasicMovement implements Movement {
 		}
 	}
 
-	public synchronized void forward(int speed) {
+	public void forward(int speed) {
 		stop();
 
 		left_motor.setSpeed(speed);
@@ -132,7 +138,7 @@ public class BasicMovement implements Movement {
 		right_motor.forward();
 	}
 
-	public synchronized void backward(int speed) {
+	public void backward(int speed) {
 		stop();
 
 		left_motor.setSpeed(speed);
@@ -144,13 +150,14 @@ public class BasicMovement implements Movement {
 		right_motor.backward();
 	}
 
-	public synchronized void stop() {
+	public void stop() {
 		if(movement_daemon.isActive()) movement_daemon.stop();
 
 		left_motor.stop();
 		right_motor.stop();
 
 		moving = false;
+		inter = true;
 	}
 
 	public void resume() {
