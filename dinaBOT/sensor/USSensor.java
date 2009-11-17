@@ -22,7 +22,7 @@ public class USSensor implements Runnable {
 	public USSensor(SensorPort port, Position position) {
 		sensor = new UltrasonicSensor(port);
 		
-		listeners = new UltrasonicSensor[3];
+		listeners = new USSensorListener[5];
 		listeners_pointer = 0;
 		
 		latest_values = new int[8];
@@ -47,7 +47,7 @@ public class USSensor implements Runnable {
 	
 	void notifyListeners() {
 		for(int i = 0;i < listeners.length;i++) {
-			listeners[i].newValues(latest_values, position);
+			if(listeners[i] != null) listeners[i].newValues(latest_values, position);
 		}
 	}
 	
