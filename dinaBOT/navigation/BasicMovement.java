@@ -67,6 +67,8 @@ public class BasicMovement implements Movement {
 	public synchronized void goTo(double x, double y, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0) return;
+		double[] current_position = odometer.getPosition();
+		turnTo(Math.atan2((y-current_position[1]),(x-current_position[0])), 60);
 		movement_daemon.goTo(x, y, speed);
 		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
