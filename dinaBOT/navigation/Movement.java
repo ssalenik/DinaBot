@@ -21,6 +21,16 @@ public interface Movement {
 	public void goTo(double x, double y, int speed);
 
 	/**
+	 * Makes the robot move to within 1cm of the target x and y position, return immediately if requested
+	 *
+	 * @param x the x coordinate to go to
+	 * @param y the y coordinate to go to
+	 * @param speed the speed to travel at
+	 * @param immediateReturn returns immediately if true, blocks otherwise
+	*/
+	public void goTo(double x, double y, int speed, boolean immediateReturn);
+
+	/**
 	 * Move forward a given distance at a given speed.
 	 *
 	 * @param distance the distance to travel (in cm)

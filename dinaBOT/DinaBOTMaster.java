@@ -247,6 +247,15 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	public void connect() {
 		while(!slave_connection.connect());
 	}
+	
+	public void moveTest() {
+		odometer.setDebug(true);
+		odometer.enableSnapping(true);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
+		movement.goTo(UNIT_TILE*4, UNIT_TILE, SPEED_FAST);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goTo(UNIT_TILE*4, UNIT_TILE*3, SPEED_FAST);
+	}
 		
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
@@ -267,10 +276,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
-		dinaBOTmaster.connect();
+		//dinaBOTmaster.connect();
 		//dinaBOTmaster.alignBrick();
-		dinaBOTmaster.milestoneDemo();
-		
+		//dinaBOTmaster.milestoneDemo();
+		dinaBOTmaster.moveTest();
 		while(true); //Never quit
 	}
 	

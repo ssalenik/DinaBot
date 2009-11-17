@@ -19,7 +19,7 @@ public class BasicMovement implements Movement {
 	/* -- Static Variables -- */
 
 	//Possible states for the movement daemon to be in
-	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE }
+	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO }
 
 	/* -- Instance Variables -- */
 
@@ -59,25 +59,16 @@ public class BasicMovement implements Movement {
 		movement_daemon_thread.setDaemon(true);
 		movement_daemon_thread.start();
 	}
+	
+	public void goTo(double x, double y, int speed) {
+		goTo(x, y, speed, false);
+	}
 
-	public synchronized void goTo(double x, double y, int speed) {
-		double[] position = odometer.getPosition();
-		
-		double distance = Math.sqrt((x-position[0])*(x-position[0])+(y-position[1])*(y-position[1]));
-		double angle = Math.atan2((y-position[1]),(x-position[0]));
-		
-		while(distance > 1) {
-			odometer.enableSnapping(false);
-			turnTo(angle,100);
-			odometer.enableSnapping(true);
-			
-			if(distance < 5) goForward(distance, 200);
-			else goForward(5, 200);
-			
-			position = odometer.getPosition();
-			distance = Math.sqrt((x-position[0])*(x-position[0])+(y-position[1])*(y-position[1]));
-			angle = Math.atan2((y-position[1]),(x-position[0]));
-		}
+	public synchronized void goTo(double x, double y, int speed, boolean returnImmediately) {
+		stop();
+		if(speed == 0) return;
+		movement_daemon.goTo(x, y, speed);
+		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 	}
 
 	public void goForward(double distance, int speed) {
@@ -191,9 +182,10 @@ public class BasicMovement implements Movement {
 		int l_mode, r_mode;
 		
 		//Stored information, used depending on the mode
-		double target_distance, target_angle;
+		double target_distance, target_angle, target_speed;
 		double[] initial_position;
 		double[] current_position;
+		double[] target_position;
 
 		/**
 		 * Create MovementDaemon
@@ -209,6 +201,7 @@ public class BasicMovement implements Movement {
 			//Setup the arrays
 			initial_position = new double[3];
 			current_position = new double[3];
+			target_position = new double[3];
 		}
 
 		/**
@@ -227,19 +220,78 @@ public class BasicMovement implements Movement {
 						}
 					} else if(mode == Mode.ROTATE_CCW) { //Rotate set angle counter clockwise
 						if((target_angle - current_position[2]) <= 0) { //Until the sign of the relative angle changes
+							odometer.enableSnapping(true);
 							stop();
 						}
 
 					} else if(mode == Mode.ROTATE_CW) { //Rotate set angle clockwise
 						if((target_angle - current_position[2]) >= 0) { //Until the sign of the relative angle changes
+							odometer.enableSnapping(true);
 							stop();
 						}
+					} else if(mode == Mode.GOTO) { //Go to 
+						target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
+
+						//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+						//eg within pi of the current positon
+						while(target_angle < (current_position[2] - Math.PI)) target_angle += 2*Math.PI;
+						while(target_angle > (current_position[2] + Math.PI)) target_angle -= 2*Math.PI;
+
+						double dmax = Math.sqrt((target_position[0]-current_position[0])*(target_position[0]-current_position[0])+(target_position[1]-current_position[1])*(target_position[1]-current_position[1]));
+						target_distance = Math.cos(current_position[2]-target_angle)*dmax;
+
+						int base_speed = (int)target_speed;
+
+						left_motor.setSpeed((int)(base_speed+base_speed*2*(current_position[2]-target_angle)));
+						right_motor.setSpeed((int)(base_speed-base_speed*2*(current_position[2]-target_angle)));
+
+						if(target_distance < 1) stop();
 					}
 					Thread.yield(); //Yield for a little while
 				}
 			}
 		}
+		
+		/**
+		 * Initiate movement to a specified x and y location
+		 *
+		 * @param x the x coordinate to go to (in cm)
+		 * @param y the y coordinate to go to (in cm)
+		 * @param speed the speed to advance at
+		*/
+		void goTo(double x, double y, int speed) {
+			/* Set permanents */
+			target_position[0] = x;
+			target_position[1] = y;
+			target_speed = speed;
+			
+			/* Compute initial state */
+			current_position = odometer.getPosition();
+			
+			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
+			//Convert angle modulo 2*pi (angle E [-2*pi, 2*pi]) and store
+			target_angle = (target_angle)%(2*Math.PI);
+
+			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+			//eg within pi of the current positon
+			while(target_angle < (current_position[2] - Math.PI)) target_angle += 2*Math.PI;
+			while(target_angle > (current_position[2] + Math.PI)) target_angle -= 2*Math.PI;
+
+			double dmax = Math.sqrt((target_position[0]-current_position[0])*(target_position[0]-current_position[0])+(target_position[1]-current_position[1])*(target_position[1]-current_position[1]));
+			target_distance = Math.cos(current_position[2]-target_angle)*dmax;
+		
+			int base_speed = (int)target_speed;
+	
+			left_motor.setSpeed((int)(base_speed+base_speed*2*(current_position[2]-target_angle)));
+			right_motor.setSpeed((int)(base_speed-base_speed*2*(current_position[2]-target_angle)));
+
+			left_motor.forward();
+			right_motor.forward();
+			
+			mode = Mode.GOTO;			
+		}
+		
 		/**
 		 * Initiate forward movement to a specified distance
 		 *
@@ -277,6 +329,7 @@ public class BasicMovement implements Movement {
 		 * @param speed the speed to advance at
 		*/
 		void turnTo(double angle, int speed) {
+			odometer.enableSnapping(false);
 			//Set motor speed
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);
