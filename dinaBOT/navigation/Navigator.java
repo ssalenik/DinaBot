@@ -35,8 +35,7 @@ public class Navigator implements Navigation, MechConstants {
 			
 			path = pather.generatePath(position[0], position[1], position[2], x, y);
 
-			if(path != null) {
-				for(node = 0; node < path.length; node++) {
+			for(node = 0; (path != null) && (node < path.length); node++) {
 					
 					position = odometer.getPosition();
 
@@ -51,10 +50,10 @@ public class Navigator implements Navigation, MechConstants {
 						node = 0;
 						// reset interrupt flag
 						interrupted = false;
-					}
 				}
+			}
 				
-			} else {
+			if (path == null){
 				LCD.drawString("no path", 0, 0);
 				return false;	//fail
 			}
