@@ -148,7 +148,7 @@ public class Astar {
 			// get number of nodes in paths
 			int[] parent = new int[] {end[0], end[1]};
 			
-			i = 0;
+			i = -1;
 			while( !( (start[0] == parent[0]) && (start[1] == parent[1]) ) ) {
 				i++;
 				//System.out.println("node: " + parent[0] + "," + parent[1]);
