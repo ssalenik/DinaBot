@@ -132,7 +132,6 @@ public class ManhattanPather implements Pathing, MechConstants {
 		
 		map = mapper.getMap();
 		
-		try {
 		for(i = 0; i < rez; i++) {
 			for(j = 0; j < rez; j++) {
 				if(map[i][j] != 0) {
@@ -140,9 +139,7 @@ public class ManhattanPather implements Pathing, MechConstants {
 				}
 			}
 		}
-		} catch (Exception e) {
-			LCD.drawString("out of bounds: " + i + "," + j, 0, 0);
-		}
+
 		
 	}
 	

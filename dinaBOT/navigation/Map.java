@@ -8,9 +8,13 @@ import java.lang.Math;
 import dinaBOT.mech.*;
 import dinaBOT.sensor.*;
 
-
-
-
+/**
+ * 
+ * 
+ * @author Stepan Salenikovich, Severin Smith
+ * @see Navigation, Navigator, Pathing, Astar, USSensorListener, USSensor
+ * @version 3
+ */
 public class Map implements MechConstants, USSensorListener {
 
 	Odometer odo;
@@ -28,6 +32,7 @@ public class Map implements MechConstants, USSensorListener {
 	
 	boolean newObstacle;
 
+	MapListener listener;
 	
 
 	public Map( Odometer odo, int rez, int threshold, double nodeDist ) {
@@ -45,44 +50,17 @@ public class Map implements MechConstants, USSensorListener {
 		lowUS.registerListener(this);
 		highUS.registerListener(this);
 	}
-
-	/*
-	public void run() {
-
-		double[] coord = new double[2];
-		int[] node = new int[2];
-		int distance;
-
-		while(true) {
-
-			if(high_Readings != null) distance = high_Readings[0];
-			else distance = 255;
-			
-			// if ostacle distance is close enough, mark appropriate node
-			if ( distance < threshold ) {
-
-				// get abs. coords from relative distance
-				coord = getUSCoord(distance);
-
-				// get node associated with coords
-				node = getNode( coord );
-				
-				Sound.twoBeeps();
-				
-				// mark node with obstacle 
-				if( map[node[0]][node[1]] == 0) {
-					map[node[0]][node[1]] = 2;
-					
-					if ( !newObstacle ) {
-						newObstacleSet(true);
-					}
-				}
-			} 
-
+	
+	public void registerListener(MapListener listener) {
+		this.listener = listener;
+	}
+	
+	void notifyListeners( int x, int y) {
+		if(listener != null) {
+			listener.newObstacle(x,y);
 		}
 	}
-	*/
-
+	
 	private double[] getUSCoord( int distance ) {
 		double[] pos = new double[3];
 		double[] coord = new double[2];
@@ -150,13 +128,11 @@ public class Map implements MechConstants, USSensorListener {
 				if( map[node[0]][node[1]] == 0) {
 					map[node[0]][node[1]] = 2;
 					
-					if ( !newObstacle ) {
-						newObstacleSet(true);
-					}
+					notifyListeners(node[0], node[1]);
 				}
-			} 
+			}
+		} 
 
-		}
 	}
 	
 	//Do not pass reference
@@ -178,29 +154,3 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 }
-
-/*
-public class Map {
-	int[][] map;
-	int rez;
-	
-	public Map(int rez) {
-		this.map = new int[rez][rez];
-		this.rez = rez;
-	}
-	
-	public int[][] getMap() {
-		return this.map;
-	}
-	
-	public int getRez() {
-		return this.rez;
-	}
-	
-	public boolean editMap(int x, int y, int value) {
-		this.map[x][y] = value;
-		
-		return true;	//sucess
-	}
-}
-*/

@@ -1,34 +1,81 @@
 package dinaBOT.navigation;
 
-public class Navigator implements Navigation {
+import dinaBOT.mech.*;
+
+import lejos.nxt.*;
+
+
+public class Navigator implements Navigation, MechConstants {
 	boolean interrupted;
 	
-	public boolean goTo(double x, double y) {
+	Pathing pather;
+	Movement movement;
+	Map map;
+	Odometer odometer;
+	
+	int[] position;
 		
-			path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
+	double[][] path;
+	int node;	//the current location in the path array
+	
+	public Navigator( Pathing pather, Movement movement, Map map, Odometer odometer ) {
+		this.pather = pather;
+		this.movement = movement;
+		this.map = map;
+		this.odometer = odometer;
+				
+		map.registerListener(this);
+	}
+	
+	public boolean goTo(double x, double y) {
+			double[] position = new double[3];
+			
+			position = odometer.getPosition();
+			
+			path = pather.generatePath( position[0], position[1], position[2], x, y);
 
 			if( path != null) {
-				for(int i = 0; i < path.length; i++) {
-					if( mapper.obstacleCheck() ) {
+				for(node = 0; node < path.length; node++) {
+					
+					movement.goTo(path[node][0], path[node][1], SPEED_MED);
+					
+					if(interrupted) {
+						// get current position
 						position = odometer.getPosition();
-						path = pather.generatePath( position[0], position[1], position[2], end[0], end[1]);
-						i = 0;
+						// generate new path
+						path = pather.generatePath( position[0], position[1], position[2], x, y);
+						// reset position in path
+						node = 0;
+						// reset interrupt flag
+						setInterrupt(false);
 					}
-					movement.goTo(path[i][0], path[i][1], 150);
-					if(interrupted) repath
 				}
+			} else {
+				LCD.drawString("no path", 0, 0);
+				return false;	//fail
 			}
-
-			// go back to 0,0
-			end =  new double[] {0*UNIT_TILE, 0*UNIT_TILE};
-
+			
+		return true;	//success
 		
 	}
 
 	public void interrupt() {
-		interrupt = stop;
 		movement.stop();
+		setInterrupt(true);
 	}
-	public void softInterrupt(int x, int y);
 	
+	public void newObstacle(int x, int y) {
+		for( ; node < path.length; node++) {
+			// check if new obstacle lies on current path
+			if( (path[node][0] == x) && (path[node][1] == y) ) {
+				//new obstacle in the way, stop all movement and set interrupt flag
+				movement.stop();
+				setInterrupt(true);
+			}
+		}
+	}
+	
+	private synchronized void setInterrupt( boolean set ) {
+		interrupted = set;
+	}
 }

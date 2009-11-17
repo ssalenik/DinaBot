@@ -133,7 +133,7 @@ public class Astar {
 
 		// do algo
 		while ( !done ) {
-			System.out.println("(" + curr[0] + "," + curr[1] + ")");
+			//System.out.println("(" + curr[0] + "," + curr[1] + ")");
 			done = astar( curr, end );
 			if( done ); // then you're done
 			// if curr == null, no path
@@ -151,7 +151,7 @@ public class Astar {
 			i = 0;
 			while( !( (start[0] == parent[0]) && (start[1] == parent[1]) ) ) {
 				i++;
-				System.out.println("node: " + parent[0] + "," + parent[1]);
+				//System.out.println("node: " + parent[0] + "," + parent[1]);
 				
 				nodeInfo = pathInfo[parent[0]][parent[1]];
 				parent[0] = nodeInfo[3];
