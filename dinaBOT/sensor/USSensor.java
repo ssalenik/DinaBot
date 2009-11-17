@@ -47,7 +47,13 @@ public class USSensor implements Runnable {
 	
 	void notifyListeners() {
 		for(int i = 0;i < listeners.length;i++) {
-			if(listeners[i] != null) listeners[i].newValues(latest_values, position);
+			if(listeners[i] != null) {
+				if(latest_values[0] <= 26 ){
+				listeners[i].newValues(adjustSensorValues(latest_values), position);
+				}
+				else{listeners[i].newValues(latest_values, position);
+				}
+			}
 		}
 	}
 	
@@ -70,6 +76,12 @@ public class USSensor implements Runnable {
 			while(us_sensor_thread != null && us_sensor_thread.isAlive()) Thread.yield();
 		}
 	}
+	
+	public int[] adjustSensorValues(int[] latest_values) {
+		for(int i = 0;i < 8;i++){
+			latest_values[i] = (int) ((latest_values[i]*latest_values[i]*0.1091) - (latest_values[i]*3.3446) + 35.629 );
+		}
+		return latest_values;}
 	
 	
 	
