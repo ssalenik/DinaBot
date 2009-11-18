@@ -16,12 +16,12 @@ import dinaBOT.util.Functions;
 */
 public class BasicMovement implements Movement {
 
-	/* -- Static Variables -- */
+	/* -- Static Variables --*/
 
 	//Possible states for the movement daemon to be in
 	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO }
 
-	/* -- Instance Variables -- */
+	/* -- Instance Variables --*/
 
 	Odometer odometer;
 
@@ -269,12 +269,12 @@ public class BasicMovement implements Movement {
 		 * @param speed the speed to advance at
 		*/
 		void goTo(double x, double y, int speed) {
-			/* Set permanents */
+			/* Set permanents*/
 			target_position[0] = x;
 			target_position[1] = y;
 			target_speed = speed;
 			
-			/* Compute initial state */
+			/* Compute initial state*/
 			current_position = odometer.getPosition();
 			
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));

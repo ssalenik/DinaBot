@@ -16,7 +16,7 @@ import lejos.nxt.Battery;
 */
 class BTDebugDaemon implements Runnable {
 
-	/* Protocol Constants */
+	/* Protocol Constants*/
 
 	static final int ERROR = -1;
 
@@ -28,7 +28,7 @@ class BTDebugDaemon implements Runnable {
 	static final int PROMPT_RESPONSE = 3;
 	static final int QUERY_RESPONSE = 3;
 
-	/* Vars */
+	/* Vars*/
 
 	boolean connected; //Indicates connection status
 	boolean running; //Controls thread execution

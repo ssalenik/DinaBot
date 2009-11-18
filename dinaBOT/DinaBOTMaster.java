@@ -14,15 +14,15 @@ import dinaBOT.detection.*;
  * The DinaBOTMaster is the main class the master brick. It <b>is</b> the robot. It contains the main() for the master.
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
- */
+*/
 public class DinaBOTMaster implements MechConstants, CommConstants {
 	
-	/* -- Static Variables -- */
+	/* -- Static Variables --*/
 	
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
 	
-	/* -- Instance Variables -- */
+	/* -- Instance Variables --*/
 	
 	Odometer odometer;
 	Movement movement;
@@ -32,7 +32,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	/**
 	 * This is the contructor for the DinaBOT master
 	 *
-	 */
+	*/
 	public DinaBOTMaster() {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
@@ -43,7 +43,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	 * This is demo method for our professor meeting on November 18th. It will ask for the input offsets for how much it will displace the pellet when 
 	 * it picks it up. It then does a 360 sweep around it to find the styrofoam pellet. When it finds it picks it up and displaces it for a certain offset 
 	 * value.
-	 */
+	*/
 	public void milestoneDemo() {
 		//User Input
 		double offsetX = 0, offsetY = 0;
@@ -55,7 +55,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		
 		BlockFinder blockFind = new BlockFinder(odometer, movement);
 		
-		/* User Input */
+		/* User Input*/
 		
 		while(!enterPressed) {
 			LCD.clear();
@@ -135,7 +135,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	/**
 	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
 	 *
-	 */
+	*/
 	public void alignBrick() {
 		
 		double forward_distance = 5;
@@ -213,7 +213,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
-	 */
+	*/
 	public static void main(String[] args) {
 		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {

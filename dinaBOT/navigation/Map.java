@@ -14,7 +14,7 @@ import dinaBOT.sensor.*;
  * @author Stepan Salenikovich, Severin Smith
  * @see Navigation, Navigator, Pathing, Astar, USSensorListener, USSensor
  * @version 3
- */
+*/
 public class Map implements MechConstants, USSensorListener {
 
 	Odometer odo;

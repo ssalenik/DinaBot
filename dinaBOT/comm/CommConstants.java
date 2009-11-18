@@ -6,12 +6,12 @@ package dinaBOT.comm;
 */
 public interface CommConstants {
 
-	/* -- Brick Names -- */
+	/* -- Brick Names --*/
 	
 	public static final String SLAVE_NAME = "DinaBOTslave";
 	public static final String MASTER_NAME = "DinaBOTmaster";
 
-	/* -- Protocol Constants -- */
+	/* -- Protocol Constants --*/
 	public static final byte DO_NOTHING = 0;
 	
 	public static final byte OPEN_CAGE = 1;
@@ -25,7 +25,7 @@ public interface CommConstants {
 	
 	public static final byte DISCONNECT = 8;
 	
-	//Sound
+	/* -- Sound Constants -- */
 	public static final byte PLAY_SONG = 10;
 	public static final byte PAUSE_SONG = 11;
 	public static final byte ABORT_SONG = 12;

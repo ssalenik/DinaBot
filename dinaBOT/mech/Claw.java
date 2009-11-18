@@ -19,7 +19,7 @@ public class Claw {
 	 * Creates a Claw instance using the specified motor.
 	 * 
 	 * @param claw the claw's motor
-	 */
+	*/
 	public Claw(Motor claw){
 		this.claw = claw;
 	}
@@ -30,7 +30,7 @@ public class Claw {
 	 * 
 	 * @param angle angle by which the claw should open
 	 * 
-	 */
+	*/
 	public void open(int angle){
 		claw.setSpeed(clawSpeed);
 		claw.rotate((int) (angle * gearRatio));
@@ -41,7 +41,7 @@ public class Claw {
 	 * 
 	 * @param angle angle by which the claw should be dropped
 	 * 
-	 */
+	*/
 	public void drop(int angle){
 		claw.setSpeed(clawSpeed);
 		claw.rotate(angle);
@@ -52,7 +52,7 @@ public class Claw {
 	 * 
 	 * @param angle angle by which claw should close
 	 * 
-	 */
+	*/
 	public void close(int angle){
 		claw.setSpeed(clawSpeed);
 		claw.rotate((int)(-angle * gearRatio));
@@ -63,7 +63,7 @@ public class Claw {
 	 * 
 	 * @param angle angle by which the claw should be lifted
 	 * 
-	 */
+	*/
 	public void lift(int angle){
 		claw.setSpeed(clawSpeed);
 		claw.rotate(-angle);
@@ -72,7 +72,7 @@ public class Claw {
 	/**	
 	 * Extension of the Motor.stop() method
 	 * 
-	 */
+	*/
 	public void stop(){
 		claw.stop();
 	}
@@ -80,7 +80,7 @@ public class Claw {
 	/**	
 	 * Extension of the Motor.flt() method
 	 * 
-	 */
+	*/
 	public void flt(){
 		claw.flt();
 	}
@@ -88,7 +88,7 @@ public class Claw {
 	/**	
 	 * Opens the claw completely and sets its tachometer to 0
 	 * 
-	 */
+	*/
 	public void reset(){
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(0);

@@ -1,5 +1,5 @@
 /**
- * This is the communications package of the dinaBOT project
+ * This is the communications package of the dinaBOT project.
  *
 */
 

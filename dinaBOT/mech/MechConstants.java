@@ -26,10 +26,13 @@ public interface MechConstants {
 	//The size of one tile on the course
 	static double UNIT_TILE = 30.48;
 	
-	
 	//SPEEDS
 	static final int SPEED_ROTATE = 60;
 	static final int SPEED_SLOW = 75;
 	static final int SPEED_MED = 150;
 	static final int SPEED_FAST = 225;
+	
+	//Maximum distance at which a block may be located in order to be detected = {@value}
+	static final int US_TRUST_THRESHOLD = 50;
+	
 }

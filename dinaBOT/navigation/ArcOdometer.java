@@ -22,9 +22,9 @@ import dinaBOT.sensor.LineDetector;
 */
 public class ArcOdometer implements Odometer {
 
-	/* -- Class Variables -- */
+	/* -- Class Variables --*/
 
-	/* Odometer */
+	/* Odometer*/
 
 	Encoder left_encoder, right_encoder;
 
@@ -32,7 +32,7 @@ public class ArcOdometer implements Odometer {
 
 	double[] position;
 
-	/* Grid snapping */
+	/* Grid snapping*/
 
 	boolean snap_enable;
 
@@ -45,7 +45,7 @@ public class ArcOdometer implements Odometer {
 
 	final int snap_saftey = 2;
 
-	/* Debug */
+	/* Debug*/
 
 	boolean debug, safe;
 

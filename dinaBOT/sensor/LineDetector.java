@@ -13,7 +13,7 @@ import lejos.nxt.LightSensor;
 */
 public class LineDetector implements Runnable {
 
-	/* -- Static Variables -- */
+	/* -- Static Variables --*/
 
 	//The actual left and right line detectors
 	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S4, true));
@@ -22,7 +22,7 @@ public class LineDetector implements Runnable {
 	//The ghetto threshold I'm using
 	static final int THRESHOLD = 450;
 
-	/* -- Instance Variables -- */
+	/* -- Instance Variables --*/
 	LightSensor sensor; //The light sensor associated with this LineDetector
 
 	int previous_reading; //The latest LightSensor value

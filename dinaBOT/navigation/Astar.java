@@ -15,17 +15,17 @@ import java.lang.Math;
  * @see Pathing
  * @see Map
  * @version 1
- */
+*/
 public class Astar {
-	/* -- Class Variables -- */
+	/* -- Class Variables --*/
 	
-	/* algo critical arrays */
+	/* algo critical arrays*/
 	
 	/**
 	 * Stores all the information the algorithm needs about each node when finding a path.  Except for number of nodes, the information is always specific to the path currently being found and changes throughout the algorithm.
 	 * <p>
 	 * Note: this array basically replaces the need for having to create a node class and thus an object for every node.  See the source code comments to see what information is stored at where.
-	 */
+	*/
 	
 	int[][][] pathInfo;	// array containing all information for pathfinding
 				/*
@@ -56,7 +56,7 @@ public class Astar {
 	
 
 	
-	/* constants ... should probably be put in MechConstants or something similar */
+	/* constants ... should probably be put in MechConstants or something similar*/
 	
 	static final int OBSTACLE = 2;	// value which is considered unpassable
 	static final int NORTH = 90;
@@ -182,7 +182,7 @@ public class Astar {
 	 * 
 	 * @param obstacle coordinates of the node with the obstacle.
 	 * @param value value of the obstacle (should be at least 2)
-	 */
+	*/
 	void addObstacle( int[] obstacle, int value ) {
 		pathInfo[obstacle[0]][obstacle[1]][0] = value;
 	}
