@@ -28,6 +28,8 @@ public class DinaBOTSlave implements CommConstants{
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
+		Song[] songSet = {Songs.marioOverworld2};
+		music = new MusicBox(songSet);
 	}
 
 	/**

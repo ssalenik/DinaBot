@@ -56,7 +56,7 @@ public class MusicBox extends Thread implements MusicPlayer{
 	}
 	
 	public boolean next(){
-		if(currentSong == playlist.length)
+		if(currentSong == (playlist.length - 1))
 			currentSong = 0;
 		else
 			currentSong++;
@@ -65,7 +65,7 @@ public class MusicBox extends Thread implements MusicPlayer{
 	
 	public boolean previous(){
 		if(currentSong == 0)
-			currentSong = playlist.length;
+			currentSong = (playlist.length - 1);
 		else
 			currentSong--;
 		return true;
@@ -77,7 +77,7 @@ public class MusicBox extends Thread implements MusicPlayer{
 		if(frequencies[songStatus[currentSong]] != 0)
 			Sound.playTone(frequency, duration - 20);
 		try {Thread.sleep(duration);} catch(Exception e) {}
-		if(currentSong == playlist[currentSong].frequencies.length)
+		if(songStatus[currentSong] == (playlist[currentSong].frequencies.length - 1))
 			abort();
 		else
 			songStatus[currentSong]++;

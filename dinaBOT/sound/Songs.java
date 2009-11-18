@@ -520,7 +520,7 @@ public class Songs {
 		 {ut, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36}		};
 	
-	static final Song marioOverworld = new Song(200, "Super Mario Bros: Overworld - melody", 
+	public static final Song marioOverworld = new Song(200, "Super Mario Bros: Overworld - melody", 
 			marioOverworldChart);
 	
 	static final int[][] marioOverworldChart2 = {
@@ -1032,7 +1032,7 @@ public class Songs {
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	36}		};
 	
-	static final Song marioOverworld2 = new Song(200, "Super Mario Bros: Overworld - accompaniement", 
+	public static final Song marioOverworld2 = new Song(200, "Super Mario Bros: Overworld - accompaniement", 
 			marioOverworldChart2);
 	
 }
