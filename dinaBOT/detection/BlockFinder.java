@@ -6,23 +6,33 @@ import dinaBOT.navigation.*;
 import dinaBOT.sensor.*;
 
 /**
- * This class locates blocks, and navigate properly towards them.
+ * This class contains all methods required to navigate an area, locate blocks, and navigate properly towards them.
  * 
  * @author Vinh Phong Buu
-*/
-public class BlockFinder implements USSensorListener, MechConstants {
+ */
+public class BlockFinder implements USSensorListener, MechConstants{
 
-	Odometer odometer;
-	Movement mover;
+	//Robot Constants
+	private Odometer odometer;
+	private Movement mover;
+	public static Motor LeftWheel = Motor.A;
+	public static Motor RightWheel = Motor.B;
+	protected USSensor lowUS = USSensor.low_sensor;
+	protected USSensor highUS = USSensor.high_sensor;
+
+	/**
+	 * Maximum distance at which a block may be located in order to be detected = {@value}
+	 */
+	public final int MAX_BLOCK_DISTANCE = 50;
 
 	/**
 	 * Size in degrees of the arc the robot should sweep = {@value}
-	*/
-	public final double SWEEP_ARC = 7*Math.PI/8;
+	 */
+	public final double SWEEP_ARC = Math.PI/2;
 
 	/**
 	 * Minimum difference allowed between high and low sensor values to assume both are seeing the same object.
-	*/
+	 */
 	public final int DETECTION_THRESHOLD = 7;
 
 	//Fields
@@ -46,12 +56,12 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	/**
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
 	 * 
-	*/
+	 */
 	public BlockFinder(Odometer odometer, Movement mover) {
 		this.odometer = odometer;
 		this.mover = mover;
-		USSensor.low_sensor.registerListener(this);
-		USSensor.high_sensor.registerListener(this);
+		lowUS.registerListener(this);
+		highUS.registerListener(this);
 		low_Readings = new int[]{255,255,255,255,255,255,255,255};
 		high_Readings = new int[]{255,255,255,255,255,255,255,255};
 	}
@@ -66,7 +76,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	 *@param blockAngle The orientation of the robot when the block was seen 
 	 *during search (in radians).
 	 *
-	*/
+	 */
 	public boolean sweep(double blockAngle) {
 
 		double initialOrientation = odometer.getPosition()[2];
@@ -114,7 +124,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 	public void findEdgeA() {
 
-			if(minLow < US_TRUST_THRESHOLD 
+			if(minLow < MAX_BLOCK_DISTANCE 
 					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 					&& minLow < blockDistance_A
 					&& low_Readings[1] < 100) {
@@ -130,7 +140,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				
 	public void	findEdgeB() {
 		
-			if( minLow < US_TRUST_THRESHOLD 
+			if( minLow < MAX_BLOCK_DISTANCE 
 					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 					&& minLow < blockDistance_B
 					&& low_Readings[1] < 100) {
@@ -192,7 +202,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				
 			
 			case 3:
-				/*//Get missing angle
+				//Get missing angle
 				if (position == USSensorListener.Position.LOW) {
 					this.low_Readings = new_values;
 					if (data_acquired) {
@@ -209,7 +219,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 						}
 						data_acquired = true;
 					}
-				}*/
+				}
 								
 				break;
 			}
