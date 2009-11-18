@@ -2,14 +2,12 @@ package dinaBOT.sound;
 
 public class Song {
 	
-	int tempo;
 	String title;
 	int id;
 	int[] frequencies;
 	int[] durations;
 		
 	public Song(int tempo, String title, int[][] chart){
-		this.tempo = tempo;
 		this.title = title;
 		this.frequencies = getFrequencies(chart);
 		this.durations = getDurations(tempo, chart);

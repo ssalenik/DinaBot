@@ -4,74 +4,83 @@ import lejos.nxt.Sound;
 
 public class MusicBox extends Thread implements MusicPlayer{
 
+	Song[] playlist;
+	int[] songStatus;
+	int currentSong;
+	boolean playStatus;
+		
 	int[] frequencies;
 	int[] durations;
-	int[] currentNotes = new int[100];
-	boolean[] playStatus = new boolean[100];
-	int songCount;
 	
-	public MusicBox(){
-		for(int i = 0; i < 100; i++){
-			currentNotes[i] = 0;
-			playStatus[i] = false;
-		}
+	
+	public MusicBox(Song[] songSet){
+		playlist = songSet;
+		songStatus = new int[songSet.length];
+		for(int i = 0; i < songSet.length; i++)
+			songStatus[i] = 0;
+		currentSong = 0;
+		
+		frequencies = playlist[0].frequencies;
+		durations = playlist[0].durations;
+		
+		playStatus = false;
+		
 		this.start();
 	}
 	
 	public void run(){
 		while(true){
-			play();
+			if(playStatus){
+				playNote();
+			}
+			else{
+				Thread.yield();
+			}
 		}
 	}
 	
+	public boolean play(){
+		playStatus = true;
+		return true;
+	}
+	
+	public boolean pause(){
+		playStatus = false;
+		return true;
+	}
+	
 	public boolean abort(){
+		playStatus = false;
+		songStatus[currentSong] = 0;
 		return true;
 	}
 	
 	public boolean next(){
+		if(currentSong == playlist.length)
+			currentSong = 0;
+		else
+			currentSong++;
 		return true;
 	}
 	
 	public boolean previous(){
+		if(currentSong == 0)
+			currentSong = playlist.length;
+		else
+			currentSong--;
 		return true;
 	}
 	
-	public void setSong(){
-		int id = songCount;
-		songCount++;
+	private void playNote(){
+		int frequency = playlist[currentSong].frequencies[songStatus[currentSong]];
+		int duration = playlist[currentSong].durations[songStatus[currentSong]];
+		if(frequencies[songStatus[currentSong]] != 0)
+			Sound.playTone(frequency, duration - 20);
+		try {Thread.sleep(duration);} catch(Exception e) {}
+		if(currentSong == playlist[currentSong].frequencies.length)
+			abort();
+		else
+			songStatus[currentSong]++;
 	}
 	
-	public void playNonStop(){
-		for(int i = 0; i < frequencies.length; i++){
-			if(frequencies[i] != 0)
-				Sound.playTone(frequencies[i], durations[i] - 20);
-			try{
-				Thread.sleep(durations[i]);
-			}catch(Exception e){}
-		}
-	}
-	
-	public boolean pause(){
-		playStatus[1] = false;
-		return true;
-	}
-	
-	public void unpause(){
-		
-	}
-	
-	public boolean play(){
-		return true;
-	}
-	
-	public void playNote(int id){
-		int currentNote = currentNotes[id];
-		if(frequencies[currentNote] != 0)
-			Sound.playTone(frequencies[currentNote], durations[currentNote] - 20);
-		try{
-			Thread.sleep(durations[currentNote]);
-		}catch(Exception e){}
-		currentNotes[id]++;
-	}
-
 }
