@@ -28,13 +28,6 @@ public class Navigator implements Navigation, MechConstants {
 		map.registerListener(this);
 	}
 
-	/**
-	 * Travels, while avoiding obstacles to the desired coordinates 
-	 *
-	 * @param x the x coordinate to go to (in cm)
-	 * @param y the y coordinate to go to (in cm)
-	 * @return return less than 0 if the coordinates cannot be reached, 0 if they were reached and more than 0 if the goTo was hard_interrupt
-	*/
 	public int goTo(double x, double y) {
 		hard_interrupt = false;
 		while(repath(x, y)) {
