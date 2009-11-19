@@ -1,22 +1,32 @@
 package dinaBOT.navigation;
 
 import dinaBOT.mech.*;
+import dinaBOT.sensor.*;
 
 import lejos.nxt.*;
 
-
-public class Navigator implements Navigation, MechConstants {
+/**
+ * 
+ * 
+ * @author Stepan Salenikovich, Severin Smith
+ * @see Navigation, Map, Pathing, Astar, MapListener, USSensorListener, USSensor
+ * @version 1
+ */
+public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	Odometer odometer;
 	Movement movement;
 
 	Map map;
 	Pathing pather;
-
+	
+	int[] low_Readings;
+	int[] high_Readings;
+	
 	int node; //the current location in the path array
 	double[][] path;
 	
-	boolean active, hard_interrupt, soft_interrupt;
+	boolean active, hard_interrupt, soft_interrupt, full_mode;
 	
 	public Navigator(Pathing pather, Movement movement, Map map, Odometer odometer) {
 		this.odometer = odometer;
@@ -26,9 +36,17 @@ public class Navigator implements Navigation, MechConstants {
 		this.pather = pather;
 
 		map.registerListener(this);
+		
+		low_Readings = new int[]{255,255,255,255,255,255,255,255};
+		high_Readings = new int[]{255,255,255,255,255,255,255,255};
+		
+		USSensor.high_sensor.registerListener(this);
+		USSensor.low_sensor.registerListener(this);
 	}
 
-	public int goTo(double x, double y) {
+
+	public int goTo(double x, double y, boolean full) {
+		this.full_mode = full;
 		hard_interrupt = false;
 		while(repath(x, y)) {
 			soft_interrupt = false;
@@ -65,6 +83,28 @@ public class Navigator implements Navigation, MechConstants {
 					soft_interrupt = true;
 					movement.stop();
 				}
+			}
+		}
+	}
+	
+	public void newValues(int[] new_values, USSensor sensor) {
+		
+		if( active && !full_mode) {
+			int minLow, minHigh;
+			
+			if( sensor == USSensor.low_sensor) low_Readings = new_values;
+			else if (sensor == USSensor.high_sensor) high_Readings = new_values;
+			else return;	//should never happen
+			
+			minLow = low_Readings[0];
+			minHigh = high_Readings[0];
+			
+			if(minLow < US_TRUST_THRESHOLD
+						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+						&& low_Readings[1] < 100) {
+				
+				interrupt();
+							
 			}
 		}
 	}
