@@ -26,9 +26,6 @@ public class Map implements MechConstants, USSensorListener {
 	double nodeDist;
 	int threshold;
 
-	protected USSensor lowUS = USSensor.low_sensor;
-	protected USSensor highUS = USSensor.high_sensor;
-	int[] low_Readings;
 	int[] high_Readings;
 
 	boolean newObstacle;
@@ -49,8 +46,7 @@ public class Map implements MechConstants, USSensorListener {
 		
 		listeners = new DinaList<MapListener>();
 
-		lowUS.registerListener(this);
-		highUS.registerListener(this);
+		USSensor.high_sensor.registerListener(this);
 	}
 
 	public void registerListener(MapListener listener) {
@@ -104,34 +100,32 @@ public class Map implements MechConstants, USSensorListener {
 		return resolution;
 	}
 
-	public void newValues(int[] new_values, USSensor sensor) {
+	public void newValues(int[] new_values, USSensor sensor) { //This is only called by the high sensor because we didn't register with the low one
 		double[] coord = new double[2];
 		int[] node = new int[2];
 		int distance = 255;
 
 		// only care about high US sensor values
-		if (sensor == USSensor.high_sensor) {
-			this.high_Readings = new_values;
+		this.high_Readings = new_values;
 
-			distance = high_Readings[0];
+		distance = high_Readings[0];
 
-			// if ostacle distance is close enough, mark appropriate node
-			if (distance < threshold) {
+		// if ostacle distance is close enough, mark appropriate node
+		if (distance < threshold) {
 
-				// get abs. coords from relative distance
-				coord = getUSCoord(distance);
+			// get abs. coords from relative distance
+			coord = getUSCoord(distance);
 
-				// get node associated with coords
-				node = getNode(coord);
+			// get node associated with coords
+			node = getNode(coord);
 
-				Sound.twoBeeps();
+			Sound.twoBeeps();
 
-				// mark node with obstacle
-				if(map[node[0]][node[1]] == 0) {
-					map[node[0]][node[1]] = 2;
+			// mark node with obstacle
+			if(map[node[0]][node[1]] == 0) {
+				map[node[0]][node[1]] = 2;
 
-					notifyListeners(node[0], node[1]);
-				}
+				notifyListeners(node[0], node[1]);
 			}
 		}
 
