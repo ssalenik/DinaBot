@@ -6,9 +6,8 @@ if [ $# -eq 1 -o $# -eq 2 ]
 	if [ $1 = "c" ]
 		then
 		echo "Cleaning ..."
-		rm -f log.txt DinaBOTSlave.nxj DinaBOTMaster.nxj
+		rm -rf log.txt DinaBOTSlave.nxj DinaBOTMaster.nxj bin/
 		exit 0
-		fi
 	fi
 	
 	echo "Setup ..."

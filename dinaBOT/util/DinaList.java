@@ -7,27 +7,27 @@ public class DinaList<E> {
 	/* -- */
 
 	Object[] element_data;
-	int element_pointer;
+	int size;
 
 	public DinaList() {
 		element_data = new Object[3];
 
-		element_pointer = 0;
+		size = 0;
 	}
 
 	public void add(E element) {
-		if(element_pointer == element_data.length) {
+		if(size == element_data.length) {
 			Object[] tmp_data = new Object[element_data.length*2];
 			System.arraycopy(element_data, 0, tmp_data, 0, element_data.length);
 			element_data = tmp_data;
 		}
 
-		element_data[element_pointer] = element;
-		element_pointer++;
+		element_data[size] = element;
+		size++;
 	}
 
 	public boolean remove(E element) {
-		for(int i = 0;i < element_pointer;i++) {
+		for(int i = 0;i < size;i++) {
 			if(element_data[i] == element) if(remove(i) != null) return true;
 		}
 		return false;
@@ -38,9 +38,9 @@ public class DinaList<E> {
 	 if(rangeCheck(index)) {
 	 E old_element = (E)element_data[index];
 
-	 int num_moved = element_pointer - index;
+	 int num_moved = size-index-1;
 	 if (num_moved > 0) System.arraycopy(element_data, index+1, element_data, index, num_moved);
-	 element_data[--element_pointer] = null; // Let gc do its work
+	 element_data[--size] = null; // Let gc do its work
 
 	 return old_element;
 		}
@@ -49,21 +49,21 @@ public class DinaList<E> {
 	}
 
 	@SuppressWarnings("unchecked")
- public E get(int index) {
+	public E get(int index) {
 		if(rangeCheck(index)) return (E)element_data[index];
 		else return null;
 	}
 
 	public int size() {
-		return element_pointer+1;
+		return size;
 	}
 
 	public boolean isEmpty() {
-		return (element_pointer <= 0);
+		return (size == 0);
 	}
 
 	boolean rangeCheck(int index) {
-		return (index >= 0 && index < element_pointer);
+		return (index >= 0 && index < size);
 	}
 
 }
