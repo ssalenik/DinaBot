@@ -258,14 +258,6 @@ public class ArcOdometer implements Odometer {
 	}
 
 	/**
-	 * Perform initial localization. Must be called adjacent to a corner (two walls).
-	 *
-	*/
-	public void localize() {
-
-	}
-
-	/**
 	 * Enable or disable grid snapping (auto correction of the odometer with grid lines).
 	 *
 	 * @param enable enables grid snapping if set to true, disables it otherwise
