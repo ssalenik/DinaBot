@@ -15,10 +15,10 @@ public interface Navigation extends MapListener {
 	 *
 	 * @param x the x coordiate to move to
 	 * @param y the y coordiate to move to
-	 * @return returns true if the robot sucessfully reached the destination, false if it was interrupted or cannot reach the destination
+	 * @return return less than 0 if the coordinates cannot be reached, 0 if they were reached and more than 0 if the goTo was hard_interrupt
 	 * @see #interrupt()
-	*/
-	public boolean goTo(double x, double y);
+	*/	
+	public int goTo(double x, double y);
 
 	/**
 	 * Interrupt an ongoing {@link #goTo(double x, double y)} call
