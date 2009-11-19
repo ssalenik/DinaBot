@@ -2,6 +2,15 @@
 
 if [ $# -eq 1 -o $# -eq 2 ]
 	then
+	
+	if [ $1 = "c" ]
+		then
+		echo "Cleaning ..."
+		rm -f log.txt DinaBOTSlave.nxj DinaBOTMaster.nxj
+		exit 0
+		fi
+	fi
+	
 	echo "Setup ..."
 	
 	if [ -f log.txt ]
@@ -74,7 +83,7 @@ if [ $# -eq 1 -o $# -eq 2 ]
 				nxjupload DinaBOTSlave.nxj -u
 			fi
 		fi
-	fi
+	fi	
 	
 	rm -rf bin
 	exit 0

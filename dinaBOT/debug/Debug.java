@@ -7,7 +7,7 @@ import dinaBOT.debug.BTDebugDaemon;
  * This Debug class, serves as a universally accessible (public and static) wrapper for bluetooth debugging.
  * <p>
  * It is designed to be used in conjuction with the penultimate Bluetooth debugging console.
- * <p> 
+ * <p>
  * By default the Debug system is not active. It must be turned on using the {@link #start()} method. All methods of the Debug class may still be called while it is not active, but they will simply return their default values.
  *
  * @author Severin Smith
@@ -84,8 +84,8 @@ public class Debug {
 	/**
 	 * Starts the underlying {@link BTDebugDaemon}.This daemon established connection to the penultimate debug console and handles the communication details.
 	 * <p>
-	 * This method will block until either a connection is established or the timeout is exceeded. 
-	 * 
+	 * This method will block until either a connection is established or the timeout is exceeded.
+	 *
 	 * @param timeout the maximum timeout in ms to wait for a connection to establish.
 	 * @return indicates true if the method returned because of a successfull connection and false if it returned because of a timeout.
 	 * @see #start()

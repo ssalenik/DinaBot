@@ -9,7 +9,7 @@ public class CloseClaw {
 	final int clawSpeed = 175;
 	final int clawRotation = -70;
 
-	public CloseClaw(Motor claw){
+	public CloseClaw(Motor claw) {
 
 		this.claw = claw;
 	}
@@ -20,7 +20,7 @@ public class CloseClaw {
 
 		claw.rotateTo(clawRotation);
 		claw.stop();
-		 
+		
 		claw.rotateTo(0);
 
 		claw.flt();

@@ -15,7 +15,7 @@ public interface Navigation extends MapListener {
 	 *
 	 * @param x the x coordiate to move to
 	 * @param y the y coordiate to move to
-	 * @return returns true if the robot sucessfully reached the destination, false if it was interrupted or cannot reach the destination 
+	 * @return returns true if the robot sucessfully reached the destination, false if it was interrupted or cannot reach the destination
 	 * @see #interrupt()
 	*/
 	public boolean goTo(double x, double y);
@@ -28,7 +28,7 @@ public interface Navigation extends MapListener {
 	public void interrupt();
 
 	/**
-	 * 
+	 *
 	 *
 	 *
 	*/

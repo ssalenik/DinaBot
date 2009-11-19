@@ -4,7 +4,7 @@ import lejos.nxt.Motor;
 
 public class BrickAlignment {
 
-	static void align(){
+	static void align() {
 
 		Motor.A.setSpeed(100);
 		Motor.B.setSpeed(100);
@@ -22,7 +22,7 @@ public class BrickAlignment {
 		Motor.B.rotate(720);
 	}
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 
 		align();
 	}

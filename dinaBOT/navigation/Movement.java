@@ -108,13 +108,13 @@ public interface Movement {
 	 *
 	*/
 	public void stop();
-	
+
 	/**
 	 * Suspend temporarily the current movement
 	 *
 	*/
 	public void suspend();
-	
+
 	/**
 	 * Resume any temporarily suspended action
 	 *

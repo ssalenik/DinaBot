@@ -26,7 +26,7 @@ public class BasicMovement implements Movement, MechConstants {
 	Odometer odometer;
 
 	Motor left_motor, right_motor;
-	
+
 	MovementDaemon movement_daemon;
 	Thread movement_daemon_thread;
 	boolean movement_daemon_running; //Run condition for the movement_daemon_thread
@@ -59,7 +59,7 @@ public class BasicMovement implements Movement, MechConstants {
 		movement_daemon_thread.setDaemon(true);
 		movement_daemon_thread.start();
 	}
-	
+
 	public boolean goTo(double x, double y, int speed) {
 		return goTo(x, y, speed, false);
 	}
@@ -67,13 +67,13 @@ public class BasicMovement implements Movement, MechConstants {
 	public boolean goTo(double x, double y, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0) return true;
-			
+
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.goTo(x, y, speed);
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
-		
+
 		return !interrupted_flag;
 	}
 
@@ -84,13 +84,13 @@ public class BasicMovement implements Movement, MechConstants {
 	public boolean goForward(double distance, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0 || distance == 0) return true; //Avoid silly input
-		
+
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.goForward(distance, speed);
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
-		
+
 		return !interrupted_flag;
 	}
 
@@ -109,13 +109,13 @@ public class BasicMovement implements Movement, MechConstants {
 	public boolean turnTo(double angle, int speed, boolean returnImmediately) {
 		stop();
 		if(speed == 0) return true; //Avoid silly input
-		
+
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.turnTo(angle, speed);
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
-		
+
 		return !interrupted_flag;
 	}
 
@@ -124,7 +124,7 @@ public class BasicMovement implements Movement, MechConstants {
 
 		synchronized(this) {
 			interrupted_flag = false;
-		
+
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);
 
@@ -145,7 +145,7 @@ public class BasicMovement implements Movement, MechConstants {
 
 		synchronized(this) {
 			interrupted_flag = false;
-	
+
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);
 
@@ -184,7 +184,7 @@ public class BasicMovement implements Movement, MechConstants {
 	public void resume() {
 		movement_daemon.resume();
 	}
-	
+
 	public void suspend() {
 		movement_daemon.suspend();
 	}
@@ -208,16 +208,16 @@ public class BasicMovement implements Movement, MechConstants {
 
 		//The current mode of the MovementDaemon
 		Mode mode, suspended_mode;
-		
+
 		int l_mode, r_mode;
-		
+
 		//Stored information, used depending on the mode
 		double target_distance, target_angle, target_speed;
-	
+
 		double[] initial_position;
 		double[] current_position;
 		double[] target_position;
-		
+
 		final int spline_correction_gain = 3;
 
 		/**
@@ -227,10 +227,10 @@ public class BasicMovement implements Movement, MechConstants {
 		MovementDaemon() {
 			mode = Mode.INACTIVE; //Initially inactive
 			suspended_mode = null;
-			
+
 			l_mode = 3;
 			r_mode = 3;
-			
+
 			//Setup the arrays
 			initial_position = new double[3];
 			current_position = new double[3];
@@ -262,7 +262,7 @@ public class BasicMovement implements Movement, MechConstants {
 							odometer.enableSnapping(true);
 							end();
 						}
-					} else if(mode == Mode.GOTO_SPLINE) { //Go to 
+					} else if(mode == Mode.GOTO_SPLINE) { //Go to
 						target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
 						//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
@@ -282,7 +282,7 @@ public class BasicMovement implements Movement, MechConstants {
 				}
 			}
 		}
-		
+
 		/**
 		 * Initiate movement to a specified x and y location
 		 *
@@ -294,15 +294,15 @@ public class BasicMovement implements Movement, MechConstants {
 			/* Set permanents */
 			target_position[0] = x;
 			target_position[1] = y;
-			
+
 			target_speed = speed;
-		
+
 			/* Variable Quantities */
-			
+
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
-			
+
 			/***** COPIED FROM TURNTO ******/
-			
+
 			odometer.enableSnapping(false);
 			//Set motor speed
 			left_motor.setSpeed(speed);
@@ -329,9 +329,9 @@ public class BasicMovement implements Movement, MechConstants {
 				right_motor.backward();
 				//And set mode
 				mode = Mode.GOTO_ROTATE_CW;
-			}						
+			}
 		}
-		
+
 		/**
 		 * Initiate forward movement to a specified distance
 		 *
@@ -349,7 +349,7 @@ public class BasicMovement implements Movement, MechConstants {
 			//Remeber requested distance
 			target_distance = distance;
 
-			//Start motors in correct direction 
+			//Start motors in correct direction
 			if(distance > 0) {
 				left_motor.forward();
 				right_motor.forward();
@@ -359,7 +359,7 @@ public class BasicMovement implements Movement, MechConstants {
 			}
 
 			//Set mode
-			mode = Mode.ADVANCE; 
+			mode = Mode.ADVANCE;
 		}
 
 		/**
@@ -432,25 +432,25 @@ public class BasicMovement implements Movement, MechConstants {
 			if(mode == Mode.INACTIVE) return false;
 			else return true;
 		}
-		
+
 		void suspend() {
 			l_mode = left_motor.getMode();
 			r_mode = right_motor.getMode();
-			
+
 			left_motor.stop();
 			right_motor.stop();
-			
+
 			suspended_mode = mode;
 			mode = Mode.SUSPENDED;
 		}
-		
+
 		void resume() {
 			if(suspended_mode != null) {
 				if(l_mode == 1) left_motor.forward();
 				else if(l_mode == 2) left_motor.backward();
 				if(r_mode == 1) right_motor.forward();
 				else if(r_mode == 2) right_motor.backward();
-			
+
 				mode = suspended_mode;
 			}
 			suspended_mode = null;

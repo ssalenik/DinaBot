@@ -102,7 +102,7 @@ public class LineDetector implements Runnable {
 	 *
 	*/
 	public void run() {
-		while(running){
+		while(running) {
 			int new_reading = sensor.getNormalizedLightValue();
 			if(new_reading < THRESHOLD && previous_reading > THRESHOLD) notifyListener();
 			previous_reading = new_reading;

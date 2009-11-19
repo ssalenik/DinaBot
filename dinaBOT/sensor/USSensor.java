@@ -1,32 +1,34 @@
 package dinaBOT.sensor;
 
-import dinaBOT.sensor.USSensorListener.*;
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.SensorPort;
 
+import dinaBOT.util.DinaList;
+
 public class USSensor implements Runnable {
 
-	public static USSensor high_sensor = new USSensor(SensorPort.S3, Position.HIGH);
-	public static USSensor low_sensor = new USSensor(SensorPort.S1, Position.LOW);
+	/* Class Variables */
+
+	public static USSensor high_sensor = new USSensor(SensorPort.S3);
+	public static USSensor low_sensor = new USSensor(SensorPort.S1);
+
+	/* Instance Variables */
 
 	UltrasonicSensor sensor;
-	USSensorListener[] listeners;
-	int listeners_pointer;
+
+	DinaList<USSensorListener> listeners;
 
 	Thread us_sensor_thread;
 	boolean running;
 
-	Position position;
 	int[] latest_values;
 
-	public USSensor(SensorPort port, Position position) {
+	public USSensor(SensorPort port) {
 		sensor = new UltrasonicSensor(port);
 
-		listeners = new USSensorListener[5];
-		listeners_pointer = 0;
+		listeners = new DinaList<USSensorListener>();
 
 		latest_values = new int[8];
-		this.position = position;
 		sensor.off();
 
 		start();
@@ -40,22 +42,37 @@ public class USSensor implements Runnable {
 			} catch(Exception e) {
 
 			}
+
 			sensor.getDistances(latest_values);
+
+			if (this == USSensor.low_sensor) {
+				if(latest_values[0] <= 26) {
+					for(int i = 0;i < 8;i++) {
+						latest_values[i] = (int)((double)(latest_values[i]*latest_values[i])*0.1091-3.3446*(double)latest_values[i]+35.629);
+					}
+				} else {
+					for(int i = 0;i < 8;i++) {
+						latest_values[i] = (int)(0.9846*(double)latest_values[i]-0.1456);
+					}
+				}
+			} else if (this == USSensor.high_sensor) {
+				for(int i = 0;i < 8;i++) {
+					latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);
+				}
+			}
+
 			notifyListeners();
 		}
 	}
 
 	void notifyListeners() {
-		for(int i = 0;i < listeners.length;i++) {
-			if(listeners[i] != null) {				
-					listeners[i].newValues(adjustSensorValues(latest_values, position), position);		
-			}
+		for(int i = 0;i < listeners.size();i++) {
+			listeners.get(i).newValues(latest_values, this);
 		}
 	}
 
 	public void registerListener(USSensorListener listener) {
-		this.listeners[listeners_pointer%listeners.length] = listener;
-		listeners_pointer++;
+		listeners.add(listener);
 	}
 
 	public void start() {
@@ -72,23 +89,5 @@ public class USSensor implements Runnable {
 			while(us_sensor_thread != null && us_sensor_thread.isAlive()) Thread.yield();
 		}
 	}
-
-	public int[] adjustSensorValues(int[] latest_values, Position position) {
-		if (position == position.LOW) {
-
-			if(latest_values[0] <= 26){
-				for(int i = 0;i < 8;i++){
-					latest_values[i] = (int) ((latest_values[i]*latest_values[i]*0.1091) - (latest_values[i]*3.3446) + 35.629 );
-				}
-			}
-		} else if (position == position.HIGH) {
-			for(int i = 0;i < 8;i++){
-				latest_values[i] = (int) ( (latest_values[i]*1.3013) - 0.7027);
-			}			
-		}
-		return latest_values;}
-
-
-
 
 }

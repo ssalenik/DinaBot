@@ -83,7 +83,7 @@ public class ArcOdometer implements Odometer {
 	public void run() {
 		while(true) { //Forever
 			//Compute the change in tacho count (in radians)
-			double d_tacho_left = (double)left_encoder.getTachoCount()/360*(2*Math.PI)-tacho_left; 
+			double d_tacho_left = (double)left_encoder.getTachoCount()/360*(2*Math.PI)-tacho_left;
 			double d_tacho_right = (double)right_encoder.getTachoCount()/360*(2*Math.PI)-tacho_right;
 
 			double dC = (d_tacho_right*WHEEL_RADIUS+d_tacho_left*WHEEL_RADIUS)/2; //Compute the arc length travelled
@@ -108,7 +108,7 @@ public class ArcOdometer implements Odometer {
 	 * <p>
 	 * Angles are in radians, x-y coordinates in cm.
 	 * <p>
-	 * Please note that this method is <b>not</b> synchronized by design. There is a tiny 
+	 * Please note that this method is <b>not</b> synchronized by design. There is a tiny
 	 * risk that the position array will get updated while arraycopy
 	 * is running (this is HIGHLY unlikley given that array copy is
 	 * a native call, not a java call, so it probably executes in a
@@ -173,9 +173,9 @@ public class ArcOdometer implements Odometer {
 	 *
 	 * @param detector indicates the detector which is calling this method
 	*/
-	public synchronized void lineDetected(LineDetector detector) {		
+	public synchronized void lineDetected(LineDetector detector) {
 		if(!snap_enable) return;
-		
+
 		//Compute the current heading between [0, 2*PI]
 		double current_heading = position[2]%(Math.PI*2);
 		if(current_heading < 0) current_heading += Math.PI*2;
