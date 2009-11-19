@@ -29,6 +29,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	Movement movement;
 
 	BTMaster slave_connection;
+	
+	int dropOffX, dropOffY; //Variables that are input at runtime to indicate where the drop-off point is
 
 	/**
 	 * This is the contructor for the DinaBOT master
@@ -38,6 +40,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 		slave_connection = new BTMaster();
+		
+		dropOffX = 0;
+		dropOffY = 0;
 	}
 
 	/**
@@ -198,6 +203,27 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		// go back to 0,0
 		navigator.goTo(0,0);
 	}
+	
+	//Method to be written by Gab
+	public void dropOff() {
+		/**
+		 *Using the odometer, you will  
+		 *have to write a method called dropOff(), situated here, which will
+		 *contain the series of commands that directs the robot to the drop off of a full stack  
+		 *of bricks at the edge of a designated drop off tile on the grid. The  
+		 *teacher has told us that the tiles along the drop off point  
+		 *would be clear of obstacles, so you don't have to worry about that.  
+		 *You will have to determine what the best way of doing this without  
+		 *knocking off possible other stacks already positioned on the drop off  
+		 *point. The point at which the robot starts the drop off will be at one  
+		 *of the outer gridline nodes of the tiles surrounding the drop off  
+		 *point. Once the robot chooses the start-dropoff point for the first  
+		 *time, it will always use the same time each time it needs to drop off  
+		 *another stack. The inputed data for the drop off will be given at  
+		 *startup and would be two ints in the main.
+		 */
+		
+	}
 
 	public void connect() {
 		while(!slave_connection.connect());
@@ -234,12 +260,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
-		//dinaBOTmaster.connect();
+		dinaBOTmaster.connect();
 		//dinaBOTmaster.alignBrick();
 		//dinaBOTmaster.milestoneDemo();
-		//dinaBOTmaster.pathTest();
-		dinaBOTmaster.moveTest();
-		DinaList<Integer> list = new DinaList<Integer>();
+		dinaBOTmaster.milestoneDemo();
+		//dinaBOTmaster.moveTest();
 		while(true); //Never quit
 
 	}
