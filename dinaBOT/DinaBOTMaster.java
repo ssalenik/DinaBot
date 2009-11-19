@@ -193,15 +193,49 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		} catch(Exception e) {}
 
 		// go to 2,3
-		navigator.goTo(2*UNIT_TILE, 3*UNIT_TILE);
+		navigator.goTo(3*UNIT_TILE, 3*UNIT_TILE, false);
+		
 
-		// stop
+
+		// go back to 0,0
+		navigator.goTo(0.0,0.0, false);
+	}
+	
+	// stepan's pathing and mapping AND block detection and pickup test
+	public void pathPickupTest() {
+		Map mapper = new Map(odometer, 12, 45, UNIT_TILE);
+		Pathing pather = new ManhattanPather(mapper, movement);
+		Navigator navigator = new Navigator(pather, movement, mapper, odometer);
+		BlockFinder blockFind = new BlockFinder(odometer, movement);
+		
+		boolean foundBlock = false;
+		int done;
+		
+
+		odometer.enableSnapping(true);
+		odometer.setDebug(false);
+
+		//Pause so the user can remove his hand from the robot
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {}
 
-		// go back to 0,0
-		navigator.goTo(0,0);
+		// go to 2,2
+		done = navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false);
+		if ( done == 1) {
+			foundBlock = blockFind.sweep(odometer.getPosition()[2]);
+			
+			if(foundBlock) {
+				//Align + Pickup
+				alignBrick();
+
+				slave_connection.request(PICKUP);
+			}
+		} else if (done == 0) {
+
+			// go back to 0,0
+			navigator.goTo(0.0,0.0, false);
+		}
 	}
 	
 	//Method to be written by Gab
@@ -263,8 +297,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		dinaBOTmaster.connect();
 		//dinaBOTmaster.alignBrick();
 		//dinaBOTmaster.milestoneDemo();
-		dinaBOTmaster.milestoneDemo();
+
+
+		dinaBOTmaster.pathPickupTest();
 		//dinaBOTmaster.moveTest();
+		//DinaList<Integer> list = new DinaList<Integer>();
+
+		//dinaBOTmaster.moveTest();
+
 		while(true); //Never quit
 
 	}
