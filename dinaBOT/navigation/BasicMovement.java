@@ -3,7 +3,7 @@ package dinaBOT.navigation;
 import lejos.nxt.Motor;
 import java.lang.Math;
 
-import dinaBOT.util.Functions;
+import dinaBOT.mech.MechConstants;
 
 /**
  * BasicMovement is a simple implementation of the specifications of the {@link Movement} interface. It provides simple movement paradigms for robot movement. This implementation assumes a robot with two wheels that can rotate about itself and who's position is accurately reflected by the associated {@link Odometer}.
@@ -14,12 +14,12 @@ import dinaBOT.util.Functions;
  * @see Navigation
  * @version 2
 */
-public class BasicMovement implements Movement {
+public class BasicMovement implements Movement, MechConstants {
 
 	/* -- Static Variables --*/
 
 	//Possible states for the movement daemon to be in
-	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO }
+	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO_ROTATE_CW, GOTO_ROTATE_CCW, GOTO_SPLINE }
 
 	/* -- Instance Variables --*/
 
@@ -31,7 +31,7 @@ public class BasicMovement implements Movement {
 	Thread movement_daemon_thread;
 	boolean movement_daemon_running; //Run condition for the movement_daemon_thread
 
-	boolean moving, inter;
+	boolean moving, interrupted_flag;
 
 	/**
 	 * Create a new BasicMovement instance with the given odometer and left and right motors.
@@ -60,94 +60,116 @@ public class BasicMovement implements Movement {
 		movement_daemon_thread.start();
 	}
 	
-	public void goTo(double x, double y, int speed) {
-		goTo(x, y, speed, false);
+	public boolean goTo(double x, double y, int speed) {
+		return goTo(x, y, speed, false);
 	}
 
-	public void goTo(double x, double y, int speed, boolean returnImmediately) {
+	public boolean goTo(double x, double y, int speed, boolean returnImmediately) {
 		stop();
-		if(speed == 0) return;
-		double[] current_position = odometer.getPosition();
-		inter = false;
-		turnTo(Math.atan2((y-current_position[1]),(x-current_position[0])), 60);
-		if(inter) {
-			inter = false;
-			return;
+		if(speed == 0) return true;
+			
+		synchronized(this) {
+			interrupted_flag = false;
+			movement_daemon.goTo(x, y, speed);
+			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
-		movement_daemon.goTo(x, y, speed);
-		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+		
+		return !interrupted_flag;
 	}
 
-	public void goForward(double distance, int speed) {
-		goForward(distance, speed, false);
+	public boolean goForward(double distance, int speed) {
+		return goForward(distance, speed, false);
 	}
 
-	public void goForward(double distance, int speed, boolean returnImmediately) {
+	public boolean goForward(double distance, int speed, boolean returnImmediately) {
 		stop();
-		if(speed == 0 || distance == 0) return; //Avoid silly input
-		movement_daemon.goForward(distance, speed);
-		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+		if(speed == 0 || distance == 0) return true; //Avoid silly input
+		
+		synchronized(this) {
+			interrupted_flag = false;
+			movement_daemon.goForward(distance, speed);
+			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+		}
+		
+		return !interrupted_flag;
 	}
 
-	public void turn(double angle, int speed) {
-		turn(angle, speed, false);
+	public boolean turn(double angle, int speed) {
+		return turn(angle, speed, false);
 	}
 
-	public void turn(double angle, int speed, boolean immediateReturn) {
-		turnTo(angle+odometer.getPosition()[2], speed, immediateReturn);
+	public boolean turn(double angle, int speed, boolean immediateReturn) {
+		return turnTo(angle+odometer.getPosition()[2], speed, immediateReturn);
 	}
 
-	public void turnTo(double angle, int speed) {
-		turnTo(angle, speed, false);
+	public boolean turnTo(double angle, int speed) {
+		return turnTo(angle, speed, false);
 	}
 
-	public void turnTo(double angle, int speed, boolean returnImmediately) {
+	public boolean turnTo(double angle, int speed, boolean returnImmediately) {
 		stop();
-		inter = false;
-		if(speed == 0) return; //Avoid silly input
-		movement_daemon.turnTo(angle, speed);
-		if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+		if(speed == 0) return true; //Avoid silly input
+		
+		synchronized(this) {
+			interrupted_flag = false;
+			movement_daemon.turnTo(angle, speed);
+			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+		}
+		
+		return !interrupted_flag;
 	}
 
 	public void rotate(boolean direction, int speed) {
 		stop();
 
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
+		synchronized(this) {
+			interrupted_flag = false;
+		
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
 
-		moving = true;
+			moving = true;
 
-		if(direction) {
-			left_motor.backward();
-			right_motor.forward();
-		} else {
-			left_motor.forward();
-			right_motor.backward();
+			if(direction) {
+				left_motor.backward();
+				right_motor.forward();
+			} else {
+				left_motor.forward();
+				right_motor.backward();
+			}
 		}
 	}
 
 	public void forward(int speed) {
 		stop();
 
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
+		synchronized(this) {
+			interrupted_flag = false;
+	
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
 
-		moving = true;
+			moving = true;
 
-		left_motor.forward();
-		right_motor.forward();
+			left_motor.forward();
+			right_motor.forward();
+		}
 	}
 
 	public void backward(int speed) {
 		stop();
 
-		left_motor.setSpeed(speed);
-		right_motor.setSpeed(speed);
+		synchronized(this) {
+			interrupted_flag = false;
 
-		moving = true;
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
 
-		left_motor.backward();
-		right_motor.backward();
+			moving = true;
+
+			left_motor.backward();
+			right_motor.backward();
+		}
 	}
 
 	public void stop() {
@@ -157,7 +179,6 @@ public class BasicMovement implements Movement {
 		right_motor.stop();
 
 		moving = false;
-		inter = true;
 	}
 
 	public void resume() {
@@ -192,9 +213,12 @@ public class BasicMovement implements Movement {
 		
 		//Stored information, used depending on the mode
 		double target_distance, target_angle, target_speed;
+	
 		double[] initial_position;
 		double[] current_position;
 		double[] target_position;
+		
+		final int spline_correction_gain = 3;
 
 		/**
 		 * Create MovementDaemon
@@ -202,7 +226,7 @@ public class BasicMovement implements Movement {
 		*/
 		MovementDaemon() {
 			mode = Mode.INACTIVE; //Initially inactive
-			suspended_mode = Mode.INACTIVE;
+			suspended_mode = null;
 			
 			l_mode = 3;
 			r_mode = 3;
@@ -225,20 +249,20 @@ public class BasicMovement implements Movement {
 					current_position = odometer.getPosition(); //Update position array
 					if(mode == Mode.ADVANCE) { //Advance set distance
 						if(target_distance*target_distance < ((current_position[0]-initial_position[0])*(current_position[0]-initial_position[0])+(current_position[1]-initial_position[1])*(current_position[1]-initial_position[1]))) {
-							stop();
+							end();
 						}
-					} else if(mode == Mode.ROTATE_CCW) { //Rotate set angle counter clockwise
+					} else if(mode == Mode.ROTATE_CCW || mode == Mode.GOTO_ROTATE_CCW) { //Rotate set angle counter clockwise
 						if((target_angle - current_position[2]) <= 0) { //Until the sign of the relative angle changes
 							odometer.enableSnapping(true);
-							stop();
+							end();
 						}
 
-					} else if(mode == Mode.ROTATE_CW) { //Rotate set angle clockwise
+					} else if(mode == Mode.ROTATE_CW || mode == Mode.GOTO_ROTATE_CW) { //Rotate set angle clockwise
 						if((target_angle - current_position[2]) >= 0) { //Until the sign of the relative angle changes
 							odometer.enableSnapping(true);
-							stop();
+							end();
 						}
-					} else if(mode == Mode.GOTO) { //Go to 
+					} else if(mode == Mode.GOTO_SPLINE) { //Go to 
 						target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
 						//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
@@ -249,12 +273,10 @@ public class BasicMovement implements Movement {
 						double dmax = Math.sqrt((target_position[0]-current_position[0])*(target_position[0]-current_position[0])+(target_position[1]-current_position[1])*(target_position[1]-current_position[1]));
 						target_distance = Math.cos(current_position[2]-target_angle)*dmax;
 
-						int base_speed = (int)target_speed;
+						left_motor.setSpeed((int)(target_speed+target_speed*spline_correction_gain*(current_position[2]-target_angle)));
+						right_motor.setSpeed((int)(target_speed-target_speed*spline_correction_gain*(current_position[2]-target_angle)));
 
-						left_motor.setSpeed((int)(base_speed+base_speed*2*(current_position[2]-target_angle)));
-						right_motor.setSpeed((int)(base_speed-base_speed*2*(current_position[2]-target_angle)));
-
-						if(target_distance < 1) stop();
+						if(target_distance < 1) end();
 					}
 					Thread.yield(); //Yield for a little while
 				}
@@ -269,36 +291,45 @@ public class BasicMovement implements Movement {
 		 * @param speed the speed to advance at
 		*/
 		void goTo(double x, double y, int speed) {
-			/* Set permanents*/
+			/* Set permanents */
 			target_position[0] = x;
 			target_position[1] = y;
-			target_speed = speed;
 			
-			/* Compute initial state*/
-			current_position = odometer.getPosition();
+			target_speed = speed;
+		
+			/* Variable Quantities */
 			
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
+			
+			/***** COPIED FROM TURNTO ******/
+			
+			odometer.enableSnapping(false);
+			//Set motor speed
+			left_motor.setSpeed(speed);
+			right_motor.setSpeed(speed);
+
+			//Remember start position
+			initial_position = odometer.getPosition();
 
 			//Convert angle modulo 2*pi (angle E [-2*pi, 2*pi]) and store
-			target_angle = (target_angle)%(2*Math.PI);
+			//target_angle = (angle)%(2*Math.PI); //THIS DOESN'T APPLY
 
 			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
 			//eg within pi of the current positon
-			while(target_angle < (current_position[2] - Math.PI)) target_angle += 2*Math.PI;
-			while(target_angle > (current_position[2] + Math.PI)) target_angle -= 2*Math.PI;
+			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
+			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
 
-			double dmax = Math.sqrt((target_position[0]-current_position[0])*(target_position[0]-current_position[0])+(target_position[1]-current_position[1])*(target_position[1]-current_position[1]));
-			target_distance = Math.cos(current_position[2]-target_angle)*dmax;
-		
-			int base_speed = (int)target_speed;
-	
-			left_motor.setSpeed((int)(base_speed+base_speed*2*(current_position[2]-target_angle)));
-			right_motor.setSpeed((int)(base_speed-base_speed*2*(current_position[2]-target_angle)));
-
-			left_motor.forward();
-			right_motor.forward();
-			
-			mode = Mode.GOTO;			
+			if((target_angle - initial_position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
+				left_motor.backward();
+				right_motor.forward();
+				//And set mode
+				mode = Mode.GOTO_ROTATE_CCW;
+			} else { //If the realtive angle is negative go clockwise
+				left_motor.forward();
+				right_motor.backward();
+				//And set mode
+				mode = Mode.GOTO_ROTATE_CW;
+			}						
 		}
 		
 		/**
@@ -368,7 +399,21 @@ public class BasicMovement implements Movement {
 		}
 
 		/**
-		 * Stop any ongoing movements
+		 * End naturally all movements
+		 *
+		*/
+		void end() {
+			if(mode == Mode.GOTO_ROTATE_CW || mode == Mode.GOTO_ROTATE_CCW) {
+				left_motor.forward();
+				right_motor.forward();
+				mode = Mode.GOTO_SPLINE; //Goto
+			} else {
+				stop();
+			}
+		}
+
+		/**
+		 * Stop any ongoing movements forcibly
 		 *
 		*/
 		void stop() {
@@ -400,12 +445,15 @@ public class BasicMovement implements Movement {
 		}
 		
 		void resume() {
-			if(l_mode == 1) left_motor.forward();
-			else if(l_mode == 2) left_motor.backward();
-			if(r_mode == 1) right_motor.forward();
-			else if(r_mode == 2) right_motor.backward();
+			if(suspended_mode != null) {
+				if(l_mode == 1) left_motor.forward();
+				else if(l_mode == 2) left_motor.backward();
+				if(r_mode == 1) right_motor.forward();
+				else if(r_mode == 2) right_motor.backward();
 			
-			mode = suspended_mode;
+				mode = suspended_mode;
+			}
+			suspended_mode = null;
 		}
 	}
 

@@ -9,7 +9,6 @@ import dinaBOT.navigation.*;
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
 import dinaBOT.detection.*;
-import dinaBOT.sound.*;
 
 /**
  * The DinaBOTMaster is the main class the master brick. It <b>is</b> the robot. It contains the main() for the master.
@@ -27,7 +26,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	
 	Odometer odometer;
 	Movement movement;
-	MusicPlayer music;
 	
 	BTMaster slave_connection;
 	
@@ -39,8 +37,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 		slave_connection = new BTMaster();
-		Song[] songSet = {Songs.marioOverworld};
-		music = new MusicBox(songSet);
 	}
 	
 	/**
@@ -209,15 +205,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	public void moveTest() {
 		odometer.setDebug(true);
 		odometer.enableSnapping(true);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.turnTo(Math.PI, SPEED_ROTATE);
-	}
-	
-	public void musicTest() {
-		music.play();
-		if(slave_connection.request(PLAY_SONG)) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
+		while(true) {
+			movement.goTo(UNIT_TILE*3, UNIT_TILE, 150);
+			movement.goTo(UNIT_TILE*3, UNIT_TILE*3, 150);
+			movement.goTo(UNIT_TILE, UNIT_TILE*3, 150);
+			movement.goTo(UNIT_TILE, UNIT_TILE, 150);
 		}
 	}
 		
@@ -240,12 +233,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
 		//Run some tests
-		dinaBOTmaster.connect();
+		//dinaBOTmaster.connect();
 		//dinaBOTmaster.alignBrick();
 		//dinaBOTmaster.milestoneDemo();
 		//dinaBOTmaster.pathTest();
-		//dinaBOTmaster.moveTest();
-		dinaBOTmaster.musicTest();
+		dinaBOTmaster.moveTest();
 		while(true); //Never quit
 	}
 	
