@@ -1,6 +1,7 @@
 package dinaBOT.navigation;
 
 import dinaBOT.mech.MechConstants;
+import dinaBOT.comm.*;
 import dinaBOT.sensor.*;
 
 /*
@@ -29,13 +30,13 @@ public class DropOff implements MechConstants{
 	
 	public Odometer odometer;
 	public Movement mover;
-	public BTmaster slave_connection;
+	public BTMaster slave_connection;
 	
 	public int dropOffX, dropOffY;
 	
 	//Add other instances you'll need
 	
-	public DropOff(Odometer odometer, Movement mover, BTmaster slave_connection, int dropOffX, int dropOffY) {
+	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, int dropOffX, int dropOffY) {
 		this.odometer = odometer;
 		this.mover = mover;
 		this.slave_connection = slave_connection;
