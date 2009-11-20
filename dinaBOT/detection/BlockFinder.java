@@ -34,6 +34,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	int minLow =0;
 	int minHigh=0;
 	int missedAngle;
+	int i = 0;
+	final int size = 5;
+	
+	static final int SECOND_COLUMN_MAX = 75;
+	//Super experimental constant
 
 	/**
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
@@ -45,7 +50,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		USSensor.low_sensor.registerListener(this);
 		USSensor.high_sensor.registerListener(this);
 		low_Readings = new int[]{255,255,255,255,255,255,255,255};
-		high_Readings = new int[]{255,255,255,255,255,255,255,255};
+		high_Readings = new int[]{255,255,255,255,255};
 	}
 
 	/**
@@ -109,35 +114,42 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	public void findEdgeA() {
 
 			if(minLow < US_TRUST_THRESHOLD
-					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+					&& minHigh - minLow > DETECTION_THRESHOLD
 					&& minLow < blockDistance_A
-					&& low_Readings[1] < 100) {
+					&& low_Readings[1] < SECOND_COLUMN_MAX) {
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
 				Sound.buzz();
-				//LCD.drawInt(minLow, 0, 0);
-				//LCD.drawInt(minHigh, 0, 2);
-				//LCD.drawInt(low_Readings[1], 0, 1);
+				LCD.drawInt(minLow, 0, 0);
+				LCD.drawInt(minHigh, 0, 2);
+				LCD.drawInt(low_Readings[1], 0, 1);
 			}
 	}
 
 	public void	findEdgeB() {
 
 			if(minLow < US_TRUST_THRESHOLD
-					&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+					&& minHigh - minLow > DETECTION_THRESHOLD
 					&& minLow < blockDistance_B
-					&& low_Readings[1] < 100) {
+					&& low_Readings[1] < SECOND_COLUMN_MAX) {
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
 				Sound.buzz();
-				//LCD.drawInt(minLow, 0, 3);
-				//LCD.drawInt(minHigh, 0, 5);
-				//LCD.drawInt(low_Readings[1], 0, 4);
+				LCD.drawInt(minLow, 0, 3);
+				LCD.drawInt(minHigh, 0, 5);
+				LCD.drawInt(low_Readings[1], 0, 4);
 			}
 		}
 
+	public static int getFilteredValue(int[] list) {
+		int value = 255;
+		for (int i=0; i<list.length; i++) {
+			value = Math.min(value, list[i]); 
+		}
+		return value;
+	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
 
@@ -154,10 +166,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 						data_acquired = false;
 					}
 				} else if (sensor == USSensor.high_sensor) {
-					this.high_Readings = new_values;
+					this.high_Readings[i%size] = new_values[0];
+					i++;
 					if (!data_acquired) {
 						minLow = low_Readings[0];
-						minHigh = high_Readings[0];
+						minHigh = getFilteredValue(high_Readings);
 						findEdgeA();
 						data_acquired = true;
 					}
@@ -173,10 +186,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 						data_acquired = false;
 					}
 				} else if (sensor == USSensor.high_sensor) {
-					this.high_Readings = new_values;
+					this.high_Readings[i%size] = new_values[0];
+					i++;
 					if (!data_acquired) {
 						minLow = low_Readings[0];
-						minHigh = high_Readings[0];
+						minHigh = getFilteredValue(high_Readings);
 						findEdgeB();
 						data_acquired = true;
 					}
@@ -193,7 +207,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 						data_acquired = false;
 					}
 				} else if (sensor == USSensor.high_sensor) {
-					this.high_Readings = new_values;
+					this.high_Readings[i%size] = new_values[0];
 					if (!data_acquired) {
 						if (missedAngle == 'A') {
 							findEdgeA();
