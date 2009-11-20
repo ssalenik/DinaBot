@@ -29,8 +29,8 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	//Current phase of operation
 	int phase =0;
 
-	int blockDistance_A = 255;
-	int blockDistance_B = 255;
+	int blockDistance_A;
+	int blockDistance_B;
 	int minLow =0;
 	int minHigh=0;
 	int missedAngle;
@@ -60,7 +60,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	 *
 	*/
 	public boolean sweep(double blockAngle) {
-
+		blockDistance_A = 255;
+		blockDistance_B = 255;
+		
 		double initialOrientation = odometer.getPosition()[2];
 		angleA = initialOrientation;
 		angleB = initialOrientation;
@@ -113,7 +115,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
-				Sound.twoBeeps();
+				Sound.buzz();
 				//LCD.drawInt(minLow, 0, 0);
 				//LCD.drawInt(minHigh, 0, 2);
 				//LCD.drawInt(low_Readings[1], 0, 1);
@@ -129,7 +131,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
-				Sound.twoBeeps();
+				Sound.buzz();
 				//LCD.drawInt(minLow, 0, 3);
 				//LCD.drawInt(minHigh, 0, 5);
 				//LCD.drawInt(low_Readings[1], 0, 4);
