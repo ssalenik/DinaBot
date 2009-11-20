@@ -155,9 +155,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		movement.goForward(forward_distance, SPEED_MED);
 
-		movement.turn(Math.PI/3, SPEED_ROTATE);
+		movement.turn(Math.PI/5, SPEED_ROTATE);
 
-		movement.goForward(forward_distance, SPEED_MED);
+		//movement.goForward(forward_distance, SPEED_MED);
 
 		if(slave_connection.request(HOLD)) {
 			LCD.clear();
@@ -166,7 +166,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		movement.goForward(-forward_distance, SPEED_MED);
 
-		movement.turn(-Math.PI/3, SPEED_ROTATE);
+		movement.turn(-Math.PI/5, SPEED_ROTATE);
 
 		for(int i = 0;i < 2;i++) {
 			if(slave_connection.request(HOLD)) {
@@ -199,13 +199,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			Thread.sleep(1000);
 		} catch(Exception e) {}
 
-		// go to 2,3
-		navigator.goTo(3*UNIT_TILE, 3*UNIT_TILE, false);
-		
-
-
-		// go back to 0,0
-		navigator.goTo(0.0,0.0, false);
+		// go to _,_ then 0,0
+		if ( navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, true) == 0) navigator.goTo(0.0,0.0, true);		
 	}
 	
 	// stepan's pathing and mapping AND block detection and pickup test
@@ -227,16 +222,27 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			Thread.sleep(1000);
 		} catch(Exception e) {}
 	
-		while(navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false) > 0) {
+		while(navigator.goTo(5*UNIT_TILE, 5*UNIT_TILE, false) > 0) {
 			System.out.println("Home");
 			if(blockFind.sweep(odometer.getPosition()[2])) {
 				System.out.println("Pickup");
 				alignBrick();
+				mapper.stop();
 				slave_connection.request(PICKUP);
+				mapper.start();
 			}
 		}
-		if(navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false) == -1) System.out.println("Fail");
-		else navigator.goTo(0.0,0.0, false);
+		
+		while(navigator.goTo(0, 0, false) > 0) {
+			System.out.println("Home");
+			if(blockFind.sweep(odometer.getPosition()[2])) {
+				System.out.println("Pickup");
+				alignBrick();
+				mapper.stop();
+				slave_connection.request(PICKUP);
+				mapper.start();
+			}
+		}
 		System.out.println("Done");
 	}
 	
@@ -246,6 +252,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 	public void moveTest() {
 		while(true) {
+			/*
+			movement.goTo(UNIT_TILE*3, UNIT_TILE, 50);
+			movement.goTo(UNIT_TILE*3, UNIT_TILE*3, 50);
+			movement.goTo(UNIT_TILE, UNIT_TILE*3, 50);
+			movement.goTo(UNIT_TILE, UNIT_TILE, 50);
+			*/
 			Button.waitForPress();
 			slave_connection.request(HOLD);
 			Button.waitForPress();
@@ -283,6 +295,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		//dinaBOTmaster.alignBrick();
 		//dinaBOTmaster.milestoneDemo();
 
+		//dinaBOTmaster.pathTest();
 		dinaBOTmaster.pathPickupTest();
 		//dinaBOTmaster.moveTest();
 		//DinaList<Integer> list = new DinaList<Integer>();
