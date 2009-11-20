@@ -84,7 +84,6 @@ public class Localization implements MechConstants, USSensorListener{
 	//odometer.setPosition(new double[] {0,0,Math.PI/2}, new boolean[] {true,true,true});
 	}
 
-	@Override
 	public void newValues(int[] new_values, USSensor sensor) {
 
 		switch (phase) {
