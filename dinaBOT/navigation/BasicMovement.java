@@ -1,6 +1,6 @@
 package dinaBOT.navigation;
 
-import lejos.nxt.Motor;
+import lejos.nxt.*;
 import java.lang.Math;
 
 import dinaBOT.mech.MechConstants;
@@ -71,6 +71,7 @@ public class BasicMovement implements Movement, MechConstants {
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.goTo(x, y, speed);
+			while(!movement_daemon.isActive()) Thread.yield();
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
 
@@ -88,6 +89,7 @@ public class BasicMovement implements Movement, MechConstants {
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.goForward(distance, speed);
+			while(!movement_daemon.isActive()) Thread.yield();
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
 
@@ -113,6 +115,7 @@ public class BasicMovement implements Movement, MechConstants {
 		synchronized(this) {
 			interrupted_flag = false;
 			movement_daemon.turnTo(angle, speed);
+			while(!movement_daemon.isActive()) Thread.yield();
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
 		}
 
@@ -297,13 +300,14 @@ public class BasicMovement implements Movement, MechConstants {
 
 			target_speed = speed;
 
+			current_position = odometer.getPosition();
+			
 			/* Variable Quantities */
-
+			
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
 			/***** COPIED FROM TURNTO ******/
 
-			odometer.enableSnapping(false);
 			//Set motor speed
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);
@@ -318,17 +322,27 @@ public class BasicMovement implements Movement, MechConstants {
 			//eg within pi of the current positon
 			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
-
-			if((target_angle - initial_position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
-				left_motor.backward();
-				right_motor.forward();
-				//And set mode
-				mode = Mode.GOTO_ROTATE_CCW;
-			} else { //If the realtive angle is negative go clockwise
+						
+			if((target_angle - initial_position[2]) > Math.PI/8 || (target_angle - initial_position[2]) < -Math.PI/8) {
+				odometer.enableSnapping(false);
+				left_motor.setSpeed(SPEED_ROTATE);
+				right_motor.setSpeed(SPEED_ROTATE);
+				
+				if((target_angle - initial_position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
+					left_motor.backward();
+					right_motor.forward();
+					//And set mode
+					mode = Mode.GOTO_ROTATE_CCW;
+				} else { //If the realtive angle is negative go clockwise
+					left_motor.forward();
+					right_motor.backward();
+					//And set mode
+					mode = Mode.GOTO_ROTATE_CW;
+				}
+			} else {
 				left_motor.forward();
-				right_motor.backward();
-				//And set mode
-				mode = Mode.GOTO_ROTATE_CW;
+				right_motor.forward();
+				mode = Mode.GOTO_SPLINE;
 			}
 		}
 

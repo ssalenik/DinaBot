@@ -17,9 +17,9 @@ public class Stacker implements Stacking {
 
 	//in degrees
 	final int clawOpenAngle = 0;
-	final int clawStraightAngle = -60;
-	final int clawClosedAngle = -80;
-	final int clawTopAngle = -230;
+	final int clawStraightAngle = -90;
+	final int clawClosedAngle = -110;
+	final int clawTopAngle = -270;
 
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 50;

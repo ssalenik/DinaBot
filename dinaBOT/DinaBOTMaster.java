@@ -221,28 +221,23 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		odometer.enableSnapping(true);
 		odometer.setDebug(false);
-
+		System.out.println("Begin");
 		//Pause so the user can remove his hand from the robot
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {}
-
-		// go to 2,2
-		done = navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false);
-		if ( done == 1) {
-			foundBlock = blockFind.sweep(odometer.getPosition()[2]);
-			
-			if(foundBlock) {
-				//Align + Pickup
+	
+		while(navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false) > 0) {
+			System.out.println("Home");
+			if(blockFind.sweep(odometer.getPosition()[2])) {
+				System.out.println("Pickup");
 				alignBrick();
-
 				slave_connection.request(PICKUP);
 			}
-		} else if (done == 0) {
-
-			// go back to 0,0
-			navigator.goTo(0.0,0.0, false);
 		}
+		if(navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, false) == -1) System.out.println("Fail");
+		else navigator.goTo(0.0,0.0, false);
+		System.out.println("Done");
 	}
 	
 	public void connect() {
@@ -250,14 +245,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	}
 
 	public void moveTest() {
-		odometer.setDebug(true);
-		odometer.enableSnapping(true);
-		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 		while(true) {
-			movement.goTo(UNIT_TILE*3, UNIT_TILE, 150);
-			movement.goTo(UNIT_TILE*3, UNIT_TILE*3, 150);
-			movement.goTo(UNIT_TILE, UNIT_TILE*3, 150);
-			movement.goTo(UNIT_TILE, UNIT_TILE, 150);
+			Button.waitForPress();
+			slave_connection.request(HOLD);
+			Button.waitForPress();
+			slave_connection.request(RELEASE);
+			Button.waitForPress();
+			slave_connection.request(TAP);
+			Button.waitForPress();
+			slave_connection.request(PICKUP);
+			slave_connection.request(OPEN_CAGE);
+			slave_connection.request(CLOSE_CAGE);
+			
 		}
 	}
 
@@ -284,13 +283,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		//dinaBOTmaster.alignBrick();
 		//dinaBOTmaster.milestoneDemo();
 
-
 		dinaBOTmaster.pathPickupTest();
 		//dinaBOTmaster.moveTest();
 		//DinaList<Integer> list = new DinaList<Integer>();
 
 		//dinaBOTmaster.moveTest();
-
 		while(true); //Never quit
 
 	}

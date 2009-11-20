@@ -37,8 +37,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 		map.registerListener(this);
 		
-		low_Readings = new int[]{255,255,255,255,255,255,255,255};
-		high_Readings = new int[]{255,255,255,255,255,255,255,255};
+		low_Readings = new int[] {255,255,255,255,255,255,255,255};
+		high_Readings = new int[] {255,255,255,255,255,255,255,255};
 		
 		USSensor.high_sensor.registerListener(this);
 		USSensor.low_sensor.registerListener(this);
@@ -48,6 +48,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	public int goTo(double x, double y, boolean full) {
 		this.full_mode = full;
 		hard_interrupt = false;
+		
 		while(repath(x, y)) {
 			soft_interrupt = false;
 			for(node = 0; node < path.length; node++) {
@@ -56,7 +57,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				active = false;
 				if(node == path.length-1) return 0;
 			}
-			
+			active = false;
 			if(hard_interrupt) return 1;
 		}
 		
@@ -89,17 +90,17 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	
 	public void newValues(int[] new_values, USSensor sensor) {
 		
-		if( active && !full_mode) {
+		if(active && !full_mode) {
 			int minLow, minHigh;
 			
-			if( sensor == USSensor.low_sensor) low_Readings = new_values;
+			if(sensor == USSensor.low_sensor) low_Readings = new_values;
 			else if (sensor == USSensor.high_sensor) high_Readings = new_values;
-			else return;	//should never happen
+			else return; //should never happen
 			
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 			
-			if(minLow < US_TRUST_THRESHOLD
+			if(minLow < 30
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 						&& low_Readings[1] < 100) {
 				

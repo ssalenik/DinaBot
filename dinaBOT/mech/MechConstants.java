@@ -12,10 +12,9 @@ public interface MechConstants {
 	 */
 	static final double WHEEL_RADIUS = 2.659;
 
-	//static final double WHEEL_BASE = 12.7435;
 	/**The distance from on wheel to the other = {@value}
 	 */	
-	static final double WHEEL_BASE = 13.1;
+	static final double WHEEL_BASE = 13;
 
 	/**The distance from one light sensor to another = {@value}
 	 *(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)

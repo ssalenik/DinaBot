@@ -4,7 +4,7 @@ import lejos.nxt.*;
 
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
-import dinaBOT.sound.*;
+//import dinaBOT.sound.*;
 
 /**
  * The DinaBOTSlave is the main class the slave brick. It <b>is</b> the robot. It contains the main() for the slave.
@@ -13,7 +13,7 @@ import dinaBOT.sound.*;
 */
 public class DinaBOTSlave implements CommConstants{
 
-	MusicPlayer music;
+//	MusicPlayer music;
 	Stacking stacker;
 	BTSlave master_connection;
 
@@ -28,8 +28,8 @@ public class DinaBOTSlave implements CommConstants{
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
-		Song[] songSet = {Songs.marioOverworld2};
-		music = new MusicBox(songSet);
+//		Song[] songSet = {Songs.marioOverworld2};
+//		music = new MusicBox(songSet);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class DinaBOTSlave implements CommConstants{
 						LCD.drawString("About to closeConnection()", 0, 0);
 						break;
 
-					case PLAY_SONG:
+					/*case PLAY_SONG:
 						success = music.play();
 						break;
 
@@ -112,7 +112,7 @@ public class DinaBOTSlave implements CommConstants{
 
 					case PREVIOUS_SONG:
 						success = music.previous();
-						break;
+						break;*/
 
 				}
 				if(master_connection.isConnected())

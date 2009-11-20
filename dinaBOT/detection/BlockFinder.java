@@ -114,9 +114,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				blockDistance_A = minLow;
 				angleA = odometer.getPosition()[2];
 				Sound.twoBeeps();
-				LCD.drawInt(minLow, 0, 0);
-				LCD.drawInt(minHigh, 0, 2);
-				LCD.drawInt(low_Readings[1], 0, 1);
+				//LCD.drawInt(minLow, 0, 0);
+				//LCD.drawInt(minHigh, 0, 2);
+				//LCD.drawInt(low_Readings[1], 0, 1);
 			}
 	}
 
@@ -130,9 +130,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				blockDistance_B = minLow;
 				angleB = odometer.getPosition()[2];
 				Sound.twoBeeps();
-				LCD.drawInt(minLow, 0, 3);
-				LCD.drawInt(minHigh, 0, 5);
-				LCD.drawInt(low_Readings[1], 0, 4);
+				//LCD.drawInt(minLow, 0, 3);
+				//LCD.drawInt(minHigh, 0, 5);
+				//LCD.drawInt(low_Readings[1], 0, 4);
 			}
 		}
 
