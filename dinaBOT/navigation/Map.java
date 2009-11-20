@@ -27,10 +27,13 @@ public class Map implements MechConstants, USSensorListener {
 	int threshold;
 
 	int[] high_Readings;
+	int[] low_Readings;
 
 	boolean newObstacle;
 
 	DinaList<MapListener> listeners;
+	
+	boolean stop;
 
 
 	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
@@ -44,9 +47,15 @@ public class Map implements MechConstants, USSensorListener {
 
 		this.newObstacle = false;
 		
+		this.start();
+		
 		listeners = new DinaList<MapListener>();
 
+		low_Readings = new int[] {255,255,255,255,255,255,255,255};
+		high_Readings = new int[] {255,255,255,255,255,255,255,255};
+		
 		USSensor.high_sensor.registerListener(this);
+		USSensor.low_sensor.registerListener(this);
 	}
 
 	public void registerListener(MapListener listener) {
@@ -104,29 +113,70 @@ public class Map implements MechConstants, USSensorListener {
 		double[] coord = new double[2];
 		int[] node = new int[2];
 		int distance = 255;
+		int[] curr_node = new int[2];	//node at which the robot is currently at
+		double[] curr_coord = new double[2];	// coordinate at which the robot is currently at
+		int minLow, minHigh;
 
+		// checks stop bool
+		if( stop ) return;
+		
 		// only care about high US sensor values
-		this.high_Readings = new_values;
-
+		if(sensor == USSensor.low_sensor) low_Readings = new_values;
+		else if (sensor == USSensor.high_sensor) high_Readings = new_values;
+		else return; //should never happen
+		
+		minLow = low_Readings[0];
+		minHigh = high_Readings[0];
+			
 		distance = high_Readings[0];
+		/*if( minLow < minHigh
+					&& minHigh < threshold
+					&& (minHigh - minLow) < 2) {
+			
+			distance = high_Readings[0];
+						
+		} else distance = 255;
+		*/
 
 		// if ostacle distance is close enough, mark appropriate node
 		if (distance < threshold) {
 
 			// get abs. coords from relative distance
 			coord = getUSCoord(distance);
+			curr_coord = getUSCoord(0);
 
 			// get node associated with coords
 			node = getNode(coord);
+			curr_node = getNode(curr_coord);
 
-			Sound.twoBeeps();
+			
 
-			// mark node with obstacle
-			if(map[node[0]][node[1]] == 0) {
-				map[node[0]][node[1]] = 2;
+			// if obstacle is not detected as in current node
+			if( !((node[0] == curr_node[0]) && (node[1] == curr_node[1])) ) {
+			
+				Sound.twoBeeps();
+				
+				// mark map with obstacle
+				if( map[node[0]][node[1]] == 0) {
+					map[node[0]][node[1]] = 2;
 
-				notifyListeners(node[0], node[1]);
+					notifyListeners(node[0], node[1]);
+				}
 			}
+		} else {
+			// mark nodes within threshold as clear
+			/*distance = threshold;
+			for( int i = 2; threshold >= UNIT_TILE; i++) {
+						
+				coord = getUSCoord(distance);
+				node = getNode(coord);
+				
+				if( map[node[0]][node[1]] > 0) {
+					map[node[0]][node[1]] = 0;
+				}
+				
+				distance = threshold/i;
+			}*/
 		}
 
 	}
@@ -147,6 +197,14 @@ public class Map implements MechConstants, USSensorListener {
 			newObstacle = false;
 			return true;
 		} else return false;
+	}
+	
+	public synchronized void stop() {
+		stop = true;
+	}
+	
+	public synchronized void start() {
+		stop = false;
 	}
 
 }
