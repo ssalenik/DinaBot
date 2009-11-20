@@ -251,13 +251,31 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	}
 
 	public void moveTest() {
+		odometer.setDebug(true);
+		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
+		odometer.enableSnapping(true);
+		Random rand = new Random();
+		int x = 4;
+		int y = 4;
 		while(true) {
-			/*
-			movement.goTo(UNIT_TILE*3, UNIT_TILE, 50);
-			movement.goTo(UNIT_TILE*3, UNIT_TILE*3, 50);
-			movement.goTo(UNIT_TILE, UNIT_TILE*3, 50);
-			movement.goTo(UNIT_TILE, UNIT_TILE, 50);
-			*/
+			int direction = rand.nextInt(4);
+			
+			if(x == 1 && direction == 2) direction = 3;
+			if(x == 7 && direction == 0) direction = 1;
+			if(y == 1 && direction == 3) direction = 0;
+			if(y == 7 && direction == 1) direction = 2;
+			
+			if(direction == 0) x++;
+			if(direction == 1) y++;
+			if(direction == 2) x--;
+			if(direction == 3) y--;
+			
+			movement.goTo(x*UNIT_TILE, y*UNIT_TILE, SPEED_MED);
+		}
+	}
+
+	void pickupTest() {
+		while(true) {
 			Button.waitForPress();
 			slave_connection.request(HOLD);
 			Button.waitForPress();
@@ -270,8 +288,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			slave_connection.request(CLOSE_CAGE);
 			
 		}
+		
 	}
-
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -301,6 +319,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		//DinaList<Integer> list = new DinaList<Integer>();
 
 		//dinaBOTmaster.moveTest();
+		//dinaBOTmaster.pickupTest();
 		while(true); //Never quit
 
 	}

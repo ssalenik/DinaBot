@@ -16,16 +16,15 @@ public class Stacker implements Stacking {
 	Motor claw;
 
 	//in degrees
-	final int clawOpenAngle = 0;
-	final int clawStraightAngle = -90;
-	final int clawClosedAngle = -110;
-	final int clawTopAngle = -270;
+	final int clawOpenAngle = 95;
+	final int clawClosedAngle = 20;
+	final int clawTopAngle = -200;
 
 	final int gatesRotation = 110;
-	final int gatesPickUpRotation = 50;
+	final int gatesPickUpRotation = 40;
 
 	final int gateSpeed = 175;
-	final int clawSpeed = 175;
+	final int clawSpeed = 200;
 
 	int brickCount = 0;
 
@@ -44,6 +43,8 @@ public class Stacker implements Stacking {
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 		claw.resetTachoCount();
+		
+		claw.rotateTo(clawOpenAngle);
 	}
 
 	/**
@@ -92,7 +93,7 @@ public class Stacker implements Stacking {
 	public boolean hold() {
 
 		claw.setSpeed(clawSpeed);
-		claw.rotateTo(clawStraightAngle);
+		claw.rotateTo(clawClosedAngle);
 		claw.stop();
 
 		return true;
