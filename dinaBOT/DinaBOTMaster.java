@@ -76,7 +76,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	}
 	
 	public void connect() {
+		slave_connection.setDebug(true);
 		while(!slave_connection.connect());
+		slave_connection.setDebug(false);
 	}
 
 	/**

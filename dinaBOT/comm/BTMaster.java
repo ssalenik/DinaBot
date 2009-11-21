@@ -13,19 +13,20 @@ import lejos.nxt.comm.*;
  * @author Alexandre Courtemanche, François Ouellet-Delorme
 */
 public class BTMaster implements CommConstants {
-
-	public RemoteDevice btrd;
-
-	public BTConnection connection;
-
-	public DataInputStream dataIn;
-	public DataOutputStream dataOut;
-
-	public boolean connected = false;
-
 	// Haven't implemented a system of retries yet
-	public static final int MAX_FIND_DEVICE_ATTEMPTS = 3;
-	public static final int MAX_CONNECT_ATTEMPTS = 3;
+	static final int MAX_FIND_DEVICE_ATTEMPTS = 3;
+	static final int MAX_CONNECT_ATTEMPTS = 3;
+
+	RemoteDevice btrd;
+
+	BTConnection connection;
+
+	DataInputStream dataIn;
+	DataOutputStream dataOut;
+
+	boolean debug;
+	boolean connected = false;
+
 
 	/**
 	 * This constructor merely instantiates. All the connections are done in the connect() method.
@@ -57,27 +58,34 @@ public class BTMaster implements CommConstants {
 			btrd = Bluetooth.getKnownDevice(SLAVE_NAME);
 
 			if (btrd == null) {
-				LCD.clear();
-				LCD.drawString("Cannot find device +"+ SLAVE_NAME, 0, 0);
+				if(debug) {
+					LCD.clear();
+					LCD.drawString("Cannot find device +"+ SLAVE_NAME, 0, 0);
+				}
 				connected = false;
 				return connected;
 			}
 
-			LCD.clear();
-			LCD.drawString("Connecting...", 0, 0);
+			if(debug) {
+				LCD.clear();
+				LCD.drawString("Connecting...", 0, 0);
+			}
 
 			connection = Bluetooth.connect(btrd);
 
 			if (connection == null) {
-				LCD.clear();
-				LCD.drawString("Connect failed", 0, 0);
+				if(debug) {
+					LCD.clear();
+					LCD.drawString("Connect failed", 0, 0);
+				}
 				connected = false;
 				return connected;
 			}
 
-			LCD.clear();
-			LCD.drawString("Connected", 0, 0);
-
+			if(debug) {
+				LCD.clear();
+				LCD.drawString("Connected", 0, 0);
+			}
 			dataIn = connection.openDataInputStream();
 			dataOut = connection.openDataOutputStream();
 
@@ -123,10 +131,15 @@ public class BTMaster implements CommConstants {
 			dataOut.close();
 			connection.close();
 		} catch (IOException ioe) {
-			System.out.println(" I/O Error: " + ioe);
+			LCD.clear();
+			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
 		}
 
 		return connected;
+	}
+	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }
