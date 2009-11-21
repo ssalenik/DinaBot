@@ -62,8 +62,8 @@ public class Stacker implements Stacking {
 		rightGate.resetTachoCount();
 
 		if(brickCount < 2) {
-			leftGate.rotate(gatesPickUpRotation/(brickCount+1), true);
-			rightGate.rotate(gatesPickUpRotation/(brickCount+1));
+			leftGate.rotate(gatesPickUpRotation, true);
+			rightGate.rotate(gatesPickUpRotation);
 		}
 
 		claw.rotateTo(clawTopAngle);
@@ -122,6 +122,15 @@ public class Stacker implements Stacking {
 		release();
 
 		return true;
+	}
+	
+	public boolean close() {
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(0);
+		claw.stop();
+
+		return true;
+	
 	}
 
 	/**

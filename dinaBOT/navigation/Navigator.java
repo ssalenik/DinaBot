@@ -100,7 +100,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 			
-			if(minLow < 30
+			if(minLow < 20
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 						&& low_Readings[1] < 100) {
 				

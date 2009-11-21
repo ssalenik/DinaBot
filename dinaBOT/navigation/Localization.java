@@ -10,7 +10,7 @@ import dinaBOT.sensor.*;
  * @author Vinh Phong Buu
  *
  */
-public class Localization implements MechConstants, USSensorListener{
+public class Localization implements MechConstants, USSensorListener {
 
 	public Odometer odometer;
 	public Movement mover;

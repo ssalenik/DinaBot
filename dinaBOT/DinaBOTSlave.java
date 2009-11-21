@@ -25,6 +25,15 @@ public class DinaBOTSlave implements CommConstants{
 	 *
 	*/
 	public DinaBOTSlave() {
+		Button.ESCAPE.addButtonListener(new ButtonListener() {
+			public void buttonPressed(Button b) {
+				stacker.close();
+				System.exit(0);
+			}
+
+			public void buttonReleased(Button b) {
+			}
+		});
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
@@ -142,15 +151,6 @@ public class DinaBOTSlave implements CommConstants{
 	*/
 	public static void main(String[] args) {
 
-		Button.ESCAPE.addButtonListener(new ButtonListener() {
-			public void buttonPressed(Button b) {
-				System.exit(0);
-			}
-
-			public void buttonReleased(Button b) {
-				System.exit(0);
-			}
-		});
 
 		DinaBOTSlave dinaBOTslave = new DinaBOTSlave();
 		dinaBOTslave.obey();

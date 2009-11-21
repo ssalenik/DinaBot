@@ -9,6 +9,7 @@ import dinaBOT.navigation.*;
 import dinaBOT.mech.*;
 import dinaBOT.comm.*;
 import dinaBOT.detection.*;
+import dinaBOT.sensor.*;
 import dinaBOT.util.*;
 
 /**
@@ -53,11 +54,15 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	 * @param drop_y the y coordinate of the drop off (in tile units)
 	*/
 	public DinaBOTMaster(int drop_x, int drop_y) {
+		
+		USSensor low = USSensor.low_sensor;
+		USSensor high = USSensor.high_sensor;
+		
 		slave_connection = new BTMaster();
 
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
-	
+		
 		localization = new Localization(odometer, movement);
 		
 		map = new Map(odometer, 12, 45, UNIT_TILE);
@@ -81,7 +86,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	public void alignBrick() {
 		//Align contant (heuristically tuned)
 		double forward_distance = 5;
-		double rotate_angle = Math.PI/5;
+		double rotate_angle = Math.PI/4;
 
 		//Main program
 		movement.goForward(forward_distance, SPEED_MED);
@@ -121,12 +126,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	public void run() {
 		//Setup
 		odometer.enableSnapping(true);
-		odometer.setDebug(true);
+		odometer.setDebug(false);
 		
 		//Pattern to follow
 		int[][] pattern = {
-			new int[] {5,0}, //x-coordinates
-			new int[] {5,0} //y-coordinates
+			new int[] {5,5},
+			new int[] {0,0}
 		};
 		
 		System.out.println("Starting...");
@@ -139,7 +144,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	
 		for(int i = 0;i < pattern.length;i++) {
 			System.out.println("Leg number: "+i);
-			int nav_status = navigator.goTo(pattern[i][0],pattern[i][1], false);
+			int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false);
 			while(nav_status > 0) {
 				System.out.println("Breaking for possible pellet");
 				if(blockFind.sweep(odometer.getPosition()[2])) {
@@ -154,7 +159,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 						return;
 					}
 				}
-				nav_status = navigator.goTo(pattern[i][0],pattern[i][1], false);
+				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false);
 			}
 			if(nav_status < 0) {
 				System.out.println("Impossible Path .. ending");
@@ -192,6 +197,24 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			movement.goTo(x*UNIT_TILE, y*UNIT_TILE, SPEED_MED);
 		}
 	}
+	
+	public void scanTest() {
+		boolean forever = true;
+		while(forever) {
+			Button.waitForPress();
+			if(blockFind.sweep(odometer.getPosition()[2])) {
+				System.out.println("Pickup");
+				alignBrick();
+				slave_connection.request(PICKUP);
+				block_count++;
+				if(block_count == 6) {
+					slave_connection.request(OPEN_CAGE);
+					slave_connection.request(CLOSE_CAGE);
+					block_count = 0;
+				}
+			}
+		}
+	}
 
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
@@ -218,6 +241,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		dinaBOTmaster.connect();
 		dinaBOTmaster.run();
 
+		//dinaBOTmaster.scanTest();
 		//dinaBOTmaster.moveTest();
 		
 		while(true); //Never quit

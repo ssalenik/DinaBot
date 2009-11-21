@@ -21,7 +21,6 @@ public class DinaList<E> {
 			System.arraycopy(element_data, 0, tmp_data, 0, element_data.length);
 			element_data = tmp_data;
 		}
-
 		element_data[size] = element;
 		size++;
 	}

@@ -22,5 +22,7 @@ public interface Stacking {
 	public boolean tap();
 
 	public boolean getCageStatus();
+	
+	public boolean close();
 
 }
