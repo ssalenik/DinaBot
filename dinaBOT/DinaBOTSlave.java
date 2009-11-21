@@ -55,21 +55,21 @@ public class DinaBOTSlave implements CommConstants{
 						break;
 
 					case OPEN_CAGE:
-						stacker.openDockingBay();
+						stacker.openCage();
 						success = true;
 						break;
 
 					case CLOSE_CAGE:
-						stacker.closeDockingBay();
+						stacker.closeCage();
 						success = true;
 						break;
 
 					case GET_CAGE_STATUS:
-						success = stacker.getDockStatus();
+						success = stacker.getCageStatus();
 						break;
 
 					case PICKUP:
-						success = stacker.activateMechanicalClaw();
+						success = stacker.pickUp();
 						break;
 
 					case TAP:

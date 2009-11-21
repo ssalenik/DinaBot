@@ -52,7 +52,7 @@ public class Stacker implements Stacking {
 	 *
 	 * @return true if the pickup succeeded.
 	*/
-	public boolean activateMechanicalClaw() {
+	public boolean pickUp() {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
@@ -128,7 +128,7 @@ public class Stacker implements Stacking {
 	 * Opens the cage doors
 	 *
 	*/
-	public void openDockingBay() {
+	public void openCage() {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
@@ -148,7 +148,7 @@ public class Stacker implements Stacking {
 	 * Closes the cage doors
 	 *
 	*/
-	public void closeDockingBay() {
+	public void closeCage() {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
@@ -168,7 +168,7 @@ public class Stacker implements Stacking {
 	 *
 	 * @return true if the cage is closed and false otherwise
 	*/
-	public boolean getDockStatus() {
+	public boolean getCageStatus() {
 		//checks if the cage is open
 		if(leftGate.getTachoCount() > 0 || rightGate.getTachoCount() > 0) return false;//cage is open
 		else return true;//cage is closed
