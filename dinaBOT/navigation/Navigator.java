@@ -28,7 +28,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	
 	boolean active, hard_interrupt, soft_interrupt, full_mode;
 	
-	public Navigator(Pathing pather, Movement movement, Map map, Odometer odometer) {
+	public Navigator(Odometer odometer, Movement movement, Map map, Pathing pather) {
 		this.odometer = odometer;
 		this.movement = movement;
 

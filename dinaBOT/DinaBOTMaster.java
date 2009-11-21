@@ -24,140 +24,69 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	Motor right_motor = Motor.B;
 
 	/* -- Instance Variables --*/
+	
+	//Connection objects
+	BTMaster slave_connection;
 
+	//Basics movement objects
 	Odometer odometer;
 	Movement movement;
 
-	BTMaster slave_connection;
+	//High level navigation object
+	Map map;
+	Pathing pather;
 	
+	Navigator navigator;
+	
+	//Utilities
 	Localization localization;
-	DropOff dropOff;
+	DropOff dropper;
+	BlockFinder blockFind;	
 	
-	int dropOffX = 0, dropOffY = 0; //Variables that are input at runtime to indicate where the drop-off point is
+	//Variables
+	int block_count;
 
 	/**
-	 * This is the contructor for the DinaBOT master
+	 * This is the constructor for the DinaBOT master
 	 *
+	 * @param drop_x the x coordinate of the drop off (in tile units)
+	 * @param drop_y the y coordinate of the drop off (in tile units)
 	*/
-	
-	//Odometer odometer, Movement mover, BTmaster slave_connection, int dropOffX, int dropOffY
-	public DinaBOTMaster() {
-		
+	public DinaBOTMaster(int drop_x, int drop_y) {
+		slave_connection = new BTMaster();
+
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
-		slave_connection = new BTMaster();
-		
+	
 		localization = new Localization(odometer, movement);
-		dropOff = new DropOff(odometer, movement, slave_connection, dropOffX, dropOffY);
 		
+		map = new Map(odometer, 12, 45, UNIT_TILE);
+		pather = new ManhattanPather(map, movement);
+		
+		navigator = new Navigator(odometer, movement, map, pather);
+		
+		blockFind = new BlockFinder(odometer, movement);
+		
+		dropper = new DropOff(odometer, movement, slave_connection, drop_x, drop_y);
+	}
+	
+	public void connect() {
+		while(!slave_connection.connect());
 	}
 
 	/**
-	 * This is demo method for our professor meeting on November 18th. It will ask for the input offsets for how much it will displace the pellet when
-	 * it picks it up. It then does a 360 sweep around it to find the styrofoam pellet. When it finds it picks it up and displaces it for a certain offset
-	 * value.
-	*/
-	public void milestoneDemo() {
-		//User Input
-		double offsetX = 0, offsetY = 0;
-		boolean enterPressed = false;
-
-		//Sweeping
-		double SWEEP_OFFSET = Math.PI/2;
-		boolean foundBlock = false;
-
-		BlockFinder blockFind = new BlockFinder(odometer, movement);
-
-		/* User Input*/
-
-		while(!enterPressed) {
-			LCD.clear();
-			LCD.drawString(offsetX + " " + offsetY, 0,0);
-			int buttonID = Button.waitForPress();
-			switch(buttonID) {
-				case Button.ID_LEFT:
-					offsetX--;
-					break;
-				case Button.ID_RIGHT:
-					offsetX++;
-					break;
-				case Button.ID_ENTER:
-					enterPressed = true;
-					break;
-			}
-		}
-
-		enterPressed = false;
-
-		while(!enterPressed) {
-			LCD.clear();
-			LCD.drawString(offsetX + " " + offsetY,0,0);
-			int buttonID = Button.waitForPress();
-			switch (buttonID) {
-				case Button.ID_LEFT:
-					offsetY--;
-					break;
-				case Button.ID_RIGHT:
-					offsetY++;
-					break;
-				case Button.ID_ENTER:
-					enterPressed = true;
-					break;
-			}
-		}
-
-		try {
-			Thread.sleep(2000);
-			LCD.drawString("Loading main program...", 0,0);
-		} catch(Exception e) {
-
-		}
-
-		//Continuously sweep for block
-		while(!foundBlock) {
-			foundBlock = blockFind.sweep(odometer.getPosition()[2]);
-			if(!foundBlock) movement.turn(SWEEP_OFFSET, SPEED_ROTATE);
-		}
-
-		//Once pellet is found
-		LCD.clear();
-		LCD.drawString("Pellet found!",0,0);
-
-		//Align + Pickup
-		alignBrick();
-
-		if(slave_connection.request(PICKUP)) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
-
-
-		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
-
-		Button.waitForPress();
-
-		movement.goTo(offsetX + BLOCK_DISTANCE, offsetY, SPEED_MED);
-
-		slave_connection.request(OPEN_CAGE);
-
-		movement.goForward(30, SPEED_MED);
-
-		slave_connection.request(CLOSE_CAGE);
-	}
-
-	/**
-	 * This is a testing method for block alignment using brick to brick communication (currently over bluetooth).
+	 * This is a method for block alignment using brick to brick communication (currently over bluetooth). It assumes the block is directly in front if the robot in an unknown orientation.
 	 *
 	*/
 	public void alignBrick() {
-
+		//Align contant (heuristically tuned)
 		double forward_distance = 5;
+		double rotate_angle = Math.PI/5;
 
+		//Main program
 		movement.goForward(forward_distance, SPEED_MED);
 
-		movement.turn(Math.PI/5, SPEED_ROTATE);
-
-		//movement.goForward(forward_distance, SPEED_MED);
+		movement.turn(rotate_angle, SPEED_ROTATE);
 
 		if(slave_connection.request(HOLD)) {
 			LCD.clear();
@@ -166,7 +95,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 
 		movement.goForward(-forward_distance, SPEED_MED);
 
-		movement.turn(-Math.PI/5, SPEED_ROTATE);
+		movement.turn(-rotate_angle, SPEED_ROTATE);
 
 		for(int i = 0;i < 2;i++) {
 			if(slave_connection.request(HOLD)) {
@@ -184,77 +113,67 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			movement.goForward(forward_distance, SPEED_MED);
 		}
 	}
-
-// stepan's pathing and mapping test WORKS!!
-	public void pathTest() {
-		Map mapper = new Map(odometer, 12, 45, UNIT_TILE);
-		Pathing pather = new ManhattanPather(mapper, movement);
-		Navigator navigator = new Navigator(pather, movement, mapper, odometer);
-
+	
+	/**
+	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
+	 *
+	*/
+	public void run() {
+		//Setup
 		odometer.enableSnapping(true);
-		odometer.setDebug(false);
-
-		//Pause so the user can remove his hand from the robot
+		odometer.setDebug(true);
+		
+		//Pattern to follow
+		int[][] pattern = {
+			new int[] {5,0}, //x-coordinates
+			new int[] {5,0} //y-coordinates
+		};
+		
+		System.out.println("Starting...");
+		
 		try {
 			Thread.sleep(1000);
-		} catch(Exception e) {}
-
-		// go to _,_ then 0,0
-		if ( navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, true) == 0) navigator.goTo(0.0,0.0, true);		
-	}
+		} catch(Exception e) {
+			
+		}
 	
-	// stepan's pathing and mapping AND block detection and pickup test
-	public void pathPickupTest() {
-		Map mapper = new Map(odometer, 12, 45, UNIT_TILE);
-		Pathing pather = new ManhattanPather(mapper, movement);
-		Navigator navigator = new Navigator(pather, movement, mapper, odometer);
-		BlockFinder blockFind = new BlockFinder(odometer, movement);
-		
-		boolean foundBlock = false;
-		int done;
-		
-
-		odometer.enableSnapping(true);
-		odometer.setDebug(false);
-		System.out.println("Begin");
-		//Pause so the user can remove his hand from the robot
-		try {
-			Thread.sleep(1000);
-		} catch(Exception e) {}
-	
-		while(navigator.goTo(5*UNIT_TILE, 5*UNIT_TILE, false) > 0) {
-			System.out.println("Home");
-			if(blockFind.sweep(odometer.getPosition()[2])) {
-				System.out.println("Pickup");
-				alignBrick();
-				mapper.stop();
-				slave_connection.request(PICKUP);
-				mapper.start();
+		for(int i = 0;i < pattern.length;i++) {
+			System.out.println("Leg number: "+i);
+			int nav_status = navigator.goTo(pattern[i][0],pattern[i][1], false);
+			while(nav_status > 0) {
+				System.out.println("Breaking for possible pellet");
+				if(blockFind.sweep(odometer.getPosition()[2])) {
+					System.out.println("Pickup");
+					alignBrick();
+					map.stop();
+					slave_connection.request(PICKUP);
+					map.start();
+					block_count++;
+					if(block_count == 6) {
+						System.out.println("Robot Full... ending");
+						return;
+					}
+				}
+				nav_status = navigator.goTo(pattern[i][0],pattern[i][1], false);
+			}
+			if(nav_status < 0) {
+				System.out.println("Impossible Path .. ending");
+				return;
 			}
 		}
 		
-		while(navigator.goTo(0, 0, false) > 0) {
-			System.out.println("Home");
-			if(blockFind.sweep(odometer.getPosition()[2])) {
-				System.out.println("Pickup");
-				alignBrick();
-				mapper.stop();
-				slave_connection.request(PICKUP);
-				mapper.start();
-			}
-		}
 		System.out.println("Done");
 	}
 	
-	public void connect() {
-		while(!slave_connection.connect());
-	}
-
+	/**
+	 * This is a testing method of coordinate correction, randomly drives around in an 8 by 8 area starting at 4-4
+	 *
+	*/
 	public void moveTest() {
 		odometer.setDebug(true);
 		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
-		Random rand = new Random();
+		Random rand = new Random(9812);
 		int x = 4;
 		int y = 4;
 		while(true) {
@@ -274,22 +193,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		}
 	}
 
-	void pickupTest() {
-		while(true) {
-			Button.waitForPress();
-			slave_connection.request(HOLD);
-			Button.waitForPress();
-			slave_connection.request(RELEASE);
-			Button.waitForPress();
-			slave_connection.request(TAP);
-			Button.waitForPress();
-			slave_connection.request(PICKUP);
-			slave_connection.request(OPEN_CAGE);
-			slave_connection.request(CLOSE_CAGE);
-			
-		}
-		
-	}
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -306,22 +209,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			System.exit(0);
 			}
 		});
+		
+		//DO some drop off stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(2, 0); //Instantiate the DinaBOT Master
+
 		//Run some tests
 		dinaBOTmaster.connect();
-		//dinaBOTmaster.alignBrick();
-		//dinaBOTmaster.milestoneDemo();
-
-		//dinaBOTmaster.pathTest();
-		dinaBOTmaster.pathPickupTest();
-		//dinaBOTmaster.moveTest();
-		//DinaList<Integer> list = new DinaList<Integer>();
+		dinaBOTmaster.run();
 
 		//dinaBOTmaster.moveTest();
-		//dinaBOTmaster.pickupTest();
+		
 		while(true); //Never quit
-
 	}
 
 }
