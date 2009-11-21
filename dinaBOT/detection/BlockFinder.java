@@ -68,6 +68,10 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		blockDistance_A = 255;
 		blockDistance_B = 255;
 		
+		//resets high_Readings
+		high_Readings = new int[]{255,255,255,255,255};
+		
+		
 		double initialOrientation = odometer.getPosition()[2];
 		angleA = initialOrientation;
 		angleB = initialOrientation;
