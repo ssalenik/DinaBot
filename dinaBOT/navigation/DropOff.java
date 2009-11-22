@@ -32,14 +32,20 @@ public class DropOff implements MechConstants{
 	public Movement mover;
 	public BTMaster slave_connection;
 	
-	public int dropOffX, dropOffY;
+	public int[] dropCoords = new int [2];
 	
 	//Add other instances you'll need
 	
-	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, int dropOffX, int dropOffY) {
+	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
 		this.slave_connection = slave_connection;
+		dropCoords[0] = drop_x;
+		dropCoords[1] = drop_y;
+	}
+	
+	public int[] getDropCoords() {
+		return dropCoords;
 	}
 	
 	public void dropOff() {

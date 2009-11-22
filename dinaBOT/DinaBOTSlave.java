@@ -151,7 +151,6 @@ public class DinaBOTSlave implements CommConstants{
 	*/
 	public static void main(String[] args) {
 
-
 		DinaBOTSlave dinaBOTslave = new DinaBOTSlave();
 		dinaBOTslave.obey();
 	}

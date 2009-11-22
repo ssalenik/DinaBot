@@ -171,7 +171,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 					slave_connection.request(PICKUP);
 					map.start();
 					block_count++;
-			
+					
 					movement.goTo(prev_pos[0], prev_pos[1], SPEED_MED);
 					movement.turnTo(prev_pos[2], SPEED_ROTATE);
 				}
@@ -246,7 +246,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		
 		//DO some drop off stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5, 0); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(3, 3); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
