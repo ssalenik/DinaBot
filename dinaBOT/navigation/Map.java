@@ -68,7 +68,7 @@ public class Map implements MechConstants, USSensorListener {
 		}
 	}
 
-	private double[] getUSCoord(int distance) {
+	public double[] getUSCoord(int distance) {
 		double[] pos = new double[3];
 		double[] coord = new double[2];
 
@@ -88,8 +88,52 @@ public class Map implements MechConstants, USSensorListener {
 		return coord;
 
 	}
+	
+	public double[] getUSCoord(int distance, double angle) {
+		double[] pos = new double[3];
+		double[] coord = new double[2];
+		
+		pos = odo.getPosition();
+		
+		pos[2] = angle;
+		
+		coord[0] = Math.cos(pos[2])*distance + pos[0];
+		coord[1] = Math.sin(pos[2])*distance + pos[1];
 
-	private int[] getNode(double[] coord) {
+		// make sure there are no negative coords
+		if (coord[0] < 0) {
+			coord[0] = 0;
+		} else if (coord[0] > (resolution - 1) * nodeDist) coord[0] = (resolution -1)*nodeDist;
+		if (coord[1] < 0) {
+			coord[1] = 0;
+		} else if (coord[1] > (resolution - 1) * nodeDist) coord[1] = (resolution -1)*nodeDist;
+
+		return coord;
+
+	}
+	
+	public boolean checkUSCoord(double distance, double angle) {
+		double[] pos = new double[3];
+		double[] coord = new double[2];
+		
+		pos = odo.getPosition();
+		
+		pos[2] = angle;
+		
+		coord[0] = Math.cos(pos[2])*distance + pos[0];
+		coord[1] = Math.sin(pos[2])*distance + pos[1];
+
+		// make sure there are no negative coords
+		if (coord[0] < 0
+					|| coord[0] > (resolution - 1) * nodeDist
+					|| coord[1] < 0
+					|| coord[1] > (resolution - 1) * nodeDist) {
+						return false;
+		} else return true;
+
+	}
+
+	public int[] getNode(double[] coord) {
 		int[] node = new int[2];
 
 		node[0] = (int)Math.round(coord[0]/nodeDist);
@@ -97,7 +141,7 @@ public class Map implements MechConstants, USSensorListener {
 
 		return node;
 	}
-
+	
 	public int[][] getMap() {
 
 		// FIX THIS SO IT RETURNS A COPY OF THE ARRAY
