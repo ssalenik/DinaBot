@@ -96,7 +96,7 @@ public class DinaBOTSlave implements CommConstants{
 					case DISCONNECT:
 						success = true;
 						LCD.clear();
-						LCD.drawString("Send sever connection confirmation?", 0, 0);
+						LCD.drawString("Sending sever connection confirmation", 0, 0);
 						master_connection.disconnectFlag();
 						master_connection.sendStatus(success);
 						LCD.clear();

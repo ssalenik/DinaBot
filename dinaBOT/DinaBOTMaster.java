@@ -113,6 +113,24 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 			movement.goForward(forward_distance, SPEED_MED);
 		}
 	}
+
+	// stepan's pathing and mapping test WORKS!!
+	public void pathTest() {
+		Map mapper = new Map(odometer, 12, 45, UNIT_TILE);
+		Pathing pather = new ManhattanPather(mapper, movement);
+		Navigator navigator = new Navigator(odometer, movement, mapper, pather);
+
+		odometer.enableSnapping(true);
+		odometer.setDebug(false);
+
+		//Pause so the user can remove his hand from the robot
+		try {
+			Thread.sleep(1000);
+		} catch(Exception e) {}
+
+		// go to _,_ then 0,0
+		if ( navigator.goTo(2*UNIT_TILE, 2*UNIT_TILE, true) == 0) navigator.goTo(0.0,0.0, true);		
+	}
 	
 	/**
 	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
