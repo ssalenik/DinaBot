@@ -34,6 +34,9 @@ public class Map implements MechConstants, USSensorListener {
 	DinaList<MapListener> listeners;
 	
 	boolean stop;
+	
+	//constant that map marks the border with
+	final static int BORDER = 10;
 
 
 	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
@@ -50,6 +53,11 @@ public class Map implements MechConstants, USSensorListener {
 		this.start();
 		
 		listeners = new DinaList<MapListener>();
+		
+		//initialize border
+		for(int x = 0; x < resolution; x++) map[x][0] = map[resolution-1][y] = BORDER;
+		for(int y = 0; y < resolution; y++) map[0][y] = map[resolution-1][y] = BORDER;
+		
 
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
 		high_Readings = new int[] {255,255,255,255,255,255,255,255};
