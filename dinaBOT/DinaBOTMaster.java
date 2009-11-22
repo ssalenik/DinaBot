@@ -18,7 +18,7 @@ import dinaBOT.util.*;
  *
  * @author Alexandre Courtemanche, Francois Ouellet Delorme, Gabriel Olteanu, Severin Smith, Stepan Salenikovich, Vinh Phong Buu
 */
-public class DinaBOTMaster implements MechConstants, CommConstants {
+public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatterns {
 
 	/* -- Static Variables --*/
 
@@ -143,10 +143,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 		
 		//Pattern to follow
-		int[][] pattern = {
-			new int[] {6,6},
-			new int[] {1,1}
-		};
+		int[][] pattern = ZIGZAG_X;
+		
+		
+		//Getting drop off coordinates
+		//Assuming that the coordinate of the drop-off point is the bottom leftnode of the tile
+		int [] dropCoords = dropper.getDropCoords();
+		
+		//Consider the nodes around the drop off zone as obstacles.
+		map.editMap(dropCoords[0],dropCoords[1], 1);
+		map.editMap(dropCoords[0]+1,dropCoords[1], 1);
+		map.editMap(dropCoords[0],dropCoords[1]+1, 1);
+		map.editMap(dropCoords[0]+1,dropCoords[1]+1, 1);
 		
 		System.out.println("Starting...");
 		
@@ -178,7 +186,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 				odometer.enableSnapping(true);
 				if(block_count == 6) {
 					System.out.println("Robot Full... returning");
-					navigator.goTo(0*UNIT_TILE, 5*UNIT_TILE, true);
+					navigator.goTo(dropper.getDropCoords()[0]*UNIT_TILE, dropper.getDropCoords()[1]*UNIT_TILE, true);
 					return;
 				}
 				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false);
