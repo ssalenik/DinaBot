@@ -65,11 +65,14 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	}
 	
 	boolean repath(double x, double y) {
-		double[] position;
+		double[] position = new double[3];
+		position = odometer.getPosition();
 		
-		if(path == null || node ==  0) {
-			position = odometer.getPosition();
-		} else position = path[node - 1];
+		if(path != null && node !=  0) {
+			position[0] = path[node - 1][0];
+			position[1] = path[node - 1][1];
+			position[2] = position[2];
+		}
 		
 		path = pather.generatePath(position[0], position[1], position[2], x, y);
 		if(path == null) return false;

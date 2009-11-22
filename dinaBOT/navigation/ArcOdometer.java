@@ -283,6 +283,10 @@ public class ArcOdometer implements Odometer {
 		snap_enable = enable;
 		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
+	
+	public boolean isSnapping() {
+		return snap_enable;
+	}
 
 	/**
 	 * Set the state onscreen debug functionality of the odometer. This feature print the current odometer position to the screen of the NXT brick

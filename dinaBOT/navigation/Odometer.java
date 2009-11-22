@@ -47,6 +47,13 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	public void enableSnapping(boolean enable);
 
 	/**
+	 * 
+	 *
+	 * @param
+	*/
+	public boolean isSnapping();
+
+	/**
 	 * Set the state onscreen debug functionality of the odometer. This feature print the current odometer position to the screen of the NXT brick
 	 *
 	 * @param state activates the debuging if and only if state is true, deactivates it otherwise

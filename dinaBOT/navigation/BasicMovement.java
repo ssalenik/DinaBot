@@ -222,6 +222,8 @@ public class BasicMovement implements Movement, MechConstants {
 		double[] target_position;
 
 		final int spline_correction_gain = 3;
+		
+		boolean previous_snap_enable;
 
 		/**
 		 * Create MovementDaemon
@@ -256,13 +258,13 @@ public class BasicMovement implements Movement, MechConstants {
 						}
 					} else if(mode == Mode.ROTATE_CCW || mode == Mode.GOTO_ROTATE_CCW) { //Rotate set angle counter clockwise
 						if((target_angle - current_position[2]) <= 0) { //Until the sign of the relative angle changes
-							odometer.enableSnapping(true);
+							odometer.enableSnapping(previous_snap_enable);
 							end();
 						}
 
 					} else if(mode == Mode.ROTATE_CW || mode == Mode.GOTO_ROTATE_CW) { //Rotate set angle clockwise
 						if((target_angle - current_position[2]) >= 0) { //Until the sign of the relative angle changes
-							odometer.enableSnapping(true);
+							odometer.enableSnapping(previous_snap_enable);
 							end();
 						}
 					} else if(mode == Mode.GOTO_SPLINE) { //Go to
@@ -324,7 +326,8 @@ public class BasicMovement implements Movement, MechConstants {
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
 						
 			if((target_angle - initial_position[2]) > Math.PI/8 || (target_angle - initial_position[2]) < -Math.PI/8) {
-				odometer.enableSnapping(false);
+				previous_snap_enable = odometer.isSnapping();
+				if(previous_snap_enable) odometer.enableSnapping(false);
 				left_motor.setSpeed(SPEED_ROTATE);
 				right_motor.setSpeed(SPEED_ROTATE);
 				
@@ -383,7 +386,8 @@ public class BasicMovement implements Movement, MechConstants {
 		 * @param speed the speed to advance at
 		*/
 		void turnTo(double angle, int speed) {
-			odometer.enableSnapping(false);
+			previous_snap_enable = odometer.isSnapping();
+			if(previous_snap_enable) odometer.enableSnapping(false);
 			//Set motor speed
 			left_motor.setSpeed(speed);
 			right_motor.setSpeed(speed);

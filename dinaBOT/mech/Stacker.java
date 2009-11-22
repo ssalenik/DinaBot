@@ -44,7 +44,7 @@ public class Stacker implements Stacking {
 		rightGate.resetTachoCount();
 		claw.resetTachoCount();
 		
-		claw.rotateTo(clawOpenAngle);
+		claw.rotateTo(clawTopAngle);
 	}
 
 	/**
@@ -71,8 +71,6 @@ public class Stacker implements Stacking {
 
 		try {Thread.sleep(1000);} catch(Exception e) {}
 
-		claw.rotateTo(clawOpenAngle);
-		claw.flt();
 
 		if(brickCount < 2) {
 			leftGate.rotateTo(0, true);
