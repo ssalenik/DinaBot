@@ -145,9 +145,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//Pattern to follow
 		int[][] pattern = ZIGZAG_X;
 		
-		
 		//Getting drop off coordinates
-		//Assuming that the coordinate of the drop-off point is the bottom leftnode of the tile
+		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
 		int [] dropCoords = dropper.getDropCoords();
 		
 		//Consider the nodes around the drop off zone as obstacles.
