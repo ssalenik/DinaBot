@@ -53,7 +53,7 @@ public class DropOff implements MechConstants, CommConstants{
 	public Movement mover;
 	public BTMaster slave_connection;
 
-	public int[] dropCoords = new int [2];
+	public int[] dropCoords = new int[2];
 	public final int DUMP_STACK_DISTANCE = 15;
 
 	public double[] left_side,right_side,top_side,bottom_side;
@@ -79,7 +79,7 @@ public class DropOff implements MechConstants, CommConstants{
 	 * 
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
 	 */
-	public int[] dropCoords() {
+	public int[] getDropCoords() {
 		return dropCoords;
 	}
 
@@ -96,7 +96,7 @@ public class DropOff implements MechConstants, CommConstants{
 		//First stack drop off
 		//Drop in the middle of the tile
 		if (stack == 1) {
-			double[] dropPoint = {dropCoords()[0]+UNIT_TILE/2,dropCoords()[1]+UNIT_TILE/2};
+			double[] dropPoint = {dropCoords[0]*UNIT_TILE+UNIT_TILE/2,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(PICKUP);
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
@@ -113,10 +113,10 @@ public class DropOff implements MechConstants, CommConstants{
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Define 4 stacking area sides
-			left_side = new double[] {dropCoords[0],dropCoords[1]+UNIT_TILE/2};
-			right_side = new double[] {dropCoords[0]+UNIT_TILE, dropCoords[1]+UNIT_TILE/2};
-			bottom_side = new double[] {dropCoords[0]+UNIT_TILE/2, dropCoords[1]};
-			top_side = new double[] {dropCoords[0]+UNIT_TILE/2, dropCoords[1]+UNIT_TILE};
+			left_side = new double[] {dropCoords[0]*UNIT_TILE,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
+			right_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE, dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
+			bottom_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE/2, dropCoords[1]*UNIT_TILE};
+			top_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE/2, dropCoords[1]*UNIT_TILE+UNIT_TILE};
 
 			//Ordering is clockwise starting with top
 			double[][] sides = {top_side,right_side,bottom_side,left_side};
