@@ -42,4 +42,35 @@ public interface SearchPatterns {
 		new int [] {1,1} // Go back to starting node
 	};
 	
+	public static final int[][] DROP_TEST = {
+		new int[] {2,2},
+		new int[] {3,3},
+		new int[] {4,4},
+		new int[] {5,5},
+		new int[] {6,6}
+	};
+	
+	/**
+	 * Moving test pattern
+	 */
+	public static final int[][] MOVE_TEST = {
+		new int[] {1,4},
+		new int[] {1,7},
+		new int[] {4,7},
+		new int[] {4,4},
+		new int[] {7,4},
+		new int[] {7,7},
+		new int[] {4,7},
+		new int[] {4,4},
+		new int[] {1,4},
+		new int[] {1,1},
+		new int[] {4,1},
+		new int[] {4,4},
+		new int[] {7,4},
+		new int[] {7,1},
+		new int[] {4,1},
+		new int[] {4,4}
+	};
+	
+	
 }

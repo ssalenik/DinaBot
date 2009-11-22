@@ -21,6 +21,8 @@ import dinaBOT.util.*;
 public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatterns {
 
 	/* -- Static Variables --*/
+	
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -183,9 +185,72 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 					movement.turnTo(prev_pos[2], SPEED_ROTATE);
 				}
 				odometer.enableSnapping(true);
-				if(block_count == 6) {
+				if(block_count == CAGE_FULL) {
+					
 					System.out.println("Robot Full... returning");
-					navigator.goTo(dropper.getDropCoords()[0]*UNIT_TILE, dropper.getDropCoords()[1]*UNIT_TILE, true);
+					
+					//Determine best drop-off set-up node
+					// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
+					
+					//If the robot is North-East of drop off area
+					if (prev_pos[0] >= dropCoords[0] + 1 && prev_pos[1] >= dropCoords[1] + 1) {
+						
+						if (prev_pos[0] == dropCoords[0] + 1) {
+							navigator.goTo((dropCoords[0] + 1)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						}
+						else if(prev_pos[1] == dropCoords[1] + 1) {
+							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] + 1)*UNIT_TILE, true);
+						}
+						else {
+							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						}
+						
+					}
+					
+					//If the robot is North-West of drop off area.
+					else if(prev_pos[0] <= dropCoords[0] && prev_pos[1] >= dropCoords[1] + 1) {
+						
+						if (prev_pos[0] == dropCoords[0]) {
+							navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						}
+						else if(prev_pos[1] == dropCoords[1] + 1) {
+							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] + 1)*UNIT_TILE, true);
+						}
+						else {
+							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						}
+						
+					}
+					
+					// If the robot is South-West of the drop off area
+					else if(prev_pos[0] <= dropCoords[0] && prev_pos[1] <= dropCoords[1]) {
+						
+						if (prev_pos[0] == dropCoords[0]) {
+							navigator.goTo((dropCoords[0]*UNIT_TILE), (dropCoords[1] - 1)*UNIT_TILE, true);
+						}
+						else if(prev_pos[1] == dropCoords[1]) {
+							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1])*UNIT_TILE, true);
+						}
+						else {
+							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+						}
+					 }
+					
+					// If the robot is South East of the drop off area
+					else {
+						
+						if (prev_pos[0] == dropCoords[0] + 1) {
+							navigator.goTo((dropCoords[0] + 1)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+						}
+						else if(prev_pos[1] == dropCoords[1]) {
+							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1])*UNIT_TILE, true);
+						}
+						else {
+							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+						}
+						
+					}
+
 					return;
 				}
 				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false);
@@ -209,24 +274,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
 		
-		int[][] pattern = {
-			new int[] {1,4},
-			new int[] {1,7},
-			new int[] {4,7},
-			new int[] {4,4},
-			new int[] {7,4},
-			new int[] {7,7},
-			new int[] {4,7},
-			new int[] {4,4},
-			new int[] {1,4},
-			new int[] {1,1},
-			new int[] {4,1},
-			new int[] {4,4},
-			new int[] {7,4},
-			new int[] {7,1},
-			new int[] {4,1},
-			new int[] {4,4}
-		};
+		int [][] pattern = MOVE_TEST;
 		
 		for(int i = 0;i < pattern.length;i++) {
 			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
