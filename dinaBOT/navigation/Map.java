@@ -55,7 +55,7 @@ public class Map implements MechConstants, USSensorListener {
 		listeners = new DinaList<MapListener>();
 		
 		//initialize border
-		for(int x = 0; x < resolution; x++) map[x][0] = map[resolution-1][y] = BORDER;
+		for(int x = 0; x < resolution; x++) map[x][0] = map[x][resolution-1] = BORDER;
 		for(int y = 0; y < resolution; y++) map[0][y] = map[resolution-1][y] = BORDER;
 		
 
