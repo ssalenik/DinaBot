@@ -66,7 +66,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		
 		localization = new Localization(odometer, movement);
 		
-		map = new Map(odometer, 7, 45, UNIT_TILE);
+		map = new Map(odometer, 9, 45, UNIT_TILE);
 		pather = new ManhattanPather(map, movement);
 		
 		navigator = new Navigator(odometer, movement, map, pather);
@@ -98,27 +98,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	
 		movement.goForward(forward_distance, SPEED_MED);
 
-		if(slave_connection.request(HOLD)) {
-			LCD.clear();
-			LCD.drawString("Success ...", 0, 0);
-		}
+		slave_connection.request(HOLD);
 
 		movement.goForward(-forward_distance, SPEED_MED);
 
 		movement.turn(-rotate_angle, SPEED_ROTATE);
 
 		for(int i = 0;i < 2;i++) {
-			if(slave_connection.request(HOLD)) {
-				LCD.clear();
-				LCD.drawString("Success ...", 0, 0);
-			}
-
+			slave_connection.request(HOLD);
 			movement.goForward(-forward_distance, SPEED_MED);
 
-			if(slave_connection.request(RELEASE)) {
-				LCD.clear();
-				LCD.drawString("Success ...", 0, 0);
-			}
+			slave_connection.request(RELEASE);
 
 			movement.goForward(forward_distance, SPEED_MED);
 		}
@@ -132,11 +122,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		//Setup
 		odometer.enableSnapping(true);
 		odometer.setDebug(true);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 		
 		//Pattern to follow
 		int[][] pattern = {
-			new int[] {5,5},
-			new int[] {0,0}
+			new int[] {6,6},
+			new int[] {1,1}
 		};
 		
 		System.out.println("Starting...");

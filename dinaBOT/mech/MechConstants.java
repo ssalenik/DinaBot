@@ -48,6 +48,6 @@ public interface MechConstants {
 	/**
 	* Size in degrees of the arc the robot should sweep = {@value}
 	*/
-	public final double SWEEP_ARC = Math.PI/2;
+	public final double SWEEP_ARC = Math.PI/3;
 
 }
