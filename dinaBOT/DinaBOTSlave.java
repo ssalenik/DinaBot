@@ -27,11 +27,11 @@ public class DinaBOTSlave implements CommConstants{
 	public DinaBOTSlave() {
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonPressed(Button b) {
-				stacker.close();
-				System.exit(0);
 			}
 
 			public void buttonReleased(Button b) {
+				stacker.close();
+				System.exit(0);
 			}
 		});
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);

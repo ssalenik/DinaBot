@@ -12,6 +12,7 @@ import dinaBOT.detection.*;
 import dinaBOT.sensor.*;
 import dinaBOT.util.*;
 
+
 /**
  * The DinaBOTMaster is the main class the master brick. It <b>is</b> the robot. It contains the main() for the master.
  *
@@ -157,7 +158,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 					map.start();
 					block_count++;
 					if(block_count == 6) {
-						System.out.println("Robot Full... ending");
+						System.out.println("Robot Full... returning");
+						navigator.goTo(5*UNIT_TILE, 0*UNIT_TILE, true);
 						return;
 					}
 				}
@@ -177,27 +179,33 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 	 *
 	*/
 	public void moveTest() {
-		odometer.setDebug(true);
+		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
-		Random rand = new Random(9812);
-		int x = 4;
-		int y = 4;
-		while(true) {
-			int direction = rand.nextInt(4);
-			
-			if(x == 1 && direction == 2) direction = 3;
-			if(x == 7 && direction == 0) direction = 1;
-			if(y == 1 && direction == 3) direction = 0;
-			if(y == 7 && direction == 1) direction = 2;
-			
-			if(direction == 0) x++;
-			if(direction == 1) y++;
-			if(direction == 2) x--;
-			if(direction == 3) y--;
-			
-			movement.goTo(x*UNIT_TILE, y*UNIT_TILE, SPEED_MED);
+		
+		int[][] pattern = {
+			new int[] {1,4},
+			new int[] {1,7},
+			new int[] {4,7},
+			new int[] {4,4},
+			new int[] {7,4},
+			new int[] {7,7},
+			new int[] {4,7},
+			new int[] {4,4},
+			new int[] {1,4},
+			new int[] {1,1},
+			new int[] {4,1},
+			new int[] {4,4},
+			new int[] {7,4},
+			new int[] {7,1},
+			new int[] {4,1},
+			new int[] {4,4}
+		};
+		
+		for(int i = 0;i < pattern.length;i++) {
+			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
 		}
+	
 	}
 	
 	public void scanTest() {
@@ -227,17 +235,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants {
 		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonPressed(Button b) {
-			System.exit(0);
+				System.exit(0);
 			}
 
 			public void buttonReleased(Button b) {
-			System.exit(0);
+				System.exit(0);
 			}
 		});
 		
 		//DO some drop off stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(2, 0); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5, 0); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();

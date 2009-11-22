@@ -14,12 +14,12 @@ public interface MechConstants {
 
 	/**The distance from on wheel to the other = {@value}
 	 */	
-	static final double WHEEL_BASE = 13;
+	static final double WHEEL_BASE = 12.5;
 
 	/**The distance from one light sensor to another = {@value}
 	 *(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)
 	 */
-	static final double LIGHT_SENSOR_BASE = 16;
+	static final double LIGHT_SENSOR_BASE = 23;
 	static final double LIGHT_SENSOR_OFFSET = 1;
 
 	/**The distance from the sensor to the center of the cage (in cm) = {@value}

@@ -40,6 +40,9 @@ public class ArcOdometer implements Odometer {
 
 	int snap_tacho_count;
 	LineDetector snap_detector;
+	
+	boolean previous_position_flag;
+	double[] previous_position;
 
 	double snap_prev_direction;
 
@@ -64,6 +67,7 @@ public class ArcOdometer implements Odometer {
 		right_encoder.resetTachoCount();
 
 		position = new double[3];
+		previous_position = new double[3];
 
 		//Register with the line detectors for grid snapping
 		LineDetector.left.registerListener(this);
@@ -242,15 +246,27 @@ public class ArcOdometer implements Odometer {
 					double offset_angle = Math.atan(distance_travelled/LIGHT_SENSOR_BASE);
 					if(snap_detector == LineDetector.left) theta = current_direction*Math.PI/2-offset_angle;
 					else theta = current_direction*Math.PI/2+offset_angle;
+					
+					double length_l = 0;
+					double theta_l= 0;
+					double theta_l_corr = 0;
+					
+					if(previous_position_flag) {
+						length_l = Math.sqrt((position[0]-previous_position[0])*(position[0]-previous_position[0])+(position[1]-previous_position[1])*(position[1]-previous_position[1]));
+						theta_l = Math.atan2((position[1]-previous_position[1]),(position[0]-previous_position[0]));
+						theta_l_corr = theta-position[2]+theta_l;
+					}
 
 					if(current_direction%2 == 0) { //pos or neg X
 						double x = Math.round(position[0]/UNIT_TILE)*UNIT_TILE+(distance_travelled-LIGHT_SENSOR_OFFSET)/2*Math.cos(theta);
-						setPosition(new double[] {x, 0, theta}, new boolean[] {true, false, true}); //Use setPosition to avoid synchronization problems
+						setPosition(new double[] {x, Math.sin(theta_l)*length_l, (theta)}, new boolean[] {true, false, true}); //Use setPosition to avoid synchronization problems
 					} else { //pos or neg Y
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+(distance_travelled-LIGHT_SENSOR_OFFSET)/2*Math.sin(theta);
-						setPosition(new double[] {0, y, theta}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
+						setPosition(new double[] {Math.cos(theta_l)*length_l, y, (theta)}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-
+					
+					System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
+					previous_position_flag = true;
 					snap_status = 0; //Reset our state to 0: no lines seen
 				}
 			}
@@ -265,6 +281,7 @@ public class ArcOdometer implements Odometer {
 	public synchronized void enableSnapping(boolean enable) {
 		//snap_status = 0;
 		snap_enable = enable;
+		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
 
 	/**
@@ -283,8 +300,8 @@ public class ArcOdometer implements Odometer {
 						while(debug) { //As long as the debug state is true
 							LCD.clear(); //Clear the screen
 							//Print X,Y and Theta
-							LCD.drawString("x = "+((Float)(float)position[0]).toString(),0,3);
-							LCD.drawString("y = "+((Float)(float)position[1]).toString(),0,4);
+							LCD.drawString("x = "+((Float)(float)(position[0]/UNIT_TILE)).toString(),0,3);
+							LCD.drawString("y = "+((Float)(float)(position[1]/UNIT_TILE)).toString(),0,4);
 							LCD.drawString("t = "+((Float)(float)(position[2]%(Math.PI*2)/(Math.PI*2)*360)).toString(),0,5);
 							LCD.drawString("snap = "+snap_enable,0,6);
 							LCD.drawString("safe = "+safe,0,7);
