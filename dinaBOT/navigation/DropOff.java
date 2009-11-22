@@ -1,5 +1,6 @@
 package dinaBOT.navigation;
 
+import lejos.nxt.LCD;
 import dinaBOT.mech.MechConstants;
 import dinaBOT.comm.*;
 
@@ -52,9 +53,11 @@ public class DropOff implements MechConstants, CommConstants{
 	public Odometer odometer;
 	public Movement mover;
 	public BTMaster slave_connection;
+	public Localization localizer;
 
 	public int[] dropCoords = new int[2];
-	public final int DUMP_STACK_DISTANCE = 15;
+	//Experimental value
+	public final int DUMP_STACK_DISTANCE = 22;
 
 	public double[] left_side,right_side,top_side,bottom_side;
 
@@ -62,14 +65,14 @@ public class DropOff implements MechConstants, CommConstants{
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
 	 * Works using a supplied Odometer and Movement.
 	 * 
-	 * @param drop_x: X coordinate of the bottom left node of the drop off tile.
-	 * @param drop_y: Y coordinate of the bottom left node of the drop off tile.
-	 * 
+	 * @param drop_x: X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
+	 * @param drop_y: Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 */
-	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, int drop_x, int drop_y) {
+	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection,Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
 		this.slave_connection = slave_connection;
+		this.localizer = localizer;
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
 	}
@@ -99,7 +102,10 @@ public class DropOff implements MechConstants, CommConstants{
 			double[] dropPoint = {dropCoords[0]*UNIT_TILE+UNIT_TILE/2,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(PICKUP);
-			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
+			
+			mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
+			localizer.localizeLight();
+			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
 			mover.goForward(BLOCK_DISTANCE, SPEED_MED);
 			//Arbitrary orientation for now
 			mover.turnTo(Math.PI/2, SPEED_ROTATE);

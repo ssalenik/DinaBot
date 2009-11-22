@@ -40,7 +40,7 @@ public class Localization implements MechConstants, USSensorListener {
 	 * corner where the robot starts and orients the robot at an orientation of about 90
 	 * degrees.
 	 */
-	public void Localize() {
+	public void localizeUS() {
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
 		phase =1;
@@ -84,6 +84,30 @@ public class Localization implements MechConstants, USSensorListener {
 	//odometer.setPosition(new double[] {0,0,Math.PI/2}, new boolean[] {true,true,true});
 	}
 
+	/**
+	 * Gridsnaps to correct it's orientation once it has USLocalized
+	 * Works strictly if approximately on an intersection.
+	 */
+	public void localizeLight() {
+		odometer.enableSnapping(false);
+		mover.goForward(-5, SPEED_SLOW);
+		odometer.enableSnapping(true);
+		mover.goForward(15, SPEED_SLOW);
+		
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(-5, SPEED_SLOW);
+		mover.goForward(15, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+	}
+	
+	/**
+	 * Call to USLocalize and LightLocalize simply.
+	 */
+	public void localize() {
+		this.localizeUS();
+		this.localizeLight();
+	}
+	
 	public void newValues(int[] new_values, USSensor sensor) {
 
 		switch (phase) {
