@@ -116,7 +116,8 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
 			//localizer.localizeLight();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
-			mover.goForward(BLOCK_DISTANCE, SPEED_MED);
+			mover.turnTo(Math.PI/2, SPEED_ROTATE);
+			mover.goForward(BLOCK_DISTANCE+3, SPEED_MED);
 			//Arbitrary orientation for now
 			mover.turnTo(Math.PI/2, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
@@ -189,6 +190,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Redundant step
 			mover.turnTo(facing, SPEED_ROTATE);
 			phase = 1;
+			//Very arbitrary check for stack (probably will be disabled)
 			while (!latchedStack) {
 				mover.turn(Math.PI/8, SPEED_ROTATE);
 				mover.turn(-Math.PI/4, SPEED_ROTATE);
@@ -196,7 +198,8 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			}
 			phase = 0;
 			//Turn 180 to be facing away
-			mover.turn(stackAngle+Math.PI, SPEED_ROTATE);
+			//TODO: Fix huge orientation error here.
+			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			
 			//Drop the second stack next to the first one.
 			slave_connection.request(OPEN_CAGE);
