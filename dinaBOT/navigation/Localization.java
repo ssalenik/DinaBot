@@ -22,13 +22,13 @@ public class Localization implements MechConstants, USSensorListener {
 
 	/**
 	 * The maximum distance at which the localizer will recongize that a wall is seen.
-	 */
+	*/
 	protected int WALL_DISTANCE = 30;
 
 	/**
 	 * Creates a new Localization using a supplied {@link dinaBOT.navigation#ArcOdometer odometer} and with
 	 * {@link dinaBOT.sensor#USSensor Ultrasonic Sensors}.
-	 */
+	*/
 	public Localization(Odometer odometer, Movement mover) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -40,7 +40,7 @@ public class Localization implements MechConstants, USSensorListener {
 	 * Using falling edge technique, detects the two walls forming the initial
 	 * corner where the robot starts and orients the robot at an orientation of about 90
 	 * degrees.
-	 */
+	*/
 	public void localizeUS() {
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
@@ -88,7 +88,7 @@ public class Localization implements MechConstants, USSensorListener {
 	/**
 	 * Gridsnaps to correct it's orientation once it has USLocalized
 	 * Works strictly if approximately on an intersection.
-	 */
+	*/
 	public void localizeLight() {
 		odometer.enableSnapping(false);
 		mover.goForward(-5, SPEED_SLOW);
@@ -109,7 +109,7 @@ public class Localization implements MechConstants, USSensorListener {
 
 	/**
 	 * Call to USLocalize and LightLocalize simply.
-	 */
+	*/
 	public void localize() {
 		this.localizeUS();
 		this.localizeLight();

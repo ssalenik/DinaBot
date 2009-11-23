@@ -11,7 +11,7 @@ package dinaBOT.navigation;
 public interface Navigation extends MapListener {
 
 	/**
-	 * Request that the robot move to a specified set of coordiates on the grid. This is a high level method and should integrate pathing and obstacle avoidance considerations
+	 * Request that the robot move to a specified set of coordinates on the grid. This is a high level method and should integrate pathing and obstacle avoidance considerations
 	 *
 	 * @param x the x coordiate to move to
 	 * @param y the y coordiate to move to
@@ -27,10 +27,4 @@ public interface Navigation extends MapListener {
 	*/
 	public void interrupt();
 
-	/**
-	 *
-	 *
-	 *
-	*/
-	public void newObstacle(int x, int y);
 }

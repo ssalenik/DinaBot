@@ -6,7 +6,7 @@ import dinaBOT.sensor.*;
 import lejos.nxt.*;
 
 /**
- *
+ * Navigator implements the navigation interface. It is the integration point of the Movement, Map and Pathing.
  *
  * @author Stepan Salenikovich, Severin Smith
  * @see Navigation
@@ -20,11 +20,13 @@ import lejos.nxt.*;
  */
 public class Navigator implements Navigation, MechConstants, USSensorListener {
 
+	/* -- Instance Variables -- */
+	
 	Odometer odometer;
 	Movement movement;
 
 	Map map;
-	Pathing pather;
+	Pathing pathing;
 
 	int[] low_Readings;
 	int[] high_Readings;
@@ -34,12 +36,20 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	boolean active, hard_interrupt, soft_interrupt, full_mode;
 
-	public Navigator(Odometer odometer, Movement movement, Map map, Pathing pather) {
+	/**
+	 * Instantiate a new Navigator
+	 *
+	 * @param odometer the odometer object to use
+	 * @param movement the movement object to use
+	 * @param map the map object to use
+	 * @param pathing the pathing object to use
+	*/
+	public Navigator(Odometer odometer, Movement movement, Map map, Pathing pathing) {
 		this.odometer = odometer;
 		this.movement = movement;
 
 		this.map = map;
-		this.pather = pather;
+		this.pathing = pathing;
 
 		map.registerListener(this);
 
@@ -49,7 +59,6 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		USSensor.high_sensor.registerListener(this);
 		USSensor.low_sensor.registerListener(this);
 	}
-
 
 	public int goTo(double x, double y, boolean full) {
 		this.full_mode = full;
@@ -70,6 +79,13 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		return -1;
 	}
 
+	/**
+	 * Regenerate a path to the x,y point from the current position. Return false if possible
+	 *
+	 * @param x the x position to go to
+	 * @param y the position to go to
+	 * @return true if the repathing was a success false otherwise
+	*/
 	boolean repath(double x, double y) {
 		double[] position = new double[3];
 		position = odometer.getPosition();
@@ -80,11 +96,15 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			position[2] = position[2];
 		}
 
-		path = pather.generatePath(position[0], position[1], position[2], x, y);
+		path = pathing.generatePath(position[0], position[1], position[2], x, y);
 		if(path == null) return false;
 		else return true;
 	}
 
+	/**
+	 * Interrupt the goTo if it is in progress
+	 *
+	*/
 	public void interrupt() {
 		hard_interrupt = true;
 		movement.stop();

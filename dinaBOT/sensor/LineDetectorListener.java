@@ -12,7 +12,7 @@ package dinaBOT.sensor;
 public interface LineDetectorListener {
 
 	/**
-	 * This method is called by the <code>detector</code> to notify the LineDetectorListener of a line cross event. You can register you LineDetectorListener with a LineDetector using {@link LineDetector#registerListener(LineDetectorListener listener)}.
+	 * This method is called by the <code>detector</code> to notify the LineDetectorListener of a line cross event. You can register your LineDetectorListener with a LineDetector using {@link LineDetector#registerListener(LineDetectorListener listener)}.
 	 *
 	 * @param detector the LineDetector calling this listener
 	 * @see LineDetector#registerListener(LineDetectorListener listener)

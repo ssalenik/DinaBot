@@ -9,25 +9,25 @@ package dinaBOT.mech;
 public interface MechConstants {
 
 	/**The radius of the robot wheels
-	 */
+	*/
 	static final double WHEEL_RADIUS = 2.659;
 
 	/**The distance from on wheel to the other = {@value}
-	 */
+	*/
 	static final double WHEEL_BASE = 12.5;
 
 	/**The distance from one light sensor to another = {@value}
 	 *(currently does not reflect the real distance on purpose, do not change unless you know what you are doing)
-	 */
+	*/
 	static final double LIGHT_SENSOR_BASE = 23;
 	static final double LIGHT_SENSOR_OFFSET = 1;
 
 	/**The distance from the sensor to the center of the cage (in cm) = {@value}
-	 */
+	*/
 	static final double BLOCK_DISTANCE = 9;
 
 	/**The size of one tile on the course = {@value}
-	 */
+	*/
 	static double UNIT_TILE = 30.48;
 
 	//SPEEDS
@@ -37,7 +37,7 @@ public interface MechConstants {
 	static final int SPEED_FAST = 225;
 
 	/**Maximum distance at which a block may be located in order to be detected = {@value}
-	 */
+	*/
 	static final int US_TRUST_THRESHOLD = 30;
 
 	/**

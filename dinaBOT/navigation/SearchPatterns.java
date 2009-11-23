@@ -10,7 +10,7 @@ public interface SearchPatterns {
 
 	/**
 	 * ZigZag search pattern that makes the robot go up and down the x-axis.
-	 */
+	*/
 	public static final int[][] ZIGZAG_X = {
 		new int[] {6,1},
 		new int[] {6,2},
@@ -27,7 +27,7 @@ public interface SearchPatterns {
 
 	/**
 	 * ZigZag search pattern that makes the robot go up and down the x-axis.
-	 */
+	*/
 	public static final int[][] ZIGZAG_Y = {
 		new int[] {1,6},
 		new int[] {2,6},
@@ -52,7 +52,7 @@ public interface SearchPatterns {
 
 	/**
 	 * Moving test pattern
-	 */
+	*/
 	public static final int[][] MOVE_TEST = {
 		new int[] {1,4},
 		new int[] {1,7},

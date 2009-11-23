@@ -23,7 +23,7 @@ import dinaBOT.comm.*;
  *time, it will always use the same time each time it needs to drop off
  *another stack. The inputed data for the drop off will be given at
  *startup and would be two ints passed from the main.
- */
+*/
 
 /*
  * Drop off point sketch
@@ -79,7 +79,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * @param localizer
 	 * @param drop_x X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 * @param drop_y Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
-	 */
+	*/
 	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -94,7 +94,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Obtains the coordinates of the drop off area.
 	 *
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
-	 */
+	*/
 	public int[] getDropCoords() {
 		return dropCoords;
 	}
@@ -104,7 +104,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
 	 *
 	 * @return Success status
-	 */
+	*/
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
 	public boolean dropOff(int stack) {
 		boolean success = false;
