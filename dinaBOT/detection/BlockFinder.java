@@ -22,7 +22,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	//Super experimental constant
 	static final int SECOND_COLUMN_MAX = 75;
 	//too close to obstacle constant
-	static final int SAFE_DIST = 20;
+	static final int SAFE_DIST = 25;
 
 	/* -- Instance Variable -- */
 
@@ -34,10 +34,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	double angleA;
 	double angleB;
 
-	int latest_low_reading_1;
-	int latest_low_reading_2;
-
-	int latest_high_reading;
+	int[] latest_low_readings;
+	int[] latest_high_readings;
+	
 	int lowest_high_reading;
 
 	//True when data sets for low & high are acquired
@@ -71,6 +70,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 		this.mover = mover;
 		this.mapper = mapper;
+		
+		latest_low_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
+		latest_high_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 
 		phase = 0;
 
@@ -94,10 +96,9 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		blockDistance_A = 255;
 		blockDistance_B = 255;
 		
-		latest_low_reading_1 = 255;
-		latest_low_reading_2 = 255;
+		latest_low_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
+		latest_high_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 		
-		latest_high_reading = 255;
 		lowest_high_reading = 255;
 
 		double initialOrientation = odometer.getPosition()[2];
@@ -120,14 +121,23 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		// or back to start in case of FAIL
 		phase = 0;
 		
+		if(debug) {
+			System.out.println("----");
+			System.out.println(blockDistance_A);
+			System.out.println(blockDistance_B);
+			System.out.println(lowest_high_reading);
+		}
+		
 		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD 
 				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD 
 				&& Math.abs(blockDistance_A - blockDistance_B) < 5
 				&& blockDistance_A != 255
 				&& blockDistance_B !=255) {
+		
+			lowest_high_reading = 255;
+		
 			double angle = (angleA+angleB)/2;
 			double blockDistance = (blockDistance_A+blockDistance_B)/2;
-
 
 			//check if coord is outside of map
 			if(!mapper.checkUSCoord(blockDistance, angle)) return false;
@@ -154,7 +164,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		if(minLow < US_TRUST_THRESHOLD
 				&& minHigh - minLow > DETECTION_THRESHOLD
 				&& minLow < blockDistance_A
-				&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
+				&& latest_low_readings[1] < SECOND_COLUMN_MAX) {
 
 			blockDistance_A = minLow;
 			angleA = odometer.getPosition()[2];
@@ -163,7 +173,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 			if(debug) {
 				LCD.drawInt(minLow, 0, 0);
 				LCD.drawInt(minHigh, 0, 2);
-				LCD.drawInt(latest_low_reading_2, 0, 1);
+				LCD.drawInt(latest_low_readings[1], 0, 1);
 			}
 		}
 	}
@@ -172,7 +182,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		if(minLow < US_TRUST_THRESHOLD
 				&& minHigh - minLow > DETECTION_THRESHOLD
 				&& minLow < blockDistance_B
-				&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
+				&& latest_low_readings[1] < SECOND_COLUMN_MAX) {
 
 			blockDistance_B = minLow;
 			angleB = odometer.getPosition()[2];
@@ -181,7 +191,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 			if(debug) {
 				LCD.drawInt(minLow, 0, 3);
 				LCD.drawInt(minHigh, 0, 5);
-				LCD.drawInt(latest_low_reading_2, 0, 4);
+				LCD.drawInt(latest_low_readings[1], 0, 4);
 			}
 		}
 	}
@@ -195,16 +205,15 @@ public class BlockFinder implements USSensorListener, MechConstants {
 			case 1:
 				//Latching A
 				if (sensor == USSensor.low_sensor) {
-					latest_low_reading_1 = new_values[0];
-					latest_low_reading_2 = new_values[1];
+					latest_low_readings = new_values;
 					if (data_acquired) {
 						data_acquired = false;
 					}
 				} else if (sensor == USSensor.high_sensor) {
-					latest_high_reading = new_values[0];
-					if(latest_high_reading < lowest_high_reading) lowest_high_reading = latest_high_reading;
+					latest_high_readings = new_values;
+					if(latest_high_readings[0] < lowest_high_reading) lowest_high_reading = latest_high_readings[0];
 					if (!data_acquired) {
-						minLow = latest_low_reading_1;
+						minLow = latest_low_readings[0];
 						minHigh = lowest_high_reading;
 						findEdgeA();
 						data_acquired = true;
@@ -216,16 +225,15 @@ public class BlockFinder implements USSensorListener, MechConstants {
 			case 2:
 				//Latching B
 				if (sensor == USSensor.low_sensor) {
-					latest_low_reading_1 = new_values[0];
-					latest_low_reading_2 = new_values[1];
+					latest_low_readings = new_values;
 					if (data_acquired) {
 						data_acquired = false;
 					}
 				} else if (sensor == USSensor.high_sensor) {
-					latest_high_reading = new_values[0];
-					if(latest_high_reading < lowest_high_reading) lowest_high_reading = latest_high_reading;
+					latest_high_readings = new_values;
+					if(latest_high_readings[0] < lowest_high_reading) lowest_high_reading = latest_high_readings[0];
 					if (!data_acquired) {
-						minLow = latest_low_reading_1;
+						minLow = latest_low_readings[0];
 						minHigh = lowest_high_reading;
 						findEdgeB();
 						data_acquired = true;
@@ -235,13 +243,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				break;
 
 			case 3:
-				//checking for obstacles
-				if (sensor == USSensor.high_sensor) {
-					latest_high_reading = new_values[0];
-					if(latest_high_reading < lowest_high_reading) {
-						lowest_high_reading = latest_high_reading;
-
-						if(lowest_high_reading < SAFE_DIST) {
+			if (sensor == USSensor.high_sensor) {
+					latest_high_readings = new_values;
+					if(latest_high_readings[0] < lowest_high_reading) {
+						lowest_high_reading = latest_high_readings[0];
+						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) || (latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2)) {
 							too_close = true;
 							mover.stop();
 						}

@@ -142,10 +142,14 @@ public class Map implements MechConstants, USSensorListener {
 					|| coord[1] < 0
 					|| coord[1] > (resolution - 1) * nodeDist) {
 						return false;
-		} else return true;
+		} else if(map[(int)Math.round(coord[0]/UNIT_TILE)][(int)Math.round(coord[1]/UNIT_TILE)] > 0) {
+			return false;
+		} else {
+			return true;
+		}
 
 	}
-
+	
 	public int[] getNode(double[] coord) {
 		int[] node = new int[2];
 
@@ -211,10 +215,10 @@ public class Map implements MechConstants, USSensorListener {
 			// if obstacle is not detected as in current node
 			if(!((node[0] == curr_node[0]) && (node[1] == curr_node[1]))) {
 
-				Sound.twoBeeps();
 
 				// mark map with obstacle
 				if(map[node[0]][node[1]] == 0) {
+					Sound.twoBeeps();
 					map[node[0]][node[1]] = 2;
 
 					notifyListeners(node[0], node[1]);

@@ -65,16 +65,16 @@ public class USSensor implements Runnable {
 			if (this == USSensor.low_sensor) {
 				if(latest_values[0] <= 26) {
 					for(int i = 0;i < 8;i++) {
-						latest_values[i] = (int)((double)(latest_values[i]*latest_values[i])*0.1091-3.3446*(double)latest_values[i]+35.629);
+						if(latest_values[i] != 255) latest_values[i] = (int)((double)(latest_values[i]*latest_values[i])*0.1091-3.3446*(double)latest_values[i]+35.629);
 					}
 				} else {
 					for(int i = 0;i < 8;i++) {
-						latest_values[i] = (int)(0.9846*(double)latest_values[i]-0.1456);
+						if(latest_values[i] != 255) latest_values[i] = (int)(0.9846*(double)latest_values[i]-0.1456);
 					}
 				}
 			} else if (this == USSensor.high_sensor) {
 				for(int i = 0;i < 8;i++) {
-					latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);
+					if(latest_values[i] != 255) latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);
 				}
 			}
 

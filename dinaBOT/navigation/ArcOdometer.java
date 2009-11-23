@@ -34,7 +34,7 @@ public class ArcOdometer implements Odometer {
 
 	/* Grid snapping*/
 
-	boolean snap_enable;
+	boolean snap_enable, lateral_snap_enable;
 
 	int snap_status;
 
@@ -73,7 +73,8 @@ public class ArcOdometer implements Odometer {
 		LineDetector.left.registerListener(this);
 		LineDetector.right.registerListener(this);
 		snap_enable = false; //Grid snapping is currently disable by default until it is 100% tested
-
+		lateral_snap_enable = false;
+		
 		//Start the odometer thread last
 		Thread odometer_thread = new Thread(this);
 		odometer_thread.setDaemon(true);
@@ -249,7 +250,7 @@ public class ArcOdometer implements Odometer {
 					double theta_l= 0;
 					double theta_l_corr = 0;
 
-					if(previous_position_flag) {
+					if(previous_position_flag && lateral_snap_enable) {
 						length_l = Math.sqrt((position[0]-previous_position[0])*(position[0]-previous_position[0])+(position[1]-previous_position[1])*(position[1]-previous_position[1]));
 						theta_l = Math.atan2((position[1]-previous_position[1]),(position[0]-previous_position[0]));
 						theta_l_corr = theta-position[2]+theta_l;
@@ -271,16 +272,19 @@ public class ArcOdometer implements Odometer {
 		}
 	}
 
-	/**
-	 * Enable or disable grid snapping (auto correction of the odometer with grid lines).
-	 *
-	 * @param enable enables grid snapping if set to true, disables it otherwise
-	*/
 	public synchronized void enableSnapping(boolean enable) {
 		//snap_status = 0;
 		snap_enable = enable;
+		lateral_snap_enable = enable;
 		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
+	
+	public synchronized void enableLateralSnapping(boolean enable) {
+		//snap_status = 0;
+		lateral_snap_enable = enable;
+		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
+	}
+	
 
 	public boolean isSnapping() {
 		return snap_enable;

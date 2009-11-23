@@ -47,6 +47,13 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	public void enableSnapping(boolean enable);
 
 	/**
+	 * Enable or disable lateral grid snapping (auto correction of the odometer with grid lines not in the direction of travel).
+	 *
+	 * @param enable enables lateral grid snapping if set to true, disables it otherwise
+	*/
+	public void enableLateralSnapping(boolean enable);
+
+	/**
 	 * Returns the state of the snapping system.
 	 *
 	 * @return true if currently snapping false otherwise

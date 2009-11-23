@@ -67,7 +67,7 @@ public class Localization implements MechConstants, USSensorListener {
 		// angleA is clockwise from angleB, so assume the average of the
 		// angles to the right of angleB is 45 degrees past 'north'
 		//Find 90 degree orientation approximation
-		phase =0;
+		phase = 0;
 		if (angleA < angleB) {
 			//The first wall seen is "south" wall.
 			//The second wall seen is "west" wall.
@@ -82,7 +82,7 @@ public class Localization implements MechConstants, USSensorListener {
 
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
 		// update the odometer position (this will be a vague estimation)
-	//odometer.setPosition(new double[] {0,0,Math.PI/2}, new boolean[] {true,true,true});
+		odometer.setPosition(new double[] {0,0,Math.PI/2}, new boolean[] {true,true,true});
 	}
 
 	/**

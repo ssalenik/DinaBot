@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 1;
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -85,7 +85,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		blockFind = new BlockFinder(odometer, movement, map);
 		dropper = new DropOff(odometer, movement, slave_connection,localization, drop_x, drop_y);
 
-		debug = true;
+		debug = false;
 	}
 
 	public void connect() {
@@ -150,6 +150,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
+		} else {
+			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
+			slave_connection.request(PICKUP); //Pickup
+			map.start(); //Reenable map
+	
+			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
+			movement.turnTo(initial_position[2], SPEED_ROTATE);
 		}
 
 		odometer.enableSnapping(true); //Renable snapping
@@ -162,17 +169,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public void dropOff() {
 		//Determine best drop-off set-up node
 		// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
-		double[] current_postion = odometer.getPosition();
+		double[] start_position = odometer.getPosition();
 		int[] dropCoords = dropper.getDropCoords();
 		//If the robot is North-East of drop off area
-		if (current_postion[0] > (dropCoords[0]) * UNIT_TILE && current_postion[1] > (dropCoords[1]) * UNIT_TILE) {
+		if (start_position[0] > (dropCoords[0]) * UNIT_TILE && start_position[1] > (dropCoords[1]) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the norteast");
-			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
 			Button.waitForPress();
-			if (current_postion[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
+			if (start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
 				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
-			else if(current_postion[1] <= dropCoords[1] + 1) {
+			else if(start_position[1] <= dropCoords[1] + 1) {
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 			}
 			else {
@@ -182,14 +189,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 
 		//If the robot is North-West of drop off area.
-		else if(current_postion[0] <= dropCoords[0] * UNIT_TILE && current_postion[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
+		else if(start_position[0] <= dropCoords[0] * UNIT_TILE && start_position[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the nortwest");
-			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
 			Button.waitForPress();
-			if (current_postion[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
+			if (start_position[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
 				navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
-			else if(current_postion[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
+			else if(start_position[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 			}
 			else {
@@ -199,14 +206,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 
 		// If the robot is South-West of the drop off area
-		else if(current_postion[0] <= (dropCoords[0] + 1) * UNIT_TILE && current_postion[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
+		else if(start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE && start_position[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the southwest");
-			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
 			Button.waitForPress();
-			if (current_postion[0] >= dropCoords[0] * UNIT_TILE) {
+			if (start_position[0] >= dropCoords[0] * UNIT_TILE) {
 				navigator.goTo((dropCoords[0]) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
-			else if(current_postion[1] >= (dropCoords[1]) * UNIT_TILE) {
+			else if(start_position[1] >= (dropCoords[1]) * UNIT_TILE) {
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 			}
 			else {
@@ -217,12 +224,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		// If the robot is South East of the drop off area
 		else {
 			if(debug) System.out.println("Im in the southeast or somewhere in between the zones");
-			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
 			Button.waitForPress();
-			if (current_postion[0] >= dropCoords[0] + 1) {
+			if (start_position[0] >= dropCoords[0] + 1) {
 				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
-			else if(current_postion[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
+			else if(start_position[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 			}
 			else {
@@ -241,18 +248,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		//Pattern to follow
+		
 		int[][] pattern = {
-			new int[] {6,1},
-			new int[] {6,2},
-			new int[] {1,2},
-			new int[] {1,3},
-			new int[] {6,3},
-			new int[] {6,4},
-			new int[] {1,4},
-			new int[] {1,5},
-			new int[] {6,5},
-			new int[] {6,6},
+			new int[] {6,7},
 			new int[] {1,1} // Go back to starting node
 		};
 
@@ -304,14 +302,57 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	*/
 	public void moveTest() {
 		odometer.setDebug(false);
-		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
+		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
-
-		int[][] pattern = MOVE_TEST;
+		odometer.enableLateralSnapping(false);
+		/*int[][] pattern = MOVE_TEST;
 
 		for(int i = 0;i < pattern.length;i++) {
 			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
-		}
+		}*/
+		
+		localization.localizeUS();
+		System.out.println("US Done");
+		odometer.setDebug(false);
+		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
+		odometer.enableSnapping(true);
+		odometer.enableLateralSnapping(false);
+		
+	
+		movement.goForward(UNIT_TILE, SPEED_SLOW);
+		movement.goForward(-UNIT_TILE, SPEED_SLOW);
+		movement.goForward(3*UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goForward(UNIT_TILE/2, SPEED_SLOW);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goForward(UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
+		movement.goForward(-UNIT_TILE/4, SPEED_SLOW);
+		
+		movement.goTo(3*UNIT_TILE/4, UNIT_TILE, SPEED_SLOW);
+		
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(UNIT_TILE, SPEED_SLOW);
+		movement.goForward(-UNIT_TILE, SPEED_SLOW);
+		movement.goForward(3*UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(UNIT_TILE/2, SPEED_SLOW);
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(UNIT_TILE/4, SPEED_SLOW);
+		movement.turnTo(0, SPEED_ROTATE);
+		movement.goForward(-UNIT_TILE/4, SPEED_SLOW);
+		
+		movement.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
+		odometer.enableLateralSnapping(true);
+		
 
 	}
 
@@ -323,7 +364,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5, 4); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(2, 6); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
