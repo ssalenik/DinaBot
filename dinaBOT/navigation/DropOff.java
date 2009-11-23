@@ -1,8 +1,6 @@
 package dinaBOT.navigation;
 
-import lejos.nxt.Button;
-import lejos.nxt.LCD;
-import lejos.nxt.Sound;
+import lejos.nxt.*;
 import dinaBOT.mech.MechConstants;
 import dinaBOT.sensor.USSensor;
 import dinaBOT.sensor.USSensorListener;
@@ -110,7 +108,9 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public boolean dropOff(int stack) {
 		boolean success = false;
 		double facing= 0;
-
+		//Initial location
+		double[] initialLocation = odometer.getPosition();
+		
 		//First stack drop off
 		//Drop in the middle of the tile
 		if (stack == 1) {
@@ -129,8 +129,13 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
 
-			//Should go back to nearest node after this returns
+			//Should go back to initial node after this returns
 			success = true;
+			//Move along X-axis
+			mover.goTo(initialLocation[0],odometer.getPosition()[1],SPEED_MED);
+			//Move along y-axis
+			mover.goTo(odometer.getPosition()[1], initialLocation[1], SPEED_MED);
+			
 		} else if (stack == 2) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 			//Define 4 stacking area corners
@@ -216,6 +221,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			slave_connection.request(CLOSE_CAGE);
 
 			success = true;
+			mover.goTo(initialLocation[0], initialLocation[1], SPEED_MED);
 		}
 
 		return success;
