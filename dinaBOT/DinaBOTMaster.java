@@ -370,7 +370,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.enableLateralSnapping(true);
 	
 	}
-
+	
+	public void pickUpTest() {
+		slave_connection.request(RELEASE); //Pickup
+		while(true) {
+			Button.waitForPress();
+			slave_connection.request(PICKUP); //Pickup
+			Button.waitForPress();
+			slave_connection.request(RELEASE); //Pickup
+		}
+	}
+	
+	
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -383,8 +394,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		dinaBOTmaster.run();
-
+		//dinaBOTmaster.run();
+		dinaBOTmaster.pickUpTest();
 		//dinaBOTmaster.moveTest();
 
 		while(true); //Never quit

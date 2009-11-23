@@ -70,12 +70,18 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				active = true;
 				if(hard_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
 				active = false;
-				if(node == path.length-1) return 0;
+				if(node == path.length-1) {
+					path = null;
+					return 0;
+				}
 			}
 			active = false;
-			if(hard_interrupt) return 1;
+			if(hard_interrupt) {
+				path = null;
+				return 1;
+			}
 		}
-
+		path = null;
 		return -1;
 	}
 
@@ -112,6 +118,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	public void newObstacle(int x, int y) {
 		if(active) {
+			System.out.println(x+"--"+y);
 			for(int i = node ; i < path.length; i++) {
 				// check if new obstacle lies on current path
 				if((path[i][0] == x*UNIT_TILE) && (path[i][1] == y*UNIT_TILE)) {
@@ -122,7 +129,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		}
 	}
 
-	public synchronized void newValues(int[] new_values, USSensor sensor) {
+	public void newValues(int[] new_values, USSensor sensor) {
 		double[] position = odometer.getPosition();
 
 		if(active && !full_mode) {
