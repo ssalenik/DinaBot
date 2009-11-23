@@ -27,15 +27,16 @@ import dinaBOT.comm.*;
 
 /*
  * Drop off point sketch
- 					 (top)
+ 				#4(x1,y2)		#3(x2,y2)
 				 	 -------
 			 		|		|
-		(Left)		| drop	|	(right)
+					| drop	|	
 			 		| point	|
 			 		 -------
- 					 (bottom)
+ 				#1(x1,y1)		#2(x2,y1)
 
-		This set of coordinates designates the middle of the each of the sides of the drop point.
+		This set of coordinates designates the middle of the each of the corners of the drop point.
+		Corners are ordered clockwise starting from (x1,y1), the given drop off coordinates
 		This is only used to perform the drop for the second stack.
  */
 
@@ -133,59 +134,60 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		} else if (stack == 2) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
-			//Define 4 stacking area sides
-			left_side = new double[] {dropCoords[0]*UNIT_TILE,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
-			right_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE, dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
-			bottom_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE/2, dropCoords[1]*UNIT_TILE};
-			top_side = new double[] {dropCoords[0]*UNIT_TILE+UNIT_TILE/2, dropCoords[1]*UNIT_TILE+UNIT_TILE};
-
-			//Ordering is clockwise starting with top
-			double[][] sides = {top_side,right_side,bottom_side,left_side};
+			//Define 4 stacking area corners
+			double x1,x2,y1,y2;
+			x1 = dropCoords[0];
+			x2 = dropCoords[0]+UNIT_TILE;
+			y1 = dropCoords[1];
+			y2 = dropCoords[1]+UNIT_TILE;
 
 			//First, find the side closest to the current location of the robot (MUST avoid going through the drop zone).
 			double[] position = odometer.getPosition();
-			double closest_distance = -1;
-			double[] closest_side = new double[2];
-			double dX, dY, distance;
-			int side = 0;
+			int corner = 0;
+			double[] dropPoint = new double[2];
 
-			for (int i=0; i < sides.length; i++) {
-				dX = Math.abs(position[0]-sides[i][0]);
-				dY = Math.abs(position[1] - sides[i][1]);
-				distance = Math.sqrt(dX*dX+dY*dY);
-				if (distance < closest_distance || closest_distance == -1) {
-					closest_distance = distance;
-					closest_side = sides[i];
-					side = i;
+			if (Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
+				dropPoint[0] = x1;
+				corner = 1;
+			} else {
+				dropPoint[0] = x2;
+				corner = 2;
+			}
+			if (Math.abs(position[1] - y1) < Math.abs(position[0] - y2)) {
+				dropPoint[1] = y1;
+			} else {
+				dropPoint[1] = y2;
+				if (corner == 1) {
+					corner = 3;
+				} else {
+					corner = 4;
 				}
 			}
 
 			//Second, get aligned with the stack present and push it back. (going backwards)
 			//(maybe push it with the stack that is in the bot instead of the cage doors)
 			slave_connection.request(PICKUP);
-			mover.goTo(closest_side[0], closest_side[1], SPEED_MED);
+			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
 
-			switch (side) {
+			switch (corner) {
 			//Face the stack
-			case TOP:
-				mover.turnTo(3*Math.PI/2, SPEED_ROTATE);
-				facing = 3*Math.PI/2;
+			case 1:
+				facing = Math.PI/4;
 				break;
-			case RIGHT:
-				mover.turnTo(Math.PI, SPEED_ROTATE);
-				facing = Math.PI;
+			case 2:
+				facing = 3*Math.PI/4;
 				break;
-			case BOTTOM:
-				mover.turnTo(Math.PI/2, SPEED_ROTATE);
-				facing = Math.PI/2;
+			case 3:
+				facing = -Math.PI/4;
 				break;
-			case LEFT:
-				mover.turnTo(0, SPEED_ROTATE);
-				facing = 0;
+			case 4:
+				facing = 5*Math.PI/4;
 				break;
 			}
 
-			Button.waitForPress();
+			mover.turnTo(facing, SPEED_ROTATE);
+			
+			//Button.waitForPress();
 			//Probably should verify first stack's presence with US
 			//TODO: Implement USSensorListener methods
 
@@ -194,7 +196,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Redundant step
 			mover.turnTo(facing, SPEED_ROTATE);
 			phase = 1;
-			//Very arbitrary check for stack (probably will be disabled)
+			//Very arbitrary check for stack presence (probably will be disabled)
 			while (!latchedStack) {
 				mover.turn(Math.PI/8, SPEED_ROTATE);
 				mover.turn(-Math.PI/4, SPEED_ROTATE);
