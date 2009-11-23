@@ -205,18 +205,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 					// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
 					
 					//If the robot is North-East of drop off area
-					if (prev_pos[0] >= (dropCoords[0] + 1) * UNIT_TILE && prev_pos[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
+					if (prev_pos[0] > (dropCoords[0]) * UNIT_TILE && prev_pos[1] > (dropCoords[1]) * UNIT_TILE) {
 						System.out.println("Im in the norteast");
 						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
 						Button.waitForPress();
-						if (prev_pos[0] == dropCoords[0] + 1) {
-							navigator.goTo((dropCoords[0] + 1)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						if (prev_pos[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
+							navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 						}
-						else if(prev_pos[1] == dropCoords[1] + 1) {
-							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] + 1)*UNIT_TILE, true);
+						else if(prev_pos[1] <= dropCoords[1] + 1) {
+							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 						}
 						else {
-							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 						}
 						
 					}
@@ -226,31 +226,31 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 						System.out.println("Im in the nortwest");
 						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
 						Button.waitForPress();
-						if (prev_pos[0] == dropCoords[0]) {
-							navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+						if (prev_pos[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
+							navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 						}
-						else if(prev_pos[1] == dropCoords[1] + 1) {
-							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] + 1)*UNIT_TILE, true);
+						else if(prev_pos[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
+							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 						}
 						else {
-							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] + 2)*UNIT_TILE, true);
+							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 						}
 						
 					}
 					
 					// If the robot is South-West of the drop off area
-					else if(prev_pos[0] <= dropCoords[0] * UNIT_TILE && prev_pos[1] <= dropCoords[1]* UNIT_TILE) {
+					else if(prev_pos[0] <= (dropCoords[0] + 1) * UNIT_TILE && prev_pos[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
 						System.out.println("Im in the southwest");
 						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
 						Button.waitForPress();
-						if (prev_pos[0] == dropCoords[0]) {
-							navigator.goTo((dropCoords[0]*UNIT_TILE), (dropCoords[1] - 1)*UNIT_TILE, true);
+						if (prev_pos[0] >= dropCoords[0] * UNIT_TILE) {
+							navigator.goTo((dropCoords[0]) * UNIT_TILE), (dropCoords[1] - 1) * UNIT_TILE, true);
 						}
-						else if(prev_pos[1] == dropCoords[1]) {
-							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1])*UNIT_TILE, true);
+						else if(prev_pos[1] >= (dropCoords[1])  * UNIT_TILE) {
+							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 						}
 						else {
-							navigator.goTo((dropCoords[0] - 1)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 						}
 					 }
 					
@@ -259,14 +259,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 						System.out.println("Im in the southeast or somewhere in between the zones");
 						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
 						Button.waitForPress();
-						if (prev_pos[0] == dropCoords[0] + 1) {
-							navigator.goTo((dropCoords[0] + 1)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+						if (prev_pos[0] >= dropCoords[0] + 1) {
+							navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 						}
-						else if(prev_pos[1] == dropCoords[1]) {
-							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1])*UNIT_TILE, true);
+						else if(prev_pos[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
+							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 						}
 						else {
-							navigator.goTo((dropCoords[0] + 2)*UNIT_TILE, (dropCoords[1] - 1)*UNIT_TILE, true);
+							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 						}
 						
 					}
