@@ -9,7 +9,10 @@ import dinaBOT.sensor.*;
  * This class locates blocks, and navigate properly towards them.
  *
  * @author Vinh Phong Buu, Stepan Salenikovich, Severin Smith
- * @see USSensor, USSensorListener, MechConstants, Map
+ * @see USSensor
+ * @see USSensorListener
+ * @see MechConstants
+ * @see Map
 */
 public class BlockFinder implements USSensorListener, MechConstants {
 
@@ -69,13 +72,13 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	}
 
 	/**
-	 * Pivots the robot to perform a {@value #SWEEP_ARC} radians sweep using the ultrasonic sensor
+	 * Pivots the robot to perform a {@value dinaBOT.mech.MechConstants#SWEEP_ARC} radians sweep using the ultrasonic sensor
 	 * to detect the nearest block. The robot then moves towards it.
 	 * In case of a false block detection, the robot simply returns to the orientation it was facing as before it
 	 * initiated the sweep.
 	 *
-	 *@param blockAngle The orientation of the robot when the block was seen during search (in radians).
-	 *
+	 * @param blockAngle The orientation of the robot when the block was seen during search (in radians).
+	 * @return true if the block was found and homed in on, false otherwise
 	*/
 	public boolean sweep(double blockAngle) {
 		double[] coord;

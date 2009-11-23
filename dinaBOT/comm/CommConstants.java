@@ -7,7 +7,6 @@ package dinaBOT.comm;
 public interface CommConstants {
 
 	/* -- Brick Names --*/
-
 	public static final String SLAVE_NAME = "DinaBOTslave";
 	public static final String MASTER_NAME = "DinaBOTmaster";
 

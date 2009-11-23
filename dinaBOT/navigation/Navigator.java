@@ -9,7 +9,13 @@ import lejos.nxt.*;
  * 
  * 
  * @author Stepan Salenikovich, Severin Smith
- * @see Navigation, Map, Pathing, Astar, MapListener, USSensorListener, USSensor
+ * @see Navigation
+ * @see Map
+ * @see Pathing
+ * @see Astar
+ * @see MapListener
+ * @see USSensorListener
+ * @see USSensor
  * @version 1
  */
 public class Navigator implements Navigation, MechConstants, USSensorListener {

@@ -13,7 +13,12 @@ import dinaBOT.util.DinaList;
  *
  *
  * @author Stepan Salenikovich, Severin Smith
- * @see Navigation, Navigator, Pathing, Astar, USSensorListener, USSensor
+ * @see Navigation
+ * @see Navigator
+ * @see Pathing
+ * @see Astar
+ * @see USSensorListener
+ * @see USSensor
  * @version 3
 */
 public class Map implements MechConstants, USSensorListener {

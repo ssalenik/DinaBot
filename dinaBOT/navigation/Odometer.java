@@ -49,7 +49,7 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	/**
 	 * 
 	 *
-	 * @param
+	 * @return true if currently snapping false otherwise
 	*/
 	public boolean isSnapping();
 

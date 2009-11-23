@@ -3,7 +3,7 @@ package dinaBOT.navigation;
 import java.lang.Math;
 
 /**
- * The Astar class is an implementation of the A* pathfinding algorithm mostly following the tutorial found at {@link http://www.policyalmanac.org/games/aStarTutorial.htm}.
+ * The Astar class is an implementation of the A* pathfinding algorithm mostly following the tutorial found at <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">http://www.policyalmanac.org/games/aStarTutorial.htm</a>.
  * <p>
  * It is implemented using only multi-dimensional arrays of integers (as opposed to linked-lists of objects) for the purposes of reducing the memory footprint of the algorithm on the NXT and because not all the built-in abstract collection classes (eg: ArrayList) in leJOS seem to be bug-free yet.
  * <p>

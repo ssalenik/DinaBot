@@ -73,10 +73,14 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
 	 * Works using a supplied Odometer and Movement.
 	 * 
-	 * @param drop_x: X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
-	 * @param drop_y: Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
+	 * @param odometer
+	 * @param mover
+	 * @param slave_connection
+	 * @param localizer
+	 * @param drop_x X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
+	 * @param drop_y Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 */
-	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection,Localization localizer, int drop_x, int drop_y) {
+	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
 		this.slave_connection = slave_connection;

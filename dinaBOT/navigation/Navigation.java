@@ -21,9 +21,9 @@ public interface Navigation extends MapListener {
 	public int goTo(double x, double y, boolean full);
 
 	/**
-	 * Interrupt an ongoing {@link #goTo(double x, double y)} call
+	 * Interrupt an ongoing {@link #goTo(double x, double y, boolean full)} call
 	 *
-	 * @see #goTo(double x, double y)
+	 * @see #goTo(double x, double y, boolean full)
 	*/
 	public void interrupt();
 
