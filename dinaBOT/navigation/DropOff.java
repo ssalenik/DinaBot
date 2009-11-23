@@ -1,7 +1,11 @@
 package dinaBOT.navigation;
 
+import lejos.nxt.Button;
 import lejos.nxt.LCD;
+import lejos.nxt.Sound;
 import dinaBOT.mech.MechConstants;
+import dinaBOT.sensor.USSensor;
+import dinaBOT.sensor.USSensorListener;
 import dinaBOT.comm.*;
 
 /*
@@ -41,13 +45,17 @@ import dinaBOT.comm.*;
  *@author Alexandre Courtemanche, Vinh Phong Buu
  */
 
-public class DropOff implements MechConstants, CommConstants{
+public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	//Constants
 	final int TOP = 0;
 	final int RIGHT = 1;
 	final int BOTTOM = 2;
 	final int LEFT = 3;
+	
+	//Experimental values
+	public final int BACK_UP_DISTANCE = -15;
+	public final int DUMP_DISTANCE = 22;
 	
 	//Fields
 	public Odometer odometer;
@@ -56,10 +64,10 @@ public class DropOff implements MechConstants, CommConstants{
 	public Localization localizer;
 
 	public int[] dropCoords = new int[2];
-	//Experimental value
-	public final int DUMP_STACK_DISTANCE = 22;
-
+	public int phase =0;
 	public double[] left_side,right_side,top_side,bottom_side;
+	public double stackAngle = 0;
+	public boolean latchedStack = false;
 
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
@@ -75,6 +83,7 @@ public class DropOff implements MechConstants, CommConstants{
 		this.localizer = localizer;
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
+		USSensor.low_sensor.registerListener(this);
 	}
 
 	/**
@@ -95,6 +104,7 @@ public class DropOff implements MechConstants, CommConstants{
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
 	public boolean dropOff(int stack) {
 		boolean success = false;
+		double facing= 0;
 
 		//First stack drop off
 		//Drop in the middle of the tile
@@ -103,14 +113,14 @@ public class DropOff implements MechConstants, CommConstants{
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(PICKUP);
 			
-			mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
-			localizer.localizeLight();
+			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
+			//localizer.localizeLight();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
 			mover.goForward(BLOCK_DISTANCE, SPEED_MED);
 			//Arbitrary orientation for now
 			mover.turnTo(Math.PI/2, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
-			mover.goForward(DUMP_STACK_DISTANCE, SPEED_SLOW);
+			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
 
 			//Should go back to nearest node after this returns
@@ -154,37 +164,76 @@ public class DropOff implements MechConstants, CommConstants{
 			//Face the stack
 			case TOP:
 				mover.turnTo(3*Math.PI/2, SPEED_ROTATE);
+				facing = 3*Math.PI/2;
 				break;
 			case RIGHT:
 				mover.turnTo(Math.PI, SPEED_ROTATE);
+				facing = Math.PI;
 				break;
 			case BOTTOM:
 				mover.turnTo(Math.PI/2, SPEED_ROTATE);
+				facing = Math.PI/2;
 				break;
 			case LEFT:
 				mover.turnTo(0, SPEED_ROTATE);
+				facing = 0;
 				break;
 			}
+			
+			Button.waitForPress();
 			//Probably should verify first stack's presence with US
 			//TODO: Implement USSensorListener methods
 			
+			//Latch Stack location to get proper position
+			mover.goForward(BACK_UP_DISTANCE, SPEED_MED);
+			//Redundant step
+			mover.turnTo(facing, SPEED_ROTATE);
+			phase = 1;
+			while (!latchedStack) {
+				mover.turn(Math.PI/8, SPEED_ROTATE);
+				mover.turn(-Math.PI/4, SPEED_ROTATE);
+				mover.turn(Math.PI/8, SPEED_ROTATE);
+			}
+			phase = 0;
 			//Turn 180 to be facing away
-			mover.goForward(-10, SPEED_MED);
-			mover.turn(Math.PI, SPEED_ROTATE);
+			mover.turn(stackAngle+Math.PI, SPEED_ROTATE);
 			
 			//Drop the second stack next to the first one.
 			slave_connection.request(OPEN_CAGE);
-			mover.goForward(-15+BLOCK_DISTANCE, SPEED_SLOW);
+			mover.goForward(BACK_UP_DISTANCE, SPEED_SLOW);
 			while(mover.isMoving());
 			
 			//Get away
-			mover.goForward(DUMP_STACK_DISTANCE, SPEED_SLOW);
+			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
 			
 			success = true;
 		}
 
 		return success;
+	}
+
+	@Override
+	public void newValues(int[] new_values, USSensor sensor) {
+		switch (phase) {
+		case 0:
+			//Do Nothing
+			break;
+			
+		case 1:
+			int lastValue1 = 255;
+			int lastValue0 = 255;
+			
+			if (new_values[0] < UNIT_TILE*1.5 && new_values[1] < UNIT_TILE*1.5 && new_values[1] < lastValue1
+					&& new_values[0] < lastValue0) {
+				stackAngle = odometer.getPosition()[2];
+				lastValue1 = new_values[1];
+				lastValue0 = new_values[0];
+				latchedStack = true;
+			}
+			break;
+		}
+		
 	}
 }
 

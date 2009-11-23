@@ -1,5 +1,6 @@
 package dinaBOT.navigation;
 
+import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.Sound;
 import dinaBOT.mech.MechConstants;
@@ -94,10 +95,16 @@ public class Localization implements MechConstants, USSensorListener {
 		odometer.enableSnapping(true);
 		mover.goForward(15, SPEED_SLOW);
 		
+		odometer.enableSnapping(false);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-5, SPEED_SLOW);
-		mover.goForward(15, SPEED_SLOW);
+		odometer.enableSnapping(true);
+		mover.goForward(10, SPEED_SLOW);
+		
+		odometer.enableSnapping(false);
+		mover.goTo(0, 0, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		odometer.enableSnapping(true);
 	}
 	
 	/**
