@@ -21,14 +21,15 @@ public interface CommConstants {
 	public static final byte TAP = 5;
 	public static final byte HOLD = 6;
 	public static final byte RELEASE = 7;
+	public static final byte ARMS_UP = 8;
 
-	public static final byte DISCONNECT = 8;
+	public static final byte DISCONNECT = 9;
 
 	/* -- Sound Constants -- */
-	public static final byte PLAY_SONG = 10;
-	public static final byte PAUSE_SONG = 11;
-	public static final byte ABORT_SONG = 12;
-	public static final byte NEXT_SONG = 13;
-	public static final byte PREVIOUS_SONG = 14;
+	public static final byte PLAY_SONG = 11;
+	public static final byte PAUSE_SONG = 12;
+	public static final byte ABORT_SONG = 13;
+	public static final byte NEXT_SONG = 14;
+	public static final byte PREVIOUS_SONG = 15;
 
 }

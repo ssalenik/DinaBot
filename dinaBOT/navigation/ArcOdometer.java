@@ -72,6 +72,7 @@ public class ArcOdometer implements Odometer {
 		//Register with the line detectors for grid snapping
 		LineDetector.left.registerListener(this);
 		LineDetector.right.registerListener(this);
+		
 		snap_enable = false; //Grid snapping is currently disable by default until it is 100% tested
 		lateral_snap_enable = false;
 		

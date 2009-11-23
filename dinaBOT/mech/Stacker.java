@@ -126,6 +126,21 @@ public class Stacker implements Stacking {
 
 		return true;
 	}
+	
+	/**
+	 * Moves the claw to arms up position
+	 *
+	 * @return true if the tap succeeded.
+	 *
+	*/
+	public boolean armsUp() {
+		
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawTopAngle);
+		claw.stop();
+
+		return true;
+	} 
 
 	/**
 	 * Moves the claw to the closed or zero tacho point. (Mainly used to reset the claw to zero before shutdown).

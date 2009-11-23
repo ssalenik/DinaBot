@@ -73,14 +73,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				if(node == path.length-1) return 0;
 			}
 			active = false;
-			if(hard_interrupt) {
-				System.out.println("Hard exit");
-				return 1;
-			} else if(soft_interrupt) {
-				System.out.println("Soft exit");
-			} else {
-				System.out.println("Normal exit");
-			}
+			if(hard_interrupt) return 1;
 		}
 
 		return -1;
@@ -129,7 +122,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		}
 	}
 
-	public void newValues(int[] new_values, USSensor sensor) {
+	public synchronized void newValues(int[] new_values, USSensor sensor) {
 		double[] position = odometer.getPosition();
 
 		if(active && !full_mode) {
@@ -144,10 +137,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 			if(minLow < 20
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
-						&& low_Readings[1] < 100 && map.checkUSCoord((double)low_Readings[0], position[2])) {
-							System.out.println("Pallet Interrupt ...");
-							System.out.println(low_Readings[0]);
-							System.out.println(high_Readings[0]);
+						&& low_Readings[1] < 75 && map.checkUSCoord((double)low_Readings[0], position[2])) {
 				interrupt();
 
 			}

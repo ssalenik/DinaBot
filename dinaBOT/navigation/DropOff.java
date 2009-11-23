@@ -116,7 +116,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		if (stack == 1) {
 			double[] dropPoint = {dropCoords[0]*UNIT_TILE+UNIT_TILE/2,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
 			//Essentially raise claws if this isn't already taken care of.
-			slave_connection.request(PICKUP);
+			slave_connection.request(ARMS_UP);
 
 			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
 			//localizer.localizeLight();
@@ -170,7 +170,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Second, get aligned with the stack present and push it back. (going backwards)
 			//(maybe push it with the stack that is in the bot instead of the cage doors)
-			slave_connection.request(PICKUP);
+			slave_connection.request(ARMS_UP);
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
 
 			switch (corner) {

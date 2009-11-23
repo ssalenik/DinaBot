@@ -152,7 +152,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 		} else {
 			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
-			slave_connection.request(PICKUP); //Pickup
+			slave_connection.request(ARMS_UP); //Pickup
 			map.start(); //Reenable map
 	
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
@@ -269,7 +269,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		
 		int[][] pattern = {
-			new int[] {6,7},
+			new int[] {7,7},
 			new int[] {1,1} // Go back to starting node
 		};
 
@@ -325,14 +325,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
 		odometer.enableLateralSnapping(false);
-		/*int[][] pattern = MOVE_TEST;
-
-		for(int i = 0;i < pattern.length;i++) {
-			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
-		}
 		
 		localization.localizeUS();
-		System.out.println("US Done");
+		if(debug) System.out.println("US Done");
+
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
@@ -372,7 +368,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		movement.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
 		odometer.enableLateralSnapping(true);
-	*/
+	
 	}
 
 	/**
