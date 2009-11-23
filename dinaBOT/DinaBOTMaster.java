@@ -167,7 +167,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 *
 	*/
 	public void dropOff() {
-		//Determine best drop-off set-up node
+		// Determines best drop-off set-up node
 		// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
 		double[] start_position = odometer.getPosition();
 		int[] dropCoords = dropper.getDropCoords();
@@ -175,14 +175,19 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		if (start_position[0] > (dropCoords[0]) * UNIT_TILE && start_position[1] > (dropCoords[1]) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the norteast");
 			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			Button.waitForPress();
 			if (start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
+				if(debug) System.out.println("Going at 8");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
 			else if(start_position[1] <= dropCoords[1] + 1) {
+				if(debug) System.out.println("Going at 6");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 			}
 			else {
+				if(debug) System.out.println("Going at 7");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
 
@@ -192,14 +197,19 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		else if(start_position[0] <= dropCoords[0] * UNIT_TILE && start_position[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the nortwest");
 			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			Button.waitForPress();
 			if (start_position[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
+				if(debug) System.out.println("Going at 9");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
 			else if(start_position[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
+				Button.waitForPress();
+				if(debug) System.out.println("Going at 11");
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
 			}
 			else {
+				if(debug) System.out.println("Going at 10");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
 
@@ -209,14 +219,19 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		else if(start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE && start_position[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the southwest");
 			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			Button.waitForPress();
 			if (start_position[0] >= dropCoords[0] * UNIT_TILE) {
+				if(debug) System.out.println("Going at 2");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0]) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
 			else if(start_position[1] >= (dropCoords[1]) * UNIT_TILE) {
+				if(debug) System.out.println("Going at 12");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 			}
 			else {
+				if(debug) System.out.println("Going at 1");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
 		 }
@@ -230,9 +245,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
 			else if(start_position[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
+				if(debug) System.out.println("Going at 5");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
 			}
 			else {
+				if(debug) System.out.println("Going at 4");
+				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
 			}
 
@@ -283,6 +302,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				if(pallet_count == CAGE_FULL) {
 					if(debug) System.out.println("Run drop off...");
 					dropOff(); //This should return us to the same point
+					dropper.dropOff(1);
 				}
 				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //And keep moving to node
 			}
@@ -309,7 +329,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		for(int i = 0;i < pattern.length;i++) {
 			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
-		}*/
+		}
 		
 		localization.localizeUS();
 		System.out.println("US Done");
@@ -352,8 +372,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		movement.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
 		odometer.enableLateralSnapping(true);
-		
-
+	*/
 	}
 
 	/**
