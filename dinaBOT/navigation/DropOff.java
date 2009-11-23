@@ -121,10 +121,10 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
 			//localizer.localizeLight();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
-			mover.turnTo(Math.PI/2, SPEED_ROTATE);
+			mover.turnTo(Math.PI/4, SPEED_ROTATE);
 			mover.goForward(BLOCK_DISTANCE+3, SPEED_MED);
 			//Arbitrary orientation for now
-			mover.turnTo(Math.PI/2, SPEED_ROTATE);
+			mover.turnTo(Math.PI/4, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
@@ -133,7 +133,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			success = true;
 		} else if (stack == 2) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
-
 			//Define 4 stacking area corners
 			double x1,x2,y1,y2;
 			x1 = dropCoords[0];
@@ -181,7 +180,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				facing = -Math.PI/4;
 				break;
 			case 4:
-				facing = 5*Math.PI/4;
+				facing = -3*Math.PI/4;
 				break;
 			}
 
