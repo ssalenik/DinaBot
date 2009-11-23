@@ -40,7 +40,7 @@ public class ArcOdometer implements Odometer {
 
 	int snap_tacho_count;
 	LineDetector snap_detector;
-	
+
 	boolean previous_position_flag;
 	double[] previous_position;
 
@@ -246,11 +246,11 @@ public class ArcOdometer implements Odometer {
 					double offset_angle = Math.atan(distance_travelled/LIGHT_SENSOR_BASE);
 					if(snap_detector == LineDetector.left) theta = current_direction*Math.PI/2-offset_angle;
 					else theta = current_direction*Math.PI/2+offset_angle;
-					
+
 					double length_l = 0;
 					double theta_l= 0;
 					double theta_l_corr = 0;
-					
+
 					if(previous_position_flag) {
 						length_l = Math.sqrt((position[0]-previous_position[0])*(position[0]-previous_position[0])+(position[1]-previous_position[1])*(position[1]-previous_position[1]));
 						theta_l = Math.atan2((position[1]-previous_position[1]),(position[0]-previous_position[0]));
@@ -264,7 +264,7 @@ public class ArcOdometer implements Odometer {
 						double y = Math.round(position[1]/UNIT_TILE)*UNIT_TILE+(distance_travelled-LIGHT_SENSOR_OFFSET)/2*Math.sin(theta);
 						setPosition(new double[] {Math.cos(theta_l)*length_l, y, (theta)}, new boolean[] {false, true, true}); //Use setPosition to avoid synchronization problems
 					}
-					
+
 					System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 					previous_position_flag = true;
 					snap_status = 0; //Reset our state to 0: no lines seen
@@ -283,7 +283,7 @@ public class ArcOdometer implements Odometer {
 		snap_enable = enable;
 		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
-	
+
 	public boolean isSnapping() {
 		return snap_enable;
 	}

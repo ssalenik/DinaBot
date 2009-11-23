@@ -42,7 +42,7 @@ public class Songs {
 		 {s, 	0, 	0, 	36},
 		 {sol, 0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //A
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	24},
@@ -98,7 +98,7 @@ public class Songs {
 		 {re, 	0, 	5, 	12},
 		 {si, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //B
 		 {s, 	0, 	0, 	24},
 		 {sol, 	0, 	5, 	12},
@@ -150,7 +150,7 @@ public class Songs {
 		 {s, 	0, 	0, 	24},
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	84},
-		
+
 		 //B
 		 {s, 	0, 	0, 	24},
 		 {sol, 	0, 	5, 	12},
@@ -202,7 +202,7 @@ public class Songs {
 		 {s, 	0, 	0, 	24},
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	84},
-		
+
 		 //C
 		 {ut, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -309,7 +309,7 @@ public class Songs {
 		 {re, 	0, 	5, 	12},
 		 {si, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //D
 		 {mi, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -415,7 +415,7 @@ public class Songs {
 		 {mi, 	0, 	4, 	12},
 		 {ut, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //C
 		 {ut, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -466,7 +466,7 @@ public class Songs {
 		 {s, 	0, 	0, 	36},
 		 {sol, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //D
 		 {mi, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -524,7 +524,7 @@ public class Songs {
 			marioOverworldChart);
 
 	static final int[][] marioOverworldChart2 = {
-		
+
 		 //INTRO
 		 {fa,	d, 	4, 	12},
 		 {fa, 	d, 	4, 	12},
@@ -598,7 +598,7 @@ public class Songs {
 		 {fa, 	0, 	4, 	12},
 		 {re, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //B
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	24},
@@ -698,7 +698,7 @@ public class Songs {
 		 {s, 	0, 	0, 	12},
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	12},
-		
+
 		 //C
 		 {la, 	b, 	2, 	12},
 		 {s, 	0, 	0, 	24},
@@ -806,7 +806,7 @@ public class Songs {
 		 {fa, 	0, 	4, 	12},
 		 {re, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //D
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	24},
@@ -924,7 +924,7 @@ public class Songs {
 		 {s, 	0, 	0, 	12},
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //C
 		 {la, 	b, 	2, 	12},
 		 {s, 	0, 	0, 	24},

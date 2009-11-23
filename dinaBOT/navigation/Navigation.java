@@ -17,7 +17,7 @@ public interface Navigation extends MapListener {
 	 * @param y the y coordiate to move to
 	 * @return return less than 0 if the coordinates cannot be reached, 0 if they were reached and more than 0 if the goTo was hard_interrupt
 	 * @see #interrupt()
-	*/	
+	*/
 	public int goTo(double x, double y, boolean full);
 
 	/**

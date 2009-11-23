@@ -137,7 +137,13 @@ public class BTMaster implements CommConstants {
 
 		return connected;
 	}
-	
+
+
+	/**
+	 * Enables and disbles the printout of debug information from the bluetooth master
+	 *
+	 * @param debug true enables debug information false disables it
+	*/
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}

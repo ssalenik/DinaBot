@@ -6,11 +6,11 @@ package dinaBOT.comm;
 */
 public interface CommConstants {
 
-	/* -- Brick Names --*/
+	/* -- Brick Names -- */
 	public static final String SLAVE_NAME = "DinaBOTslave";
 	public static final String MASTER_NAME = "DinaBOTmaster";
 
-	/* -- Protocol Constants --*/
+	/* -- Protocol Constants -- */
 	public static final byte DO_NOTHING = 0;
 
 	public static final byte OPEN_CAGE = 1;

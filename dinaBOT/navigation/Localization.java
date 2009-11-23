@@ -68,10 +68,10 @@ public class Localization implements MechConstants, USSensorListener {
 		// angles to the right of angleB is 45 degrees past 'north'
 		//Find 90 degree orientation approximation
 		phase =0;
-		if (angleA < angleB){
+		if (angleA < angleB) {
 			//The first wall seen is "south" wall.
 			//The second wall seen is "west" wall.
-			finalAngle = ((angleA+angleB)/2) + (Math.PI/4); 
+			finalAngle = ((angleA+angleB)/2) + (Math.PI/4);
 		} else {
 			//The first wall seen is "east" wall.
 			//The second wall seen is "south" wall.
@@ -94,19 +94,19 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.goForward(-5, SPEED_SLOW);
 		odometer.enableSnapping(true);
 		mover.goForward(15, SPEED_SLOW);
-		
+
 		odometer.enableSnapping(false);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-5, SPEED_SLOW);
 		odometer.enableSnapping(true);
 		mover.goForward(10, SPEED_SLOW);
-		
+
 		odometer.enableSnapping(false);
 		mover.goTo(0, 0, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		odometer.enableSnapping(true);
 	}
-	
+
 	/**
 	 * Call to USLocalize and LightLocalize simply.
 	 */
@@ -114,13 +114,13 @@ public class Localization implements MechConstants, USSensorListener {
 		this.localizeUS();
 		this.localizeLight();
 	}
-	
+
 	public void newValues(int[] new_values, USSensor sensor) {
 
 		switch (phase) {
 
 		case 0:
-			//Do nothing 
+			//Do nothing
 			break;
 
 		case 1:

@@ -9,18 +9,18 @@ import dinaBOT.sensor.USSensorListener;
 import dinaBOT.comm.*;
 
 /*
- *Using the odometer, you will  
+ *Using the odometer, you will
  *have to write a method called dropOff(), situated here, which will
- *contain the series of commands that directs the robot to the drop off of a full stack  
- *of bricks at the edge of a designated drop off tile on the grid. The  
- *teacher has told us that the tiles along the drop off point  
- *would be clear of obstacles, so you don't have to worry about that.  
- *You will have to determine what the best way of doing this without  
- *knocking off possible other stacks already positioned on the drop off  
- *point. The point at which the robot starts the drop off will be at one  
- *of the outer gridline nodes of the tiles surrounding the drop off  
- *point. Once the robot chooses the start-dropoff point for the first  
- *time, it will always use the same time each time it needs to drop off  
+ *contain the series of commands that directs the robot to the drop off of a full stack
+ *of bricks at the edge of a designated drop off tile on the grid. The
+ *teacher has told us that the tiles along the drop off point
+ *would be clear of obstacles, so you don't have to worry about that.
+ *You will have to determine what the best way of doing this without
+ *knocking off possible other stacks already positioned on the drop off
+ *point. The point at which the robot starts the drop off will be at one
+ *of the outer gridline nodes of the tiles surrounding the drop off
+ *point. Once the robot chooses the start-dropoff point for the first
+ *time, it will always use the same time each time it needs to drop off
  *another stack. The inputed data for the drop off will be given at
  *startup and would be two ints passed from the main.
  */
@@ -28,11 +28,11 @@ import dinaBOT.comm.*;
 /*
  * Drop off point sketch
  					 (top)
-				 	 -------	
+				 	 -------
 			 		|		|
 		(Left)		| drop	|	(right)
 			 		| point	|
-			  		 -------	
+			 		 -------
  					 (bottom)
 
 		This set of coordinates designates the middle of the each of the sides of the drop point.
@@ -52,11 +52,11 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	final int RIGHT = 1;
 	final int BOTTOM = 2;
 	final int LEFT = 3;
-	
+
 	//Experimental values
 	public final int BACK_UP_DISTANCE = -15;
 	public final int DUMP_DISTANCE = 22;
-	
+
 	//Fields
 	public Odometer odometer;
 	public Movement mover;
@@ -72,7 +72,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
 	 * Works using a supplied Odometer and Movement.
-	 * 
+	 *
 	 * @param odometer
 	 * @param mover
 	 * @param slave_connection
@@ -92,7 +92,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	/**
 	 * Obtains the coordinates of the drop off area.
-	 * 
+	 *
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
 	 */
 	public int[] getDropCoords() {
@@ -102,7 +102,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	/**
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
-	 * 
+	 *
 	 * @return Success status
 	 */
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
@@ -116,7 +116,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			double[] dropPoint = {dropCoords[0]*UNIT_TILE+UNIT_TILE/2,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(PICKUP);
-			
+
 			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
 			//localizer.localizeLight();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
@@ -150,7 +150,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			int side = 0;
 
 			for (int i=0; i < sides.length; i++) {
-				dX = Math.abs(position[0]-sides[i][0]); 
+				dX = Math.abs(position[0]-sides[i][0]);
 				dY = Math.abs(position[1] - sides[i][1]);
 				distance = Math.sqrt(dX*dX+dY*dY);
 				if (distance < closest_distance || closest_distance == -1) {
@@ -159,12 +159,12 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 					side = i;
 				}
 			}
-			
+
 			//Second, get aligned with the stack present and push it back. (going backwards)
 			//(maybe push it with the stack that is in the bot instead of the cage doors)
 			slave_connection.request(PICKUP);
 			mover.goTo(closest_side[0], closest_side[1], SPEED_MED);
-			
+
 			switch (side) {
 			//Face the stack
 			case TOP:
@@ -184,11 +184,11 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				facing = 0;
 				break;
 			}
-			
+
 			Button.waitForPress();
 			//Probably should verify first stack's presence with US
 			//TODO: Implement USSensorListener methods
-			
+
 			//Latch Stack location to get proper position
 			mover.goForward(BACK_UP_DISTANCE, SPEED_MED);
 			//Redundant step
@@ -204,33 +204,32 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Turn 180 to be facing away
 			//TODO: Fix huge orientation error here.
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
-			
+
 			//Drop the second stack next to the first one.
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(BACK_UP_DISTANCE, SPEED_SLOW);
 			while(mover.isMoving());
-			
+
 			//Get away
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
-			
+
 			success = true;
 		}
 
 		return success;
 	}
 
-	@Override
 	public void newValues(int[] new_values, USSensor sensor) {
 		switch (phase) {
 		case 0:
 			//Do Nothing
 			break;
-			
+
 		case 1:
 			int lastValue1 = 255;
 			int lastValue0 = 255;
-			
+
 			if (new_values[0] < UNIT_TILE*1.5 && new_values[1] < UNIT_TILE*1.5 && new_values[1] < lastValue1
 					&& new_values[0] < lastValue0) {
 				stackAngle = odometer.getPosition()[2];
@@ -240,7 +239,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			}
 			break;
 		}
-		
+
 	}
 }
 

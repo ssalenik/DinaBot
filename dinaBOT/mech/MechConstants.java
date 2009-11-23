@@ -13,7 +13,7 @@ public interface MechConstants {
 	static final double WHEEL_RADIUS = 2.659;
 
 	/**The distance from on wheel to the other = {@value}
-	 */	
+	 */
 	static final double WHEEL_BASE = 12.5;
 
 	/**The distance from one light sensor to another = {@value}
@@ -39,12 +39,12 @@ public interface MechConstants {
 	/**Maximum distance at which a block may be located in order to be detected = {@value}
 	 */
 	static final int US_TRUST_THRESHOLD = 30;
-	
+
 	/**
 	* Minimum difference allowed between high and low sensor values to assume both are seeing the same object = {@value}
 	*/
 	public final int DETECTION_THRESHOLD = 25;
-	
+
 	/**
 	* Size in degrees of the arc the robot should sweep = {@value}
 	*/

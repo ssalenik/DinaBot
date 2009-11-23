@@ -2,8 +2,8 @@ package dinaBOT;
 
 import lejos.nxt.*;
 
-import dinaBOT.mech.*;
 import dinaBOT.comm.*;
+import dinaBOT.mech.*;
 //import dinaBOT.sound.*;
 
 /**
@@ -34,9 +34,12 @@ public class DinaBOTSlave implements CommConstants{
 				System.exit(0);
 			}
 		});
+
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
+
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
+
 //		Song[] songSet = {Songs.marioOverworld2};
 //		music = new MusicBox(songSet);
 	}
@@ -46,12 +49,10 @@ public class DinaBOTSlave implements CommConstants{
 	 *
 	*/
 	public void obey() {
-
 		byte nextCommand = 0;
 		boolean success = false;
 
 		while(listeningForInstructions) {
-
 			if (master_connection.isConnected()) {
 				nextCommand = master_connection.waitForCommand();
 				LCD.clear();
@@ -124,11 +125,9 @@ public class DinaBOTSlave implements CommConstants{
 						break;*/
 
 				}
-				if(master_connection.isConnected())
-					master_connection.sendStatus(success);
-			}
 
-			else {
+				if(master_connection.isConnected()) master_connection.sendStatus(success);
+			} else {
 				// I'm not sure why, but you have to make the thread wait for this minimum amount of time or else a null exception comes up
 				// This might be the result of the slave brick waiting for a connection that already exists and there ends up being a null pointer.
 				try {
@@ -150,7 +149,6 @@ public class DinaBOTSlave implements CommConstants{
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
 	public static void main(String[] args) {
-
 		DinaBOTSlave dinaBOTslave = new DinaBOTSlave();
 		dinaBOTslave.obey();
 	}

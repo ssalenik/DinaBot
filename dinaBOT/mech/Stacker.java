@@ -43,7 +43,7 @@ public class Stacker implements Stacking {
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 		claw.resetTachoCount();
-		
+
 		claw.rotateTo(clawTopAngle);
 	}
 
@@ -121,14 +121,14 @@ public class Stacker implements Stacking {
 
 		return true;
 	}
-	
+
 	public boolean close() {
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(0);
 		claw.stop();
 
 		return true;
-	
+
 	}
 
 	/**

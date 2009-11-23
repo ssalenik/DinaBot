@@ -1,6 +1,7 @@
 package dinaBOT.detection;
 
 import lejos.nxt.*;
+
 import dinaBOT.mech.MechConstants;
 import dinaBOT.navigation.*;
 import dinaBOT.sensor.*;
@@ -16,11 +17,18 @@ import dinaBOT.sensor.*;
 */
 public class BlockFinder implements USSensorListener, MechConstants {
 
+	/* -- Static Variable -- */
+
+	//Super experimental constant
+	static final int SECOND_COLUMN_MAX = 75;
+	//too close to obstacle constant
+	static final int SAFE_DIST = 20;
+
+	/* -- Instance Variable -- */
+
 	Odometer odometer;
 	Movement mover;
 	Map mapper;
-
-	//constants have been moved to MechConstants - stepan
 
 	//Fields
 	double angleA;
@@ -28,6 +36,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 	int latest_low_reading_1;
 	int latest_low_reading_2;
+
 	int latest_high_reading;
 	int lowest_high_reading;
 
@@ -39,22 +48,16 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 	int blockDistance_A;
 	int blockDistance_B;
-	
+
 	int minLow;
 	int minHigh;
-	
-	boolean debug;	
-	
+
 	int[][] map;
-	
-	//too close to obstacle constant
-	static final int SAFE_DIST = 20;
-	
-	// too close boolean
+
+	//too close boolean
 	boolean too_close;
-	
-	//Super experimental constant
-	static final int SECOND_COLUMN_MAX = 75;
+
+	boolean debug;
 
 	/**
 	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
@@ -62,11 +65,12 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	*/
 	public BlockFinder(Odometer odometer, Movement mover, Map mapper) {
 		this.odometer = odometer;
+
 		this.mover = mover;
 		this.mapper = mapper;
-		
-		phase = 0;		
-		
+
+		phase = 0;
+
 		USSensor.low_sensor.registerListener(this);
 		USSensor.high_sensor.registerListener(this);
 	}
@@ -81,27 +85,24 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	 * @return true if the block was found and homed in on, false otherwise
 	*/
 	public boolean sweep(double blockAngle) {
-		double[] coord;
-		int[] node;
-		double angle;
-		double blockDistance;
-		
+		//Reset all the variables
 		too_close = false;
-		
 		
 		blockDistance_A = 255;
 		blockDistance_B = 255;
+		
 		latest_low_reading_1 = 255;
 		latest_low_reading_2 = 255;
+		
 		latest_high_reading = 255;
-		lowest_high_reading = 255;		
-		
+		lowest_high_reading = 255;
+
 		double initialOrientation = odometer.getPosition()[2];
-		
+
 		angleA = initialOrientation;
 		angleB = initialOrientation;
 
-		//Turn to the direction where the block was first seen
+		//Turn past the direction where the block was first seen
 		mover.turnTo(blockAngle+SWEEP_ARC/2, SPEED_ROTATE);
 
 		//Clockwise sweep
@@ -115,31 +116,31 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		//To the bisecting angle !
 		// or back to start in case of FAIL
 		phase = 0;
-		System.out.println("______");
-		System.out.println(blockDistance_A);
-		System.out.println(blockDistance_B);
-		System.out.println(lowest_high_reading);
+		
 		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD && blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD && Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
-			angle = (angleA+angleB)/2;
-			blockDistance = (blockDistance_A+blockDistance_B)/2;
-			
+			double angle = (angleA+angleB)/2;
+			double blockDistance = (blockDistance_A+blockDistance_B)/2;
+
 
 			//check if coord is outside of map
-			if( !mapper.checkUSCoord(blockDistance, angle) ) return false;
-			
+			if(!mapper.checkUSCoord(blockDistance, angle)) return false;
+
 			// go to phase 3; go to pallet phase
 			phase = 3;
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
 			mover.goForward((blockDistance_A+blockDistance_B)/2, SPEED_MED);
-			
+
 			//gets too close to obstacle while moving
 			if(too_close) return false;
+			phase = 0;
 			return true;
 		} else {
 			//Fail-safe technique for now.
 			mover.turnTo(initialOrientation, SPEED_ROTATE);
+			phase = 0;
 			return false;
 		}
+		
 	}
 
 	public void findEdgeA() {
@@ -193,7 +194,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 					}
 				} else if (sensor == USSensor.high_sensor) {
 					latest_high_reading = new_values[0];
-					if(latest_high_reading < lowest_high_reading) {lowest_high_reading = latest_high_reading;System.out.println(lowest_high_reading);}
+					if(latest_high_reading < lowest_high_reading) lowest_high_reading = latest_high_reading;
 					if (!data_acquired) {
 						minLow = latest_low_reading_1;
 						minHigh = lowest_high_reading;
@@ -214,7 +215,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 					}
 				} else if (sensor == USSensor.high_sensor) {
 					latest_high_reading = new_values[0];
-					if(latest_high_reading < lowest_high_reading) {lowest_high_reading = latest_high_reading;System.out.println(lowest_high_reading);}
+					if(latest_high_reading < lowest_high_reading) lowest_high_reading = latest_high_reading;
 					if (!data_acquired) {
 						minLow = latest_low_reading_1;
 						minHigh = lowest_high_reading;
@@ -224,25 +225,30 @@ public class BlockFinder implements USSensorListener, MechConstants {
 				}
 
 				break;
-				
+
 			case 3:
 				//checking for obstacles
 				if (sensor == USSensor.high_sensor) {
 					latest_high_reading = new_values[0];
 					if(latest_high_reading < lowest_high_reading) {
 						lowest_high_reading = latest_high_reading;
-						
+
 						if(lowest_high_reading < SAFE_DIST) {
 							too_close = true;
 							mover.stop();
 						}
 					}
 				}
-				
+
 				break;
 		}
 	}
-	
+
+	/**
+	 * Enables and disbles the printout of debug information from the block finder
+	 *
+	 * @param debug true enables debug information false disables it
+	*/
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}

@@ -351,7 +351,7 @@ public class Astar {
 
 		adjInfo = pathInfo[adj[0]][adj[1]];
 		// check if no obstacle and not on closed list
-		if( (adjInfo[0] < OBSTACLE) && (adjInfo[0] > -1) ) {
+		if((adjInfo[0] < OBSTACLE) && (adjInfo[0] > -1)) {
 
 			// if not on open list already
 			if(adjInfo[0] != 0) {

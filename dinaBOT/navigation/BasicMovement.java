@@ -222,7 +222,7 @@ public class BasicMovement implements Movement, MechConstants {
 		double[] target_position;
 
 		final int spline_correction_gain = 3;
-		
+
 		boolean previous_snap_enable;
 
 		/**
@@ -303,9 +303,9 @@ public class BasicMovement implements Movement, MechConstants {
 			target_speed = speed;
 
 			current_position = odometer.getPosition();
-			
+
 			/* Variable Quantities */
-			
+
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
 			/***** COPIED FROM TURNTO ******/
@@ -324,13 +324,13 @@ public class BasicMovement implements Movement, MechConstants {
 			//eg within pi of the current positon
 			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
-						
+
 			if((target_angle - initial_position[2]) > Math.PI/8 || (target_angle - initial_position[2]) < -Math.PI/8) {
 				previous_snap_enable = odometer.isSnapping();
 				if(previous_snap_enable) odometer.enableSnapping(false);
 				left_motor.setSpeed(SPEED_ROTATE);
 				right_motor.setSpeed(SPEED_ROTATE);
-				
+
 				if((target_angle - initial_position[2]) > 0) { //If the realtive angle is positive go counter-clockwise
 					left_motor.backward();
 					right_motor.forward();

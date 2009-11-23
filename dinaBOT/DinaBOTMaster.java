@@ -2,13 +2,12 @@ package dinaBOT;
 
 import lejos.nxt.*;
 
-import java.util.Random;
 import java.lang.Math;
 
-import dinaBOT.navigation.*;
-import dinaBOT.mech.*;
 import dinaBOT.comm.*;
 import dinaBOT.detection.*;
+import dinaBOT.mech.*;
+import dinaBOT.navigation.*;
 import dinaBOT.sensor.*;
 import dinaBOT.util.*;
 
@@ -21,14 +20,14 @@ import dinaBOT.util.*;
 public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatterns {
 
 	/* -- Static Variables -- */
-	
+
 	static final int CAGE_FULL = 1;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
 
 	/* -- Instance Variables -- */
-	
+
 	//Connection objects
 	BTMaster slave_connection;
 
@@ -39,16 +38,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	//High level navigation object
 	Map map;
 	Pathing pather;
-	
+
 	Navigator navigator;
-	
+
 	//Utilities
 	Localization localization;
+	BlockFinder blockFind;
 	DropOff dropper;
-	BlockFinder blockFind;	
-	
+
 	//Variables
-	int block_count;
+	int pallet_count;
+	boolean debug;
 
 	/**
 	 * This is the constructor for the DinaBOT master
@@ -57,27 +57,37 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 * @param drop_y the y coordinate of the drop off (in tile units)
 	*/
 	public DinaBOTMaster(int drop_x, int drop_y) {
-		
+		//Add a convenient quit button
+		Button.ESCAPE.addButtonListener(new ButtonListener() {
+			public void buttonPressed(Button b) {
+				System.exit(0);
+			}
+
+			public void buttonReleased(Button b) {
+				System.exit(0);
+			}
+		});
+
 		USSensor low = USSensor.low_sensor;
 		USSensor high = USSensor.high_sensor;
-		
+
 		slave_connection = new BTMaster();
 
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
-		
-		localization = new Localization(odometer, movement);
-		
+
 		map = new Map(odometer, 9, 45, UNIT_TILE);
 		pather = new ManhattanPather(map, movement);
-		
+
 		navigator = new Navigator(odometer, movement, map, pather);
-		
+
+		localization = new Localization(odometer, movement);
 		blockFind = new BlockFinder(odometer, movement, map);
-		
 		dropper = new DropOff(odometer, movement, slave_connection,localization, drop_x, drop_y);
+
+		debug = true;
 	}
-	
+
 	public void connect() {
 		slave_connection.setDebug(true);
 		while(!slave_connection.connect());
@@ -85,19 +95,19 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 
 	/**
-	 * This is a method for block alignment using brick to brick communication (currently over bluetooth). It assumes the block is directly in front if the robot in an unknown orientation.
+	 * This is a heuristic method for block alignment using brick to brick communication (currently over bluetooth). It assumes the block is directly in front if the robot in an unknown orientation.
 	 *
 	*/
-	public void alignBrick() {
-		//Align contant (heuristically tuned)
+	public void alignPallet() {
+		//Align contants (heuristically tuned)
 		double forward_distance = 5;
 		double rotate_angle = Math.PI/4;
 
-		//Main program
+		//Alignement method
 		movement.goForward(forward_distance, SPEED_MED);
 
 		movement.turn(rotate_angle, SPEED_ROTATE);
-	
+
 		movement.goForward(forward_distance, SPEED_MED);
 
 		slave_connection.request(HOLD);
@@ -117,6 +127,111 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 
 	/**
+	 * Searches for a pellet in the immediate vicinity and picks it up if found (also increments pallet_count)
+	 *
+	*/
+	public void pickUpPallet() {
+		double[] initial_position = odometer.getPosition(); //Remember start position
+
+		odometer.enableSnapping(false); //Disable snapping for diagonal movement
+
+		slave_connection.request(RELEASE); //Put down claw
+
+		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
+			if(debug) System.out.println("Picking up");
+
+			alignPallet(); //If successfull align pallet
+
+			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
+			slave_connection.request(PICKUP); //Pickup
+			map.start(); //Reenable map
+
+			pallet_count++; //Increment pallet count
+
+			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
+			movement.turnTo(initial_position[2], SPEED_ROTATE);
+		}
+
+		odometer.enableSnapping(true); //Renable snapping
+	}
+
+	/**
+	 * This method moves to the drop off point, exectues the drop off and then returns to the point it was called from
+	 *
+	*/
+	public void dropOff() {
+		//Determine best drop-off set-up node
+		// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
+		double[] current_postion = odometer.getPosition();
+		int[] dropCoords = dropper.getDropCoords();
+		//If the robot is North-East of drop off area
+		if (current_postion[0] > (dropCoords[0]) * UNIT_TILE && current_postion[1] > (dropCoords[1]) * UNIT_TILE) {
+			if(debug) System.out.println("Im in the norteast");
+			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			Button.waitForPress();
+			if (current_postion[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
+				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
+			}
+			else if(current_postion[1] <= dropCoords[1] + 1) {
+				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
+			}
+			else {
+				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
+			}
+
+		}
+
+		//If the robot is North-West of drop off area.
+		else if(current_postion[0] <= dropCoords[0] * UNIT_TILE && current_postion[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
+			if(debug) System.out.println("Im in the nortwest");
+			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			Button.waitForPress();
+			if (current_postion[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
+				navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
+			}
+			else if(current_postion[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
+				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
+			}
+			else {
+				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
+			}
+
+		}
+
+		// If the robot is South-West of the drop off area
+		else if(current_postion[0] <= (dropCoords[0] + 1) * UNIT_TILE && current_postion[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
+			if(debug) System.out.println("Im in the southwest");
+			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			Button.waitForPress();
+			if (current_postion[0] >= dropCoords[0] * UNIT_TILE) {
+				navigator.goTo((dropCoords[0]) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
+			}
+			else if(current_postion[1] >= (dropCoords[1]) * UNIT_TILE) {
+				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
+			}
+			else {
+				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
+			}
+		 }
+
+		// If the robot is South East of the drop off area
+		else {
+			if(debug) System.out.println("Im in the southeast or somewhere in between the zones");
+			if(debug) System.out.println(current_postion[0]+ " "+ current_postion[1]);
+			Button.waitForPress();
+			if (current_postion[0] >= dropCoords[0] + 1) {
+				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
+			}
+			else if(current_postion[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
+				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
+			}
+			else {
+				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
+			}
+
+		}
+	}
+	/**
 	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
 	 *
 	*/
@@ -125,183 +240,88 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.enableSnapping(true);
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
-		
+
 		//Pattern to follow
 		int[][] pattern = {
-			new int [] {6,1},
-			new int [] {6,2},
-			new int [] {1,2},
-			new int [] {1,3},
-			new int [] {6,3},
-			new int [] {6,4},
-			new int [] {1,4},
-			new int [] {1,5},
-			new int [] {6,5},
-			new int [] {6,6},
-			new int [] {1,1} // Go back to starting node
+			new int[] {6,1},
+			new int[] {6,2},
+			new int[] {1,2},
+			new int[] {1,3},
+			new int[] {6,3},
+			new int[] {6,4},
+			new int[] {1,4},
+			new int[] {1,5},
+			new int[] {6,5},
+			new int[] {6,6},
+			new int[] {1,1} // Go back to starting node
 		};
-		
+
 		//Getting drop off coordinates
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int [] dropCoords = dropper.getDropCoords();
-		
+		int[] dropCoords = dropper.getDropCoords();
+
 		//Consider the nodes around the drop off zone as obstacles.
 		map.editMap(dropCoords[0],dropCoords[1], 1);
 		map.editMap(dropCoords[0]+1,dropCoords[1], 1);
 		map.editMap(dropCoords[0],dropCoords[1]+1, 1);
 		map.editMap(dropCoords[0]+1,dropCoords[1]+1, 1);
-		
-		System.out.println("Starting...");
-		
+
+		if(debug) System.out.println("Starting...");
+
 		try {
 			Thread.sleep(1000);
 		} catch(Exception e) {
-			
+
 		}
-	
-		for(int i = 0;i < pattern.length;i++) {
-			System.out.println("Leg number: "+i);
-			int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false);
-			while(nav_status > 0) {
-				double[] prev_pos = odometer.getPosition();
-				odometer.enableSnapping(false);
-				slave_connection.request(RELEASE);
-				System.out.println("Breaking for possible pellet");
-				if(blockFind.sweep(odometer.getPosition()[2])) {
-					System.out.println("Pickup");
-					alignBrick();
-					map.stop();
-					slave_connection.request(PICKUP);
-					map.start();
-					block_count++;
-					
-					movement.goTo(prev_pos[0], prev_pos[1], SPEED_MED);
-					movement.turnTo(prev_pos[2], SPEED_ROTATE);
+
+		for(int i = 0;i < pattern.length;i++) { //For each node in search path
+
+			if(debug) System.out.println("Leg number: "+i);
+
+			int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //Start moving to node
+			while(nav_status > 0) { //Keep going till you get there
+				if(debug) System.out.println("Breaking for possible pellet");
+				pickUpPallet(); //Pick up pallet for interrupt
+				if(pallet_count == CAGE_FULL) {
+					if(debug) System.out.println("Run drop off...");
+					dropOff(); //This should return us to the same point
 				}
-				odometer.enableSnapping(true);
-				if(block_count == CAGE_FULL) {
-					
-					System.out.println("Robot Full... returning");
-					
-					//Determine best drop-off set-up node
-					// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
-					
-					//If the robot is North-East of drop off area
-					if (prev_pos[0] > (dropCoords[0]) * UNIT_TILE && prev_pos[1] > (dropCoords[1]) * UNIT_TILE) {
-						System.out.println("Im in the norteast");
-						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
-						Button.waitForPress();
-						if (prev_pos[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
-							navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-						}
-						else if(prev_pos[1] <= dropCoords[1] + 1) {
-							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
-						}
-						else {
-							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-						}
-						
-					}
-					
-					//If the robot is North-West of drop off area.
-					else if(prev_pos[0] <= dropCoords[0] * UNIT_TILE && prev_pos[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
-						System.out.println("Im in the nortwest");
-						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
-						Button.waitForPress();
-						if (prev_pos[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
-							navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-						}
-						else if(prev_pos[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
-							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
-						}
-						else {
-							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-						}
-						
-					}
-					
-					// If the robot is South-West of the drop off area
-					else if(prev_pos[0] <= (dropCoords[0] + 1) * UNIT_TILE && prev_pos[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
-						System.out.println("Im in the southwest");
-						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
-						Button.waitForPress();
-						if (prev_pos[0] >= dropCoords[0] * UNIT_TILE) {
-							navigator.goTo((dropCoords[0]) * UNIT_TILE), (dropCoords[1] - 1) * UNIT_TILE, true);
-						}
-						else if(prev_pos[1] >= (dropCoords[1])  * UNIT_TILE) {
-							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
-						}
-						else {
-							navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-						}
-					 }
-					
-					// If the robot is South East of the drop off area
-					else {
-						System.out.println("Im in the southeast or somewhere in between the zones");
-						System.out.println(prev_pos[0]+ "  "+ prev_pos[1]);
-						Button.waitForPress();
-						if (prev_pos[0] >= dropCoords[0] + 1) {
-							navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-						}
-						else if(prev_pos[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
-							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
-						}
-						else {
-							navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-						}
-						
-					}
-					
-					return;
-				}
-				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); // Go to next segment
-				
+				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //And keep moving to node
 			}
-			if(nav_status < 0) {
-				System.out.println("Impossible Path .. ending");
+
+			if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
+				if(debug) System.out.println("Impossible Path .. ending");
 				return;
 			}
 		}
-		
-		System.out.println("Done");
+
+		if(debug) System.out.println("Done");
 	}
-	
+
 	/**
-	 * This is a testing method of coordinate correction, randomly drives around in an 8 by 8 area starting at 4-4
+	 * This is a testing method of coordinate correction. It moves in a cute little pattern
 	 *
 	*/
 	public void moveTest() {
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE*4,UNIT_TILE*4,0}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
-		
-		int [][] pattern = MOVE_TEST;
-		
+
+		int[][] pattern = MOVE_TEST;
+
 		for(int i = 0;i < pattern.length;i++) {
 			movement.goTo(pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE, SPEED_MED);
 		}
-	
+
 	}
-	
+
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
 	 * @param args This is the command line args, this is irrelevent in the NXT
 	*/
 	public static void main(String[] args) {
-		//Add a convenient quit button
-		Button.ESCAPE.addButtonListener(new ButtonListener() {
-			public void buttonPressed(Button b) {
-				System.exit(0);
-			}
-
-			public void buttonReleased(Button b) {
-				System.exit(0);
-			}
-		});
-		
-		//DO some drop off stuff here
+		//DO some drop off input stuff here
 
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5, 4); //Instantiate the DinaBOT Master
 
@@ -310,7 +330,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		dinaBOTmaster.run();
 
 		//dinaBOTmaster.moveTest();
-		
+
 		while(true); //Never quit
 	}
 
