@@ -1,7 +1,7 @@
 package dinaBOT.navigation;
 
 /**
- * This interface specifies what basic movement capabilites should be implemented. And their basic description.
+ * This interface specifies what basic movement capabilities should be implemented. And their basic description.
  *
  * @author Severin Smith
  * @see BasicMovement

@@ -47,7 +47,7 @@ public interface Odometer extends Runnable, LineDetectorListener, MechConstants 
 	public void enableSnapping(boolean enable);
 
 	/**
-	 *
+	 * Returns the state of the snapping system.
 	 *
 	 * @return true if currently snapping false otherwise
 	*/

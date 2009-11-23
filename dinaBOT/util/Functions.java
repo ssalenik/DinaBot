@@ -1,7 +1,7 @@
 package dinaBOT.util;
 
 /**
- * This is a collection of usefull simple functions which come up often when programming, they are all statically accessable here
+ * This is a collection of useful simple functions which come up often when programming, they are all statically accessible here
  *
  * @author Severin Smith
  * @version 1
@@ -22,7 +22,7 @@ public class Functions {
 	 *
 	 * @param value the value to constrain
 	 * @param min the minimum of the range
-	 * @param max the maxiumum of the range
+	 * @param max the maximum of the range
 	 * @see #constrain(int value, int min, int max)
 	*/
 	public static double constrain(double value, double min, double max) {
@@ -36,7 +36,7 @@ public class Functions {
 	 *
 	 * @param value the value to constrain
 	 * @param min the minimum of the range
-	 * @param max the maxiumum of the range
+	 * @param max the maximum of the range
 	 * @see #constrain(double value, double min, double max)
 	*/
 	public static int constrain(int value, int min, int max) {
@@ -50,9 +50,9 @@ public class Functions {
 	 *
 	 * @param value the value to constrain and map
 	 * @param low1 the minimum of the initial range
-	 * @param high1 the maxiumum of the inital range
+	 * @param high1 the maximum of the initial range
 	 * @param low2 the minimum of the final range
-	 * @param high2 the maxiumum of the final range
+	 * @param high2 the maximum of the final range
 	 * @see #map(int value, int low1, int high1, int low2, int high2)
 	*/
 	public static double map(double value, double low1, double high1, double low2, double high2) {
@@ -65,9 +65,9 @@ public class Functions {
 	 *
 	 * @param value the value to constrain and map
 	 * @param low1 the minimum of the initial range
-	 * @param high1 the maxiumum of the inital range
+	 * @param high1 the maximum of the initial range
 	 * @param low2 the minimum of the final range
-	 * @param high2 the maxiumum of the final range
+	 * @param high2 the maximum of the final range
 	 * @see #map(double value, double low1, double high1, double low2, double high2)
 	*/
 	public static int map(int value, int low1, int high1, int low2, int high2) {

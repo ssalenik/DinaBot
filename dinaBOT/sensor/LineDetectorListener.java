@@ -1,7 +1,7 @@
 package dinaBOT.sensor;
 
 /**
- * This interface specifies the interfaces that classes to implement to resiter for notification of line cross events from the left and right LineDetectors.
+ * Classes must implement this interface to register for notification of line cross events from the left and right LineDetectors.
  *
  * @author Gabriel Olteanu, Severin Smith, Vinh Phong Buu
  * @see LineDetector

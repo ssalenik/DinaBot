@@ -81,7 +81,7 @@ public class ArcOdometer implements Odometer {
 	}
 
 	/**
-	 * The run method contiuously polls the tacho counter and computes the updated position of the robot as a function of the change in the tacho counts of the left and right wheels
+	 * The run method continuously polls the tacho counter and computes the updated position of the robot as a function of the change in the tacho counts of the left and right wheels
 	 *
 	*/
 	public void run() {
@@ -114,9 +114,9 @@ public class ArcOdometer implements Odometer {
 	 * <p>
 	 * Please note that this method is <b>not</b> synchronized by design. There is a tiny
 	 * risk that the position array will get updated while arraycopy
-	 * is running (this is HIGHLY unlikley given that array copy is
+	 * is running (this is HIGHLY unlikely given that array copy is
 	 * a native call, not a java call, so it probably executes in a
-	 * single sweep everytime). But the normal updates from the run
+	 * single sweep every time). But the normal updates from the run
 	 * method make such tiny increments to the position array that it
 	 * won't make much difference if a partially updated position array
 	 * is returned . In contrast, if the method was synchronized
@@ -143,7 +143,7 @@ public class ArcOdometer implements Odometer {
 	 * <p>
 	 * Angles are in radians, x-y coordinates in cm.
 	 * <p>
-	 * TODO Currently if you are performing a turnTo and you update the position of the odometer simulaneously you can enter an endless loop. This should be addressed
+	 * TODO Currently if you are performing a turnTo and you update the position of the odometer simultaneously you can enter an endless loop. This should be addressed
 	 *
 	 * @param position the array of update position values
 	 * @param update the masking array for updating position values
@@ -172,8 +172,6 @@ public class ArcOdometer implements Odometer {
 
 	/**
 	 * Accepts notification of a new line cross event and performs grid snapping accordingly.
-	 * <p>
-	 * TODO Should perform small adjustement eg keep the theta in the same range it was previously + limit maximum correction (correct as average of odometer + snapping?)
 	 *
 	 * @param detector indicates the detector which is calling this method
 	*/

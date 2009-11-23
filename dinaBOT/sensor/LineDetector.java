@@ -4,6 +4,7 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.LightSensor;
 
 /**
+ * The line detector is a wrapper for the light sensors. It provides simple filtering and only calls it's listeners when it sees a new line. It should only send one trigger per grid line.
  *
  * @author Gabriel Olteanu, Severin Smith, Vinh Phong Buu
  * @see LineDetectorListener
@@ -13,7 +14,7 @@ import lejos.nxt.LightSensor;
 */
 public class LineDetector implements Runnable {
 
-	/* -- Static Variables --*/
+	/* -- Class Variables --*/
 
 	//The actual left and right line detectors
 	public static final LineDetector left = new LineDetector(new LightSensor(SensorPort.S4, true));
@@ -23,6 +24,7 @@ public class LineDetector implements Runnable {
 	static final int THRESHOLD = 450;
 
 	/* -- Instance Variables --*/
+	
 	LightSensor sensor; //The light sensor associated with this LineDetector
 
 	int previous_reading; //The latest LightSensor value

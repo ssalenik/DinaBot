@@ -19,7 +19,7 @@ import dinaBOT.util.*;
 */
 public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatterns {
 
-	/* -- Static Variables -- */
+	/* -- Class Variables -- */
 
 	static final int CAGE_FULL = 1;
 
@@ -51,7 +51,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	boolean debug;
 
 	/**
-	 * This is the constructor for the DinaBOT master
+	 * This is the constructor for the DinaBOTMaster
 	 *
 	 * @param drop_x the x coordinate of the drop off (in tile units)
 	 * @param drop_y the y coordinate of the drop off (in tile units)
@@ -156,7 +156,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 
 	/**
-	 * This method moves to the drop off point, exectues the drop off and then returns to the point it was called from
+	 * This method moves to the drop off point, executes the drop off and then returns to the point it was called from
 	 *
 	*/
 	public void dropOff() {
@@ -318,7 +318,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
-	 * @param args This is the command line args, this is irrelevent in the NXT
+	 * @param args This is the command line args, this is irrelevant in the NXT
 	*/
 	public static void main(String[] args) {
 		//DO some drop off input stuff here

@@ -17,7 +17,7 @@ import dinaBOT.sensor.*;
 */
 public class BlockFinder implements USSensorListener, MechConstants {
 
-	/* -- Static Variable -- */
+	/* -- Class Variables -- */
 
 	//Super experimental constant
 	static final int SECOND_COLUMN_MAX = 75;
@@ -60,8 +60,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	boolean debug;
 
 	/**
-	 * Creates a BlockFinder using a supplied {@link dinaBOT.navigation.ArcOdometer odometer}.
+	 * Creates a BlockFinder.
 	 *
+	 * @param odometer to be used by this BlockFinder
+	 * @param mover the movement to use
+	 * @param mapper the map to be used
 	*/
 	public BlockFinder(Odometer odometer, Movement mover, Map mapper) {
 		this.odometer = odometer;
@@ -117,7 +120,11 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		// or back to start in case of FAIL
 		phase = 0;
 		
-		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD && blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD && Math.abs(blockDistance_A - blockDistance_B) < 5 && blockDistance_A != 255 && blockDistance_B !=255) {
+		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD 
+				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD 
+				&& Math.abs(blockDistance_A - blockDistance_B) < 5
+				&& blockDistance_A != 255
+				&& blockDistance_B !=255) {
 			double angle = (angleA+angleB)/2;
 			double blockDistance = (blockDistance_A+blockDistance_B)/2;
 
@@ -129,10 +136,10 @@ public class BlockFinder implements USSensorListener, MechConstants {
 			phase = 3;
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
 			mover.goForward((blockDistance_A+blockDistance_B)/2, SPEED_MED);
+ 			phase = 0;
 
 			//gets too close to obstacle while moving
 			if(too_close) return false;
-			phase = 0;
 			return true;
 		} else {
 			//Fail-safe technique for now.
@@ -143,40 +150,41 @@ public class BlockFinder implements USSensorListener, MechConstants {
 		
 	}
 
-	public void findEdgeA() {
-			if(minLow < US_TRUST_THRESHOLD
-					&& minHigh - minLow > DETECTION_THRESHOLD
-					&& minLow < blockDistance_A
-					&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
+	void findEdgeA() {
+		if(minLow < US_TRUST_THRESHOLD
+				&& minHigh - minLow > DETECTION_THRESHOLD
+				&& minLow < blockDistance_A
+				&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
 
-				blockDistance_A = minLow;
-				angleA = odometer.getPosition()[2];
-				Sound.buzz();
-				if(debug) {
-					LCD.drawInt(minLow, 0, 0);
-					LCD.drawInt(minHigh, 0, 2);
-					LCD.drawInt(latest_low_reading_2, 0, 1);
-				}
-			}
-	}
-
-	public void	findEdgeB() {
-
-			if(minLow < US_TRUST_THRESHOLD
-					&& minHigh - minLow > DETECTION_THRESHOLD
-					&& minLow < blockDistance_B
-					&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
-
-				blockDistance_B = minLow;
-				angleB = odometer.getPosition()[2];
-				Sound.buzz();
-				if(debug) {
-					LCD.drawInt(minLow, 0, 3);
-					LCD.drawInt(minHigh, 0, 5);
-					LCD.drawInt(latest_low_reading_2, 0, 4);
-				}
+			blockDistance_A = minLow;
+			angleA = odometer.getPosition()[2];
+			Sound.buzz();
+			
+			if(debug) {
+				LCD.drawInt(minLow, 0, 0);
+				LCD.drawInt(minHigh, 0, 2);
+				LCD.drawInt(latest_low_reading_2, 0, 1);
 			}
 		}
+	}
+
+	void findEdgeB() {
+		if(minLow < US_TRUST_THRESHOLD
+				&& minHigh - minLow > DETECTION_THRESHOLD
+				&& minLow < blockDistance_B
+				&& latest_low_reading_2 < SECOND_COLUMN_MAX) {
+
+			blockDistance_B = minLow;
+			angleB = odometer.getPosition()[2];
+			Sound.buzz();
+			
+			if(debug) {
+				LCD.drawInt(minLow, 0, 3);
+				LCD.drawInt(minHigh, 0, 5);
+				LCD.drawInt(latest_low_reading_2, 0, 4);
+			}
+		}
+	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
 		switch (phase) {

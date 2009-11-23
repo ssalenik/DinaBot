@@ -16,7 +16,7 @@ import dinaBOT.mech.MechConstants;
 */
 public class BasicMovement implements Movement, MechConstants {
 
-	/* -- Static Variables --*/
+	/* -- Class Variables --*/
 
 	//Possible states for the movement daemon to be in
 	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO_ROTATE_CW, GOTO_ROTATE_CCW, GOTO_SPLINE }
@@ -176,8 +176,11 @@ public class BasicMovement implements Movement, MechConstants {
 	}
 
 	public void stop() {
-		if(movement_daemon.isActive()) movement_daemon.stop();
-
+		if(movement_daemon.isActive()) {
+			movement_daemon.stop();
+			interrupted_flag = true;
+		}
+		
 		left_motor.stop();
 		right_motor.stop();
 
@@ -203,7 +206,7 @@ public class BasicMovement implements Movement, MechConstants {
 	}
 
 	/**
-	 * The MovementDaemon actually handles the details of all complex motions such as driveStraight, goForward and turnTo in a seperate thread. This allows theses method to be in either block or non-block.
+	 * The MovementDaemon actually handles the details of all complex motions such as goTo, goForward and turnTo in a seperate thread. This allows theses method to be in either block or non-block.
 	 * <p>
 	 * The MovementDaemon can either be suspended (Mode.INACTIVE) when it is not in use. In this state the thread yields. Or it can be in one if the implmented other modes such as Mode.ROTATE_CCW, Mode.ROTATE_CW and Mode.ADVANCE in which case the thread is active. Within the BasicMovement class the status of the thread can be polled with isActive()
 	*/
@@ -243,7 +246,7 @@ public class BasicMovement implements Movement, MechConstants {
 		}
 
 		/**
-		 * Run method from Runnable. This method will suspend unless some complex movement is in progress
+		 * Run method from Runnable. This method will suspend unless some complex movement is in progress.
 		 *
 		*/
 		public void run() {
@@ -289,7 +292,7 @@ public class BasicMovement implements Movement, MechConstants {
 		}
 
 		/**
-		 * Initiate movement to a specified x and y location
+		 * Initiate movement to a specified x and y location.
 		 *
 		 * @param x the x coordinate to go to (in cm)
 		 * @param y the y coordinate to go to (in cm)

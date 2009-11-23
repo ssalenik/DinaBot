@@ -5,6 +5,13 @@ import lejos.nxt.SensorPort;
 
 import dinaBOT.util.DinaList;
 
+/**
+ * The USSensor is a wrapper for the ultrasonic sensors. It provides a centralized polling system for the sensors as well as a point where filtering and linearization can be implemented. All listeners will be notified of ultrasonic data as it arrives in it's filtered and linearized form.
+ *
+ * @author Severin Smith, Vinh Phong Buu
+ * @see USSensorListener
+ * @version 2
+*/
 public class USSensor implements Runnable {
 
 	/* Class Variables */
@@ -22,7 +29,12 @@ public class USSensor implements Runnable {
 	boolean running;
 
 	int[] latest_values;
-
+	
+	/**
+	 * Creates a new USSensor instance
+	 *
+	 * @param port the sensor port to be wrapped
+	*/
 	public USSensor(SensorPort port) {
 		sensor = new UltrasonicSensor(port);
 
@@ -34,9 +46,14 @@ public class USSensor implements Runnable {
 		start();
 	}
 
+	/**
+	 * This run method from the Runnable interface. It continuously polls the us sensor, there is a 50ms delay between each new data poll. Polled data is first filter/linearized, then stored for reference until the next polling and finally the listeners are notified of the new inbound data.
+	 *
+	*/
 	public void run() {
 		while(running) {
 			sensor.ping();
+			
 			try {
 				Thread.sleep(50);
 			} catch(Exception e) {
@@ -64,17 +81,30 @@ public class USSensor implements Runnable {
 			notifyListeners();
 		}
 	}
-
+	
+	/**
+	 * Notifies the listeners of new data
+	 *
+	*/
 	void notifyListeners() {
 		for(int i = 0;i < listeners.size();i++) {
 			listeners.get(i).newValues(latest_values, this);
 		}
 	}
-
+	
+	/**
+	 * Register a new {@link USSensorListener listener} with the USSensor. This listener will be notified of new ultrasonic sensor data.
+	 *
+	 * @param listener the listener to register with this USSensor instance.
+	*/
 	public void registerListener(USSensorListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * Start the underlying thread which polls the ultrasonic sensor.
+	 *
+	*/
 	public void start() {
 		stop();
 		running = true;
@@ -83,6 +113,10 @@ public class USSensor implements Runnable {
 		us_sensor_thread.start();
 	}
 
+	/**
+	 * Stops the underlying thread which polls the ultrasonic sensor.
+	 *
+	*/
 	public void stop() {
 		if(running) {
 			running = false;

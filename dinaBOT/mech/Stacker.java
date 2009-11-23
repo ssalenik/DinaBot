@@ -83,9 +83,9 @@ public class Stacker implements Stacking {
 	}
 
 	/**
-	 * Attempts to align the block at right angles from the robot by closing the claw on it.
+	 * Moves the claw to the hold position (straight)
 	 *
-	 * @return true if the closing succeeded.
+	 * @return true if the hold succeeded.
 	 *
 	*/
 	public boolean hold() {
@@ -99,7 +99,7 @@ public class Stacker implements Stacking {
 	}
 
 	/**
-	 * Assumes the claw is touching the block and opens the claw to release the block.
+	 * Moves the claw to the release position (open)
 	 *
 	 * @return true if the opening succeeded.
 	 *
@@ -114,7 +114,12 @@ public class Stacker implements Stacking {
 
 	}
 
-
+	/**
+	 * Moves the claw to the hold position and then to the open position. This "taps" the the brick and hopefully straightens it.
+	 *
+	 * @return true if the tap succeeded.
+	 *
+	*/
 	public boolean tap() {
 		hold();
 		release();
@@ -122,6 +127,12 @@ public class Stacker implements Stacking {
 		return true;
 	}
 
+	/**
+	 * Moves the claw to the closed or zero tacho point. (Mainly used to reset the claw to zero before shutdown).
+	 *
+	 * @return true if the closing succeeded.
+	 *
+	*/
 	public boolean close() {
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(0);
@@ -148,9 +159,6 @@ public class Stacker implements Stacking {
 
 	}
 
-	//implement a method to make the robot move forward to get rid of the blocks
-	//to be implemented in master via BTB communication
-
 	/**
 	 * Closes the cage doors
 	 *
@@ -171,7 +179,7 @@ public class Stacker implements Stacking {
 	}
 
 	/**
-	 * Checks whether the cage doors are closed or open
+	 * Checks wether the cage doors are closed or open
 	 *
 	 * @return true if the cage is closed and false otherwise
 	*/
