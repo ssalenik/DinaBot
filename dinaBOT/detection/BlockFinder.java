@@ -5,6 +5,7 @@ import lejos.nxt.*;
 import dinaBOT.mech.MechConstants;
 import dinaBOT.navigation.*;
 import dinaBOT.sensor.*;
+import dinaBOT.comm.*;
 
 /**
  * This class locates blocks, and navigate properly towards them.
@@ -15,7 +16,7 @@ import dinaBOT.sensor.*;
  * @see MechConstants
  * @see Map
 */
-public class BlockFinder implements USSensorListener, MechConstants {
+public class BlockFinder implements USSensorListener, MechConstants, CommConstants {
 
 	/* -- Class Variables -- */
 

@@ -63,6 +63,9 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public Localization localizer;
 
 	public int[] dropCoords = new int[2];
+	public int[][] dropArea;
+	public int coordPointer = 0;
+	
 	public int phase =0;
 	public double[] left_side,right_side,top_side,bottom_side;
 	public double stackAngle = 0;
@@ -85,8 +88,26 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		this.mover = mover;
 		this.slave_connection = slave_connection;
 		this.localizer = localizer;
+		
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
+		
+		int[][] dropArea = { //Clockwise from the bottom left of the drop off area
+			new int[] {drop_x - 1, drop_y - 1},
+			new int[] {drop_x - 1, drop_y},
+			new int[] {drop_x - 1,drop_y + 1},
+			new int[] {drop_x - 1,drop_y + 2},
+			new int[] {drop_x,drop_y + 2},
+			new int[] {drop_x + 1,drop_y + 2},
+			new int[] {drop_x + 2,drop_y + 2},
+			new int[] {drop_x + 2,drop_y + 1},
+			new int[] {drop_x + 2,drop_y - 1},
+			new int[] {drop_x + 1,drop_y - 1},
+			new int[] {drop_x,drop_y - 1}
+		};
+		
+		
+		
 		USSensor.low_sensor.registerListener(this);
 	}
 
@@ -97,6 +118,13 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 */
 	public int[] getDropCoords() {
 		return dropCoords;
+	}
+	
+	/**
+	 *
+	 */
+	public int[] getNextCoordinate() {
+		return dropArea[coordPointer++ % dropArea.length];
 	}
 
 

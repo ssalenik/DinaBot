@@ -82,7 +82,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		navigator = new Navigator(odometer, movement, map, pather);
 
 		localization = new Localization(odometer, movement);
-		blockFind = new BlockFinder(odometer, movement, map);
+		blockFind = new BlockFinder(odometer, movement, map, slave_connection);
 		dropper = new DropOff(odometer, movement, slave_connection,localization, drop_x, drop_y);
 
 		debug = false;
