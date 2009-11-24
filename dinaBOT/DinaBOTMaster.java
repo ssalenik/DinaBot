@@ -168,14 +168,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	*/	
 	public void dropOff() {
 		
+		//Getting drop off coordinates
+		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
+		int[] dropCoords = dropper.getDropCoords();		
+		
 		double[] start_position = odometer.getPosition();
-		int[] dropCoords = dropper.getDropCoords();
+		
 		debug = true;
 		int [] dropSetUpCoords = new int[2];
 		dropSetUpCoords[0] = constrain(roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
 		dropSetUpCoords[1] = constrain(roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
-		navigator.goTo((dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
+		navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
 	}
 					   
 	/**
@@ -192,10 +196,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			new int[] {7,7},
 			new int[] {1,1} // Go back to starting node
 		};
-
-		//Getting drop off coordinates
+		
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int[] dropCoords = dropper.getDropCoords();
+		int[] dropCoords = dropper.getDropCoords();		
 
 		//Consider the nodes around the drop off zone as obstacles.
 		map.editMap(dropCoords[0],dropCoords[1], 1);

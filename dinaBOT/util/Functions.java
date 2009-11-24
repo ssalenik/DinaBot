@@ -22,10 +22,9 @@ public class Functions {
 	 * @param value the value you want to round up or down
 	 */
 	public static int roundToInt(double value) {
-		double temp = value;
-		value % 1;
-		if(value >= 0.5) return	(((int)temp)+1);
-		if(value < 0.5) return (int)temp
+		double temp = value % 1;
+		if(temp >= 0.5) return	(((int)value)+1);
+		else return (int)value; 
 	}
 
 	/**
