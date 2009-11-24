@@ -165,101 +165,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	/**
 	 * This method makes the robot move to the correct drop off point, depending on how it is positioned with respect to it.
 	 *
-	*/
+	*/	
 	public void dropOff() {
-		// Determines best drop-off set-up node
-		// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
-		double[] start_position = odometer.getPosition();
-		int[] dropCoords = dropper.getDropCoords();
-		debug = true;
-		//If the robot is North-East of drop off area
-		if (start_position[0] > (dropCoords[0]) * UNIT_TILE && start_position[1] > (dropCoords[1]) * UNIT_TILE) {
-			if(debug) System.out.println("Im in the norteast");
-			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			if (start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE) {
-				if(debug) System.out.println("Going at 8");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-			}
-			else if(start_position[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
-				if(debug) System.out.println("Going at 6");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
-			}
-			else {
-				if(debug) System.out.println("Going at 7");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-			}
-
-		}
-
-		//If the robot is North-West of drop off area.
-		else if(start_position[0] <= dropCoords[0] * UNIT_TILE && start_position[1] >= (dropCoords[1] + 1) * UNIT_TILE) {
-			if(debug) System.out.println("Im in the nortwest");
-			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			if (start_position[0] >= (dropCoords[0] - 1) * UNIT_TILE) {
-				if(debug) System.out.println("Going at 9");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0])*UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-			}
-			else if(start_position[1] <= (dropCoords[1] + 2) * UNIT_TILE) {
-				Button.waitForPress();
-				if(debug) System.out.println("Going at 11");
-				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
-			}
-			else {
-				if(debug) System.out.println("Going at 10");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
-			}
-
-		}
-
-		// If the robot is South-West of the drop off area
-		else if(start_position[0] <= (dropCoords[0] + 1) * UNIT_TILE && start_position[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
-			if(debug) System.out.println("Im in the southwest");
-			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			if (start_position[0] >= dropCoords[0] * UNIT_TILE) {
-				if(debug) System.out.println("Going at 2");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0]) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-			}
-			else if(start_position[1] >= (dropCoords[1]) * UNIT_TILE) {
-				if(debug) System.out.println("Going at 12");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
-			}
-			else {
-				if(debug) System.out.println("Going at 1");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] - 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-			}
-		 }
-
-		// If the robot is South East of the drop off area
-		else {
-			if(debug) System.out.println("Im in the southeast or somewhere in between the zones");
-			if(debug) System.out.println(start_position[0]+ " "+ start_position[1]);
-			Button.waitForPress();
-			if (start_position[0] >= dropCoords[0] + 1) {
-				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-			}
-			else if(start_position[1] >= (dropCoords[1] - 1) * UNIT_TILE) {
-				if(debug) System.out.println("Going at 5");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1]) * UNIT_TILE, true);
-			}
-			else {
-				if(debug) System.out.println("Going at 4");
-				Button.waitForPress();
-				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] - 1) * UNIT_TILE, true);
-			}
-
-		}
-	}	
-	
-	public void alternateDropOff() {
 		
 		double[] start_position = odometer.getPosition();
 		int[] dropCoords = dropper.getDropCoords();
@@ -270,6 +177,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		navigator.goTo((dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
 	}
+					   
 	/**
 	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
 	 *
