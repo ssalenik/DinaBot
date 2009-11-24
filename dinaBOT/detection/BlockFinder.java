@@ -150,6 +150,8 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 			//gets too close to obstacle while moving
 			if(too_close) return false;
+			
+			
 			return true;
 		} else {
 			//Fail-safe technique for now.

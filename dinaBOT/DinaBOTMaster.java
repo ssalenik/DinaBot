@@ -135,10 +135,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		odometer.enableSnapping(false); //Disable snapping for diagonal movement
 
-		slave_connection.request(RELEASE); //Put down claw
-
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
 			if(debug) System.out.println("Picking up");
+			
+			slave_connection.request(RELEASE); //Put down claw
 
 			alignPallet(); //If successfull align pallet
 
@@ -151,10 +151,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 		} else {
-			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
-			slave_connection.request(ARMS_UP); //Pickup
-			map.start(); //Reenable map
-	
+			
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 		}
@@ -163,10 +160,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 
 	/**
-	 * This method makes the robot move to the correct drop off point, depending on how it is positioned with respect to it.
+	 * This method makes the robot move to the correct drop off point, depending on where it is positioned with respect to it.
 	 *
 	*/	
-	public void dropOff() {
+	public void goToDropArea() {
 		
 		//Getting drop off coordinates
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
@@ -179,7 +176,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
 		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
-		navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
+		//int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
+		
+		
 	}
 					   
 	/**
@@ -224,7 +223,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				pickUpPallet(); //Pick up pallet for interrupt
 				if(pallet_count == CAGE_FULL) {
 					if(debug) System.out.println("Run drop off...");
-					dropOff(); //This should return us to the same point
+					goToDropArea(); //This should return us to the same point
 					dropper.dropOff(1);
 				}
 				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //And keep moving to node
@@ -296,7 +295,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	
 	public void dropTest() {
 		odometer.setPosition(new double[] {UNIT_TILE*2,5,5.5 * UNIT_TILE, 0}, new boolean[] {true, true, true});
-		dropOff();
+		goToDropArea();
 		dropper.dropOff(1);
 
 	}
