@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 6;
+	static final int CAGE_FULL = 1;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -163,7 +163,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 
 	/**
-	 * This method moves to the drop off point, executes the drop off and then returns to the point it was called from
+	 * This method makes the robot move to the correct drop off point, depending on how it is positioned with respect to it.
 	 *
 	*/
 	public void dropOff() {
@@ -171,6 +171,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		// It is currently assumed that there are no obstacles on the stacking area and the stacking area is not surrounded by obstacles
 		double[] start_position = odometer.getPosition();
 		int[] dropCoords = dropper.getDropCoords();
+		debug = true;
 		//If the robot is North-East of drop off area
 		if (start_position[0] > (dropCoords[0]) * UNIT_TILE && start_position[1] > (dropCoords[1]) * UNIT_TILE) {
 			if(debug) System.out.println("Im in the norteast");
@@ -180,7 +181,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 1) * UNIT_TILE, (dropCoords[1] + 2) * UNIT_TILE, true);
 			}
-			else if(start_position[1] <= dropCoords[1] + 1) {
+			else if(start_position[1] <= (dropCoords[1] + 1) * UNIT_TILE) {
 				if(debug) System.out.println("Going at 6");
 				Button.waitForPress();
 				navigator.goTo((dropCoords[0] + 2) * UNIT_TILE, (dropCoords[1] + 1) * UNIT_TILE, true);
@@ -256,6 +257,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			}
 
 		}
+	}	
+	
+	public void alternateDropOff() {
+		
+		double[] start_position = odometer.getPosition();
+		int[] dropCoords = dropper.getDropCoords();
+		debug = true;
+		int [] dropSetUpCoords = new int[2];
+		dropSetUpCoords[0] = constrain(roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
+		dropSetUpCoords[1] = constrain(roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
+		
+		navigator.goTo((dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
 	}
 	/**
 	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
@@ -267,7 +280,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		
 		int[][] pattern = {
 			new int[] {7,7},
 			new int[] {1,1} // Go back to starting node
@@ -371,17 +383,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	
 	}
 	
-	public void pickUpTest() {
-		slave_connection.request(RELEASE); //Pickup
-		while(true) {
-			Button.waitForPress();
-			slave_connection.request(PICKUP); //Pickup
-			Button.waitForPress();
-			slave_connection.request(RELEASE); //Pickup
-		}
+	public void dropTest() {
+		odometer.setPosition(new double[] {UNIT_TILE*2,5,5.5 * UNIT_TILE, 0}, new boolean[] {true, true, true});
+		dropOff();
+		dropper.dropOff(1);
+
 	}
-	
-	
+
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -390,12 +398,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(2, 6); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(3, 3); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
 		//dinaBOTmaster.run();
-		dinaBOTmaster.pickUpTest();
+		dinaBOTmaster.dropTest();
 		//dinaBOTmaster.moveTest();
 
 		while(true); //Never quit

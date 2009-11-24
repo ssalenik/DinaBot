@@ -42,6 +42,9 @@ public interface SearchPatterns {
 		new int[] {1,1} // Go back to starting node
 	};
 
+	/**
+	 * Spiral patterns that makes the robot go around the obstacle course in a spiral.
+	 */
 	public static final int[][] SPIRAL = {
 		new int [] {7,1},
 		new int [] {7,7},

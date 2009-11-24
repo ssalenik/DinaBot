@@ -16,6 +16,17 @@ public class Functions {
 	private Functions() {
 
 	}
+	
+	/**
+	 * Rounds a value up or down to the appropriate integer.
+	 * @param value the value you want to round up or down
+	 */
+	public static int roundToInt(double value) {
+		double temp = value;
+		value % 1;
+		if(value >= 0.5) return	(((int)temp)+1);
+		if(value < 0.5) return (int)temp
+	}
 
 	/**
 	 * Constrains the value to the specified range.
