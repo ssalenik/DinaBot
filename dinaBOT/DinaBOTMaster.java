@@ -176,8 +176,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		debug = true;
 		int [] dropSetUpCoords = new int[2];
-		dropSetUpCoords[0] = constrain(roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
-		dropSetUpCoords[1] = constrain(roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
+		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
+		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
 		navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
 	}
