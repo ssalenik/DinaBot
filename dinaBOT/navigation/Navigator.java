@@ -32,9 +32,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	int[] high_Readings;
 
 	int node; //the current location in the path array
+	int suspend_count;
 	double[][] path;
 
-	boolean active, hard_interrupt, soft_interrupt, full_mode;
+	boolean active, suspend_interrupt, soft_interrupt, full_mode;
 
 	/**
 	 * Instantiate a new Navigator
@@ -48,13 +49,15 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		this.odometer = odometer;
 		this.movement = movement;
 
+		suspend_count = 2;
+		
 		this.map = map;
 		this.pathing = pathing;
 
-		map.registerListener(this);
-
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
 		high_Readings = new int[] {255,255,255,255,255,255,255,255};
+
+		map.registerListener(this);
 
 		USSensor.high_sensor.registerListener(this);
 		USSensor.low_sensor.registerListener(this);
@@ -62,22 +65,27 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	public int goTo(double x, double y, boolean full) {
 		this.full_mode = full;
-		hard_interrupt = false;
 
+		if (suspend_interrupt) {
+			suspend_count = 0;
+			suspend_interrupt = false;
+		}
+		
 		while(repath(x, y)) {
+			
 			soft_interrupt = false;
 			for(node = 0; node < path.length; node++) {
 				active = true;
-				if(hard_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
+				if(suspend_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
 				active = false;
 				if(node == path.length-1) {
 					path = null;
 					return 0;
 				}
+				if (suspend_count < 2) suspend_count++;
 			}
 			active = false;
-			if(hard_interrupt) {
-				path = null;
+			if(suspend_interrupt) {
 				return 1;
 			}
 		}
@@ -112,7 +120,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	 *
 	*/
 	public void interrupt() {
-		hard_interrupt = true;
+		suspend_interrupt = true;
 		movement.stop();
 	}
 
@@ -132,7 +140,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	public void newValues(int[] new_values, USSensor sensor) {
 		double[] position = odometer.getPosition();
 
-		if(active && !full_mode) {
+		if(active && !full_mode && suspend_count >= 2) {
 			int minLow, minHigh;
 
 			if(sensor == USSensor.low_sensor) low_Readings = new_values;

@@ -29,6 +29,7 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	Odometer odometer;
 	Movement mover;
 	Map mapper;
+	BTMaster slave_connection;
 
 	//Fields
 	double angleA;
@@ -65,11 +66,13 @@ public class BlockFinder implements USSensorListener, MechConstants {
 	 * @param mover the movement to use
 	 * @param mapper the map to be used
 	*/
-	public BlockFinder(Odometer odometer, Movement mover, Map mapper) {
+	public BlockFinder(Odometer odometer, Movement mover, Map mapper, BTMaster slave_connection) {
 		this.odometer = odometer;
 
 		this.mover = mover;
 		this.mapper = mapper;
+		
+		this.slave_connection = slave_connection;
 		
 		latest_low_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 		latest_high_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
@@ -144,13 +147,13 @@ public class BlockFinder implements USSensorListener, MechConstants {
 
 			// go to phase 3; go to pallet phase
 			phase = 3;
+			slave_connection.request(RELEASE);
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
 			mover.goForward((blockDistance_A+blockDistance_B)/2, SPEED_MED);
  			phase = 0;
 
 			//gets too close to obstacle while moving
 			if(too_close) return false;
-			
 			
 			return true;
 		} else {

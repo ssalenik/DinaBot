@@ -138,8 +138,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
 			if(debug) System.out.println("Picking up");
 			
-			slave_connection.request(RELEASE); //Put down claw
-
 			alignPallet(); //If successfull align pallet
 
 			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
@@ -177,7 +175,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
 		//int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
-		
 		
 	}
 					   
@@ -312,8 +309,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		//dinaBOTmaster.run();
-		dinaBOTmaster.dropTest();
+		dinaBOTmaster.run();
+		//dinaBOTmaster.dropTest();
 		//dinaBOTmaster.moveTest();
 
 		while(true); //Never quit
