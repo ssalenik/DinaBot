@@ -34,7 +34,7 @@ import dinaBOT.comm.*;
  			#1(x1,y1)		#2(x2,y1)
 
 		This set of coordinates designates the middle of the each of the corners of the drop point.
-		Corners are ordered clockwise starting from (x1,y1), the given drop off coordinates
+		Corners are ordered counter-clockwise starting from (x1,y1), the given drop off coordinates
 		This is only used to perform the drop for the second stack.
  */
 
@@ -115,10 +115,10 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		int corner = 0;
 
 		//Define 4 stacking area corners
-		x1 = dropCoords[0];
-		x2 = dropCoords[0]+UNIT_TILE;
-		y1 = dropCoords[1];
-		y2 = dropCoords[1]+UNIT_TILE;
+		x1 = dropCoords[0]*UNIT_TILE;
+		x2 = dropCoords[0]*UNIT_TILE+UNIT_TILE;
+		y1 = dropCoords[1]*UNIT_TILE;
+		y2 = dropCoords[1]*UNIT_TILE+UNIT_TILE;
 
 		//Find nearest drop off area corner.
 		if (Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
@@ -163,12 +163,12 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Move to drop point.
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
-			localizer.localizeAnywhere();
+			//localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
 
 			//Perform Drop off
 			mover.turnTo(facing, SPEED_ROTATE);
-			mover.goForward(1.4*UNIT_TILE, SPEED_SLOW);
+			mover.goForward(0.7*UNIT_TILE, SPEED_SLOW);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
@@ -176,15 +176,16 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Go back to initial node after this returns
 			success = true;
-			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 			mover.goTo(odometer.getPosition()[1], position[1], SPEED_MED);
+			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
 		} else if (stack == 2) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
 			slave_connection.request(ARMS_UP);
-			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
+			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
+			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
 			mover.turnTo(facing, SPEED_ROTATE);
 
@@ -216,6 +217,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			slave_connection.request(CLOSE_CAGE);
 
 			success = true;
+			mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(position[0], position[1], SPEED_MED);
 		}
 

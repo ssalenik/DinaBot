@@ -19,7 +19,7 @@ public class Localization implements MechConstants, USSensorListener {
 	double angleA, angleB, finalAngle;
 	double[] position;
 	boolean angleALatched = false, angleBLatched = false;
-	
+
 	int last_values[] = new int[6];
 	int median = 3;
 	int idx = 0;
@@ -50,7 +50,7 @@ public class Localization implements MechConstants, USSensorListener {
 		last_values = new int[6];
 		angleALatched = false;
 		angleBLatched = false;
-		
+
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
 		phase =1;
@@ -187,7 +187,7 @@ public class Localization implements MechConstants, USSensorListener {
 		case 1:
 			//Sweeping along wall
 			//Stop when no wall is seen
-			
+
 			if (sensor == USSensor.low_sensor) {
 				last_values[idx%6] = new_values[0];
 				idx++;
