@@ -13,7 +13,7 @@ public class MusicBox extends Thread implements MusicPlayer{
 	int[] durations;
 
 
-	public MusicBox(Song[] songSet) {
+	public MusicBox(Song[] songSet, boolean slave) {
 		playlist = songSet;
 		songStatus = new int[songSet.length];
 		for(int i = 0; i < songSet.length; i++)
@@ -25,6 +25,12 @@ public class MusicBox extends Thread implements MusicPlayer{
 
 		playStatus = false;
 
+		if(slave){
+			try {Thread.sleep(350);} catch(Exception e) {}
+		}
+		else{
+			try {Thread.sleep(10);} catch(Exception e) {}
+		}
 		this.start();
 	}
 
@@ -74,8 +80,9 @@ public class MusicBox extends Thread implements MusicPlayer{
 	private void playNote() {
 		int frequency = playlist[currentSong].frequencies[songStatus[currentSong]];
 		int duration = playlist[currentSong].durations[songStatus[currentSong]];
+		System.out.println(frequency);
 		if(frequencies[songStatus[currentSong]] != 0)
-			Sound.playTone(frequency, duration - 20);
+			Sound.playTone(frequency, duration - 15);
 		try {Thread.sleep(duration);} catch(Exception e) {}
 		if(songStatus[currentSong] == (playlist[currentSong].frequencies.length - 1))
 			abort();

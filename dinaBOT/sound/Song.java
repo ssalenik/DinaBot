@@ -7,7 +7,7 @@ public class Song {
 	int[] frequencies;
 	int[] durations;
 
-	public Song(int tempo, String title, int[][] chart) {
+	public Song(double tempo, String title, int[][] chart) {
 		this.title = title;
 		this.frequencies = getFrequencies(chart);
 		this.durations = getDurations(tempo, chart);
@@ -16,9 +16,18 @@ public class Song {
 	private int getFrequency(int note, int alteration, int octave) {
 		if(note == 10)
 			return 0;
-		int halfSteps = note + alteration + (12*octave); //number of half-steps away from A4
-		double frequency = 440 * Math.pow(2.0, halfSteps/12);
-		return (int)(frequency);
+		int halfSteps = note + alteration + (12*(octave-4)); //number of half-steps away from A4
+		double frequencyCoefficient = 1.059463094;
+		double unprocessedFrequency = 1.0;
+		if(halfSteps >= 0){
+			for(int i = 0; i < halfSteps; i++)
+				unprocessedFrequency *= frequencyCoefficient;
+		}
+		else{
+			for(int i = 0; i > halfSteps; i--)
+				unprocessedFrequency /= frequencyCoefficient;
+		}
+		return (int)(440 * unprocessedFrequency);
 	}
 
 	private int[] getFrequencies(int[][] chart) {
@@ -28,11 +37,14 @@ public class Song {
 		return frequencies;
 	}
 
-	private int[] getDurations(int tempo, int[][] chart) {
+	private int[] getDurations(double tempo, int[][] chart) {
 		int[] durations = new int[chart.length];
-		int millisecondsPerBeat = (int) 60000 / tempo;
-		for(int i = 0; i < durations.length; i++)
-			durations[i] = (int) millisecondsPerBeat * (chart[i][3] / 24);
+		int millisecondsPerBeat = (int) (60000 / tempo);
+		double duration;
+		for(int i = 0; i < durations.length; i++){
+			 duration = millisecondsPerBeat * chart[i][3] / 24;
+			 durations[i] = (int) duration;
+		}
 		return durations;
 	}
 }
