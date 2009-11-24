@@ -19,16 +19,20 @@ public class Localization implements MechConstants, USSensorListener {
 	double angleA, angleB, finalAngle;
 	double[] position;
 	boolean angleALatched = false, angleBLatched = false;
+	
+	int last_values[] = new int[6];
+	int median = 3;
+	int idx = 0;
 
 	/**
 	 * The maximum distance at which the localizer will recongize that a wall is seen.
-	*/
-	protected int WALL_DISTANCE = 30;
+	 */
+	protected int WALL_DISTANCE = 25;
 
 	/**
 	 * Creates a new Localization using a supplied {@link dinaBOT.navigation#ArcOdometer odometer} and with
 	 * {@link dinaBOT.sensor#USSensor Ultrasonic Sensors}.
-	*/
+	 */
 	public Localization(Odometer odometer, Movement mover) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -40,8 +44,13 @@ public class Localization implements MechConstants, USSensorListener {
 	 * Using falling edge technique, detects the two walls forming the initial
 	 * corner where the robot starts and orients the robot at an orientation of about 90
 	 * degrees.
-	*/
+	 */
 	public void localizeUS() {
+		//Reset all fields;
+		last_values = new int[6];
+		angleALatched = false;
+		angleBLatched = false;
+		
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
 		phase =1;
@@ -54,8 +63,10 @@ public class Localization implements MechConstants, USSensorListener {
 		while(!angleALatched && mover.isMoving());
 
 		// switch direction and wait until it sees no wall
-		mover.rotate(true, SPEED_ROTATE);
+		phase = 0;
+		mover.turn(Math.PI/2, SPEED_ROTATE);
 		phase =1;
+		mover.rotate(true, SPEED_ROTATE);
 		while (mover.isMoving());
 
 		// keep rotating until the robot sees a wall
@@ -72,11 +83,12 @@ public class Localization implements MechConstants, USSensorListener {
 			//The first wall seen is "south" wall.
 			//The second wall seen is "west" wall.
 			finalAngle = ((angleA+angleB)/2) + (Math.PI/4);
-		} else {
+		} 
+		/*else {
 			//The first wall seen is "east" wall.
 			//The second wall seen is "south" wall.
 			finalAngle = ((angleA+angleB)/2) - (Math.PI/4);
-		}
+		}*/
 
 		mover.turnTo (finalAngle, SPEED_ROTATE);
 
@@ -88,12 +100,12 @@ public class Localization implements MechConstants, USSensorListener {
 	/**
 	 * Gridsnaps to correct it's orientation once it has USLocalized
 	 * Works strictly if approximately on an intersection.
-	*/
+	 */
 	public void localizeLight() {
 		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
 		odometer.enableLateralSnapping(false);
-		
+
 		mover.goForward(UNIT_TILE, SPEED_SLOW);
 		mover.goForward(-UNIT_TILE, SPEED_SLOW);
 		mover.goForward(3*UNIT_TILE/4, SPEED_SLOW);
@@ -107,9 +119,9 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
-		
+
 		mover.goTo(3*UNIT_TILE/4, UNIT_TILE, SPEED_SLOW);
-		
+
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(UNIT_TILE, SPEED_SLOW);
 		mover.goForward(-UNIT_TILE, SPEED_SLOW);
@@ -124,19 +136,19 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
-		
+
 		mover.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
 		odometer.enableLateralSnapping(true);
 	}
 
 	/**
 	 * Call to USLocalize and LightLocalize simply.
-	*/
+	 */
 	public void localize() {
 		this.localizeUS();
 		this.localizeLight();
 	}
-	
+
 	/**
 	 * Performs a quick localization routine using only the light sensors to fix the orientation
 	 * at any node on the grid.
@@ -144,7 +156,7 @@ public class Localization implements MechConstants, USSensorListener {
 	public void localizeAnywhere() {
 		odometer.enableSnapping(true);
 		odometer.enableLateralSnapping(false);
-		
+
 		mover.turnTo(Math.PI, SPEED_ROTATE);
 		mover.goForward(3/4*UNIT_TILE, SPEED_SLOW);
 		mover.goForward(-3/4*UNIT_TILE, SPEED_SLOW);
@@ -152,7 +164,7 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.goForward(1/4*UNIT_TILE, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(-1/4*UNIT_TILE, SPEED_SLOW);
-		
+
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(3/4*UNIT_TILE, SPEED_SLOW);
 		mover.goForward(-3/4*UNIT_TILE, SPEED_SLOW);
@@ -160,7 +172,7 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.goForward(1/4*UNIT_TILE, SPEED_SLOW);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-1/4*UNIT_TILE, SPEED_SLOW);
-		
+
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 	}
 
@@ -175,17 +187,21 @@ public class Localization implements MechConstants, USSensorListener {
 		case 1:
 			//Sweeping along wall
 			//Stop when no wall is seen
-			if (sensor == USSensor.low_sensor && new_values[0] > WALL_DISTANCE+10) {
-				mover.stop();
-				Sound.twoBeeps();
+			
+			if (sensor == USSensor.low_sensor) {
+				last_values[idx%6] = new_values[0];
+				idx++;
+				if (last_values[median] > WALL_DISTANCE+20) {
+					mover.stop();
+					Sound.twoBeeps();
+				}
 			}
-
 			break;
 
 		case 2:
 			//Latch first Wall
 			//Stop when the angle is latched
-			if (sensor == USSensor.low_sensor && new_values[0] < WALL_DISTANCE-5 && !angleALatched) {
+			if (sensor == USSensor.low_sensor && new_values[0] < WALL_DISTANCE && !angleALatched) {
 				angleA = odometer.getPosition()[2];
 				angleALatched = true;
 				try {
