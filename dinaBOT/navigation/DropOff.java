@@ -21,17 +21,17 @@ import dinaBOT.comm.*;
  *time, it will always use the same time each time it needs to drop off
  *another stack. The inputed data for the drop off will be given at
  *startup and would be two ints passed from the main.
-*/
+ */
 
 /*
  * Drop off point sketch
- 				#4(x1,y2)		#3(x2,y2)
+ 			#4(x1,y2)		#3(x2,y2)
 				 	 -------
 			 		|		|
 					| drop	|	
 			 		| point	|
 			 		 -------
- 				#1(x1,y1)		#2(x2,y1)
+ 			#1(x1,y1)		#2(x2,y1)
 
 		This set of coordinates designates the middle of the each of the corners of the drop point.
 		Corners are ordered clockwise starting from (x1,y1), the given drop off coordinates
@@ -67,6 +67,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public double[] left_side,right_side,top_side,bottom_side;
 	public double stackAngle = 0;
 	public boolean latchedStack = false;
+	double x1,x2,y1,y2;
 
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
@@ -78,7 +79,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * @param localizer
 	 * @param drop_x X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 * @param drop_y Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
-	*/
+	 */
 	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -93,7 +94,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Obtains the coordinates of the drop off area.
 	 *
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
-	*/
+	 */
 	public int[] getDropCoords() {
 		return dropCoords;
 	}
@@ -103,99 +104,93 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
 	 *
 	 * @return Success status
-	*/
+	 */
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
 	public boolean dropOff(int stack) {
 		boolean success = false;
 		double facing= 0;
 		//Initial location
-		double[] initialLocation = odometer.getPosition();
-		
+		double[] dropPoint = new double[2];
+		double[] position = odometer.getPosition();
+		int corner = 0;
+
+		//Define 4 stacking area corners
+		x1 = dropCoords[0];
+		x2 = dropCoords[0]+UNIT_TILE;
+		y1 = dropCoords[1];
+		y2 = dropCoords[1]+UNIT_TILE;
+
+		//Find nearest drop off area corner.
+		if (Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
+			dropPoint[0] = x1;
+			corner = 1;
+		} else {
+			dropPoint[0] = x2;
+			corner = 2;
+		}
+		if (Math.abs(position[1] - y1) < Math.abs(position[0] - y2)) {
+			dropPoint[1] = y1;
+		} else {
+			dropPoint[1] = y2;
+			if (corner == 1) {
+				corner = 3;
+			} else {
+				corner = 4;
+			}
+		}
+
+		switch (corner) {
+		//Face the stack location.
+		case 1:
+			facing = Math.PI/4;
+			break;
+		case 2:
+			facing = 3*Math.PI/4;
+			break;
+		case 3:
+			facing = -Math.PI/4;
+			break;
+		case 4:
+			facing = -3*Math.PI/4;
+			break;
+		}
+
 		//First stack drop off
 		//Drop in the middle of the tile
 		if (stack == 1) {
-			double[] dropPoint = {dropCoords[0]*UNIT_TILE+UNIT_TILE/2,dropCoords[1]*UNIT_TILE+UNIT_TILE/2};
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(ARMS_UP);
 
-			//mover.goTo(dropCoords[0], dropCoords[1], SPEED_MED);
-			//localizer.localizeLight();
+			//Move to drop point.
+			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
+			localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
-			mover.turnTo(Math.PI/4, SPEED_ROTATE);
-			mover.goForward(BLOCK_DISTANCE+3, SPEED_MED);
-			//Arbitrary orientation for now
-			mover.turnTo(Math.PI/4, SPEED_ROTATE);
+
+			//Perform Drop off
+			mover.turnTo(facing, SPEED_ROTATE);
+			mover.goForward(1.4*UNIT_TILE, SPEED_SLOW);
+			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 			slave_connection.request(CLOSE_CAGE);
 
-			//Should go back to initial node after this returns
+			//Go back to initial node after this returns
 			success = true;
-			//Move along X-axis
-			mover.goTo(initialLocation[0],odometer.getPosition()[1],SPEED_MED);
-			//Move along y-axis
-			mover.goTo(odometer.getPosition()[1], initialLocation[1], SPEED_MED);
-			
+			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
+			mover.goTo(odometer.getPosition()[1], position[1], SPEED_MED);
+
 		} else if (stack == 2) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
-			//Define 4 stacking area corners
-			double x1,x2,y1,y2;
-			x1 = dropCoords[0];
-			x2 = dropCoords[0]+UNIT_TILE;
-			y1 = dropCoords[1];
-			y2 = dropCoords[1]+UNIT_TILE;
 
-			//First, find the side closest to the current location of the robot (MUST avoid going through the drop zone).
-			double[] position = odometer.getPosition();
-			int corner = 0;
-			double[] dropPoint = new double[2];
-
-			if (Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
-				dropPoint[0] = x1;
-				corner = 1;
-			} else {
-				dropPoint[0] = x2;
-				corner = 2;
-			}
-			if (Math.abs(position[1] - y1) < Math.abs(position[0] - y2)) {
-				dropPoint[1] = y1;
-			} else {
-				dropPoint[1] = y2;
-				if (corner == 1) {
-					corner = 3;
-				} else {
-					corner = 4;
-				}
-			}
-
-			//Second, get aligned with the stack present and push it back. (going backwards)
-			//(maybe push it with the stack that is in the bot instead of the cage doors)
+			//Get aligned with the stack present and push it back. (going backwards)
 			slave_connection.request(ARMS_UP);
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_MED);
 
-			switch (corner) {
-			//Face the stack
-			case 1:
-				facing = Math.PI/4;
-				break;
-			case 2:
-				facing = 3*Math.PI/4;
-				break;
-			case 3:
-				facing = -Math.PI/4;
-				break;
-			case 4:
-				facing = -3*Math.PI/4;
-				break;
-			}
-
 			mover.turnTo(facing, SPEED_ROTATE);
-			
+
 			//Button.waitForPress();
 			//Probably should verify first stack's presence with US
-			//TODO: Implement USSensorListener methods
 
-			//Latch Stack location to get proper position
 			mover.goForward(BACK_UP_DISTANCE, SPEED_MED);
 			//Redundant step
 			mover.turnTo(facing, SPEED_ROTATE);
@@ -221,7 +216,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			slave_connection.request(CLOSE_CAGE);
 
 			success = true;
-			mover.goTo(initialLocation[0], initialLocation[1], SPEED_MED);
+			mover.goTo(position[0], position[1], SPEED_MED);
 		}
 
 		return success;

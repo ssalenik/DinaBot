@@ -8,7 +8,7 @@ import dinaBOT.sensor.*;
 
 /**
  * This class localizes the robot initially to have it facing approximately at Pi/2 radians.
- * @author Vinh Phong Buu
+ * @author Vinh Phong Buu, Severin Smith
  *
  */
 public class Localization implements MechConstants, USSensorListener {
@@ -82,7 +82,7 @@ public class Localization implements MechConstants, USSensorListener {
 
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
 		// update the odometer position (this will be a vague estimation)
-		odometer.setPosition(new double[] {0,0,Math.PI/2}, new boolean[] {true,true,true});
+		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4,Math.PI/2}, new boolean[] {true,true,true});
 	}
 
 	/**
@@ -90,21 +90,43 @@ public class Localization implements MechConstants, USSensorListener {
 	 * Works strictly if approximately on an intersection.
 	*/
 	public void localizeLight() {
-		odometer.enableSnapping(false);
-		mover.goForward(-5, SPEED_SLOW);
+		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
 		odometer.enableSnapping(true);
-		mover.goForward(15, SPEED_SLOW);
-
-		odometer.enableSnapping(false);
-		mover.turnTo(0, SPEED_ROTATE);
-		mover.goForward(-5, SPEED_SLOW);
-		odometer.enableSnapping(true);
-		mover.goForward(10, SPEED_SLOW);
-
-		odometer.enableSnapping(false);
-		mover.goTo(0, 0, SPEED_SLOW);
+		odometer.enableLateralSnapping(false);
+		
+		mover.goForward(UNIT_TILE, SPEED_SLOW);
+		mover.goForward(-UNIT_TILE, SPEED_SLOW);
+		mover.goForward(3*UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
-		odometer.enableSnapping(true);
+		mover.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(UNIT_TILE/2, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
+		
+		mover.goTo(3*UNIT_TILE/4, UNIT_TILE, SPEED_SLOW);
+		
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(UNIT_TILE, SPEED_SLOW);
+		mover.goForward(-UNIT_TILE, SPEED_SLOW);
+		mover.goForward(3*UNIT_TILE/4, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(UNIT_TILE/2, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
+		
+		mover.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
+		odometer.enableLateralSnapping(true);
 	}
 
 	/**
@@ -113,6 +135,33 @@ public class Localization implements MechConstants, USSensorListener {
 	public void localize() {
 		this.localizeUS();
 		this.localizeLight();
+	}
+	
+	/**
+	 * Performs a quick localization routine using only the light sensors to fix the orientation
+	 * at any node on the grid.
+	 */
+	public void localizeAnywhere() {
+		odometer.enableSnapping(true);
+		odometer.enableLateralSnapping(false);
+		
+		mover.turnTo(Math.PI, SPEED_ROTATE);
+		mover.goForward(3/4*UNIT_TILE, SPEED_SLOW);
+		mover.goForward(-3/4*UNIT_TILE, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(1/4*UNIT_TILE, SPEED_SLOW);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
+		mover.goForward(-1/4*UNIT_TILE, SPEED_SLOW);
+		
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(3/4*UNIT_TILE, SPEED_SLOW);
+		mover.goForward(-3/4*UNIT_TILE, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(1/4*UNIT_TILE, SPEED_SLOW);
+		mover.turnTo(0, SPEED_ROTATE);
+		mover.goForward(-1/4*UNIT_TILE, SPEED_SLOW);
+		
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
