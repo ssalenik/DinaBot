@@ -151,7 +151,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
 			double offset = 0;
-			if((blockDistance_A+blockDistance_B)/2 < 20) {
+			if((blockDistance_A+blockDistance_B)/2 < 17) {
 				offset = -(20-(blockDistance_A+blockDistance_B)/2);
 				mover.goForward(-(20-(blockDistance_A+blockDistance_B)/2), SPEED_MED);
 			}
