@@ -71,6 +71,8 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public double stackAngle = 0;
 	public boolean latchedStack = false;
 	double x1,x2,y1,y2;
+	
+	boolean firstTry = true;
 
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
@@ -126,11 +128,11 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
 	 */
 	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
-		
+		boolean found = false;
 		if (firstTry) { //If this is the first time it asks for an alternate drop-off set up point
 			firstTry = false;
 			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
-				boolean found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
+				found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
 				if (found) {
 					coordPointer = i;
 				}
