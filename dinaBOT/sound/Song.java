@@ -19,7 +19,7 @@ public class Song {
 		int halfSteps = note + alteration + (12*(octave-4)); //number of half-steps away from A4
 		double frequencyCoefficient = 1.059463094;
 		double unprocessedFrequency = 1.0;
-		if(halfSteps >= 0){
+		if(halfSteps >= 0) {
 			for(int i = 0; i < halfSteps; i++)
 				unprocessedFrequency *= frequencyCoefficient;
 		}
@@ -41,7 +41,7 @@ public class Song {
 		int[] durations = new int[chart.length];
 		int millisecondsPerBeat = (int) (60000 / tempo);
 		double duration;
-		for(int i = 0; i < durations.length; i++){
+		for(int i = 0; i < durations.length; i++) {
 			 duration = millisecondsPerBeat * chart[i][3] / 24;
 			 durations[i] = (int) duration;
 		}

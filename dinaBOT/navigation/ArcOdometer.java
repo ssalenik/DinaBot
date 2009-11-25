@@ -72,10 +72,10 @@ public class ArcOdometer implements Odometer {
 		//Register with the line detectors for grid snapping
 		LineDetector.left.registerListener(this);
 		LineDetector.right.registerListener(this);
-		
+
 		snap_enable = false; //Grid snapping is currently disable by default until it is 100% tested
 		lateral_snap_enable = false;
-		
+
 		//Start the odometer thread last
 		Thread odometer_thread = new Thread(this);
 		odometer_thread.setDaemon(true);
@@ -180,7 +180,7 @@ public class ArcOdometer implements Odometer {
 	public synchronized void lineDetected(LineDetector detector) {
 		if(!snap_enable) return;
 
-		//Compute the current heading between [0, 2*PI]
+		//Compute the current heading between[0, 2*PI]
 		double current_heading = position[2]%(Math.PI*2);
 		if(current_heading < 0) current_heading += Math.PI*2;
 
@@ -279,13 +279,13 @@ public class ArcOdometer implements Odometer {
 		lateral_snap_enable = enable;
 		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
-	
+
 	public synchronized void enableLateralSnapping(boolean enable) {
 		//snap_status = 0;
 		lateral_snap_enable = enable;
 		System.arraycopy(position, 0, previous_position, 0, 3); //Copy the current position into the array
 	}
-	
+
 
 	public boolean isSnapping() {
 		return snap_enable;

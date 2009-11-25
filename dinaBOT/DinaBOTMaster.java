@@ -137,7 +137,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
 			if(debug) System.out.println("Picking up");
-			
+
 			alignPallet(); //If successfull align pallet
 
 			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
@@ -149,14 +149,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 			odometer.enableSnapping(true); //Renable snapping
-			
+
 			return true;
 		} else {
-			
+
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 			odometer.enableSnapping(true); //Renable snapping
-	
+
 			return false;
 		}
 
@@ -165,27 +165,27 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	/**
 	 * This method makes the robot move to the correct drop off point, depending on where it is positioned with respect to it.
 	 *
-	*/	
+	*/
 	public void goToDropArea() {
-		
+
 		//Getting drop off coordinates
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int[] dropCoords = dropper.getDropCoords();		
-		
+		int[] dropCoords = dropper.getDropCoords();
+
 		double[] start_position = odometer.getPosition();
-		
-		debug = true;
-		int [] dropSetUpCoords = new int[2];
-		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
-		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
-		
-		int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true, true);
+
+		int[] dropSetUpCoords = new int[2];
+		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]/UNIT_TILE), dropCoords[0]-1, dropCoords[0]+2);
+		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]/UNIT_TILE), dropCoords[1]-1, dropCoords[1]+2);
+
+		int nav_status = navigator.goTo(dropSetUpCoords[0]*UNIT_TILE, dropSetUpCoords[1]*UNIT_TILE, true, true);
+	
 		while (nav_status < 0) {
 			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
 			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
 		}
 	}
-					   
+
 	/**
 	 * This is the "main" execution method of the robot. Here is the central thread of our program which should control everything.
 	 *
@@ -196,10 +196,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		blockFind.setDebug(false);
-		
+		localization.localize();
+
+		map.start();
+
 		int[][] pattern = { new int[] {7,7}, new int[] {1,1} //Zig-zag pattern
-			
+
 			/*new int[] {6,1},
 			new int[] {6,2},
 			new int[] {1,2},
@@ -210,11 +212,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			new int[] {1,5},
 			new int[] {6,5},
 			new int[] {6,6},
-			new int[] {1,1}*/  // Go back to starting node
+			new int[] {1,1}*/ // Go back to starting node
 		};
-		
+
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int[] dropCoords = dropper.getDropCoords();		
+		int[] dropCoords = dropper.getDropCoords();
 
 		//Consider the nodes around the drop off zone as obstacles.
 		map.editMap(dropCoords[0],dropCoords[1], DROP_ZONE);
@@ -238,7 +240,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		for(int i = 0;i < pattern.length;i++) { //For each node in search path
 
 			if(debug) System.out.println("Leg number: "+i);
-				
+
 				int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
 
 				while(nav_status > 0) { //Keep going till you get there
@@ -251,7 +253,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 						done = true;
 					} else nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
 				}
-				
+
 				if(done) continue;
 
 				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
@@ -265,71 +267,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 
 		if(debug) System.out.println("Done");
-	}
-
-	/**
-	 * This is a testing method of coordinate correction. It moves in a cute little pattern
-	 *
-	*/
-	public void moveTest() {
-		odometer.setDebug(false);
-		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
-		odometer.enableSnapping(true);
-		odometer.enableLateralSnapping(false);
-		
-		localization.localizeUS();
-		if(debug) System.out.println("US Done");
-
-		odometer.setDebug(false);
-		odometer.setPosition(new double[] {3*UNIT_TILE/4,3*UNIT_TILE/4, Math.PI/2}, new boolean[] {true, true, true});
-		odometer.enableSnapping(true);
-		odometer.enableLateralSnapping(false);
-		
-	
-		movement.goForward(UNIT_TILE, SPEED_SLOW);
-		movement.goForward(-UNIT_TILE, SPEED_SLOW);
-		movement.goForward(3*UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.goForward(UNIT_TILE/2, SPEED_SLOW);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.goForward(UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
-		movement.goForward(-UNIT_TILE/4, SPEED_SLOW);
-		
-		movement.goTo(3*UNIT_TILE/4, UNIT_TILE, SPEED_SLOW);
-		
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(UNIT_TILE, SPEED_SLOW);
-		movement.goForward(-UNIT_TILE, SPEED_SLOW);
-		movement.goForward(3*UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(UNIT_TILE/2, SPEED_SLOW);
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(UNIT_TILE/4, SPEED_SLOW);
-		movement.turnTo(0, SPEED_ROTATE);
-		movement.goForward(-UNIT_TILE/4, SPEED_SLOW);
-		
-		movement.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
-		odometer.enableLateralSnapping(true);
-	
-	}
-	
-	public void dropTest() {
-		odometer.setPosition(new double[] {UNIT_TILE*2,5.5 * UNIT_TILE, 0}, new boolean[] {true, true, true});
-		goToDropArea();
-		dropper.dropOff(1);
-	}
-	
-	public void indeed() {
-		movement.turnTo(Math.PI/2, SPEED_ROTATE);
 	}
 
 	/**

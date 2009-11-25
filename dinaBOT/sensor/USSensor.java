@@ -29,7 +29,7 @@ public class USSensor implements Runnable {
 	boolean running;
 
 	int[] latest_values;
-	
+
 	/**
 	 * Creates a new USSensor instance
 	 *
@@ -53,7 +53,7 @@ public class USSensor implements Runnable {
 	public void run() {
 		while(running) {
 			sensor.ping();
-			
+
 			try {
 				Thread.sleep(50);
 			} catch(Exception e) {
@@ -92,7 +92,7 @@ public class USSensor implements Runnable {
 			notifyListeners();
 		}
 	}
-	
+
 	/**
 	 * Notifies the listeners of new data
 	 *
@@ -102,7 +102,7 @@ public class USSensor implements Runnable {
 			listeners.get(i).newValues(latest_values, this);
 		}
 	}
-	
+
 	/**
 	 * Register a new {@link USSensorListener listener} with the USSensor. This listener will be notified of new ultrasonic sensor data.
 	 *

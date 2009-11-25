@@ -17,5 +17,5 @@ public interface MapListener {
 	 * @see Map#registerListener(MapListener listener)
 	*/
 	public void newObstacle(int x, int y);
-		
+
 }

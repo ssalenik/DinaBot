@@ -180,7 +180,7 @@ public class BasicMovement implements Movement, MechConstants {
 			movement_daemon.stop();
 			interrupted_flag = true;
 		}
-		
+
 		left_motor.stop();
 		right_motor.stop();
 
@@ -273,7 +273,7 @@ public class BasicMovement implements Movement, MechConstants {
 					} else if(mode == Mode.GOTO_SPLINE) { //Go to
 						target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 
-						//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+						//Adjust angle so it's in the range[-pi+current_pos, pi+current_pos]
 						//eg within pi of the current positon
 						while(target_angle < (current_position[2] - Math.PI)) target_angle += 2*Math.PI;
 						while(target_angle > (current_position[2] + Math.PI)) target_angle -= 2*Math.PI;
@@ -320,10 +320,10 @@ public class BasicMovement implements Movement, MechConstants {
 			//Remember start position
 			initial_position = odometer.getPosition();
 
-			//Convert angle modulo 2*pi (angle E [-2*pi, 2*pi]) and store
+			//Convert angle modulo 2*pi (angle E[-2*pi, 2*pi]) and store
 			//target_angle = (angle)%(2*Math.PI); //THIS DOESN'T APPLY
 
-			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+			//Adjust angle so it's in the range[-pi+current_pos, pi+current_pos]
 			//eg within pi of the current positon
 			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
@@ -398,10 +398,10 @@ public class BasicMovement implements Movement, MechConstants {
 			//Remember start position
 			initial_position = odometer.getPosition();
 
-			//Convert angle modulo 2*pi (angle E [-2*pi, 2*pi]) and store
+			//Convert angle modulo 2*pi (angle E[-2*pi, 2*pi]) and store
 			target_angle = (angle)%(2*Math.PI);
 
-			//Adjust angle so it's in the range [-pi+current_pos, pi+current_pos]
+			//Adjust angle so it's in the range[-pi+current_pos, pi+current_pos]
 			//eg within pi of the current positon
 			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;

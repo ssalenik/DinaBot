@@ -22,7 +22,7 @@ public class Stacker implements Stacking {
 	final int clawTopStraight = -120;
 
 	final int gatesRotation = 110;
-	final int gatesPickUpRotation = 0;	//doesn't do anything!!!
+	final int gatesPickUpRotation = 30;	//doesn't do anything!!!
 
 	final int gateSpeed = 175;
 	final int clawSpeed = 200;
@@ -64,8 +64,8 @@ public class Stacker implements Stacking {
 		rightGate.resetTachoCount();
 
 		if(brickCount < 2) {
-			leftGate.rotate(gatesPickUpRotation, true);
-			rightGate.rotate(gatesPickUpRotation);
+			leftGate.rotateTo(gatesPickUpRotation, true);
+			rightGate.rotateTo(gatesPickUpRotation);
 		}
 
 		claw.rotateTo(clawTopAngle);
@@ -129,7 +129,7 @@ public class Stacker implements Stacking {
 
 		return true;
 	}
-	
+
 	/**
 	 * Moves the claw to arms up position
 	 *
@@ -137,13 +137,13 @@ public class Stacker implements Stacking {
 	 *
 	*/
 	public boolean armsUp() {
-		
+
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(clawTopStraight);
 		claw.stop();
 
 		return true;
-	} 
+	}
 
 	/**
 	 * Moves the claw to the closed or zero tacho point. (Mainly used to reset the claw to zero before shutdown).
@@ -172,8 +172,8 @@ public class Stacker implements Stacking {
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 
-		leftGate.rotate(gatesRotation, true);
-		rightGate.rotate(gatesRotation);
+		leftGate.rotateTo(gatesRotation, true);
+		rightGate.rotateTo(gatesRotation);
 
 	}
 
