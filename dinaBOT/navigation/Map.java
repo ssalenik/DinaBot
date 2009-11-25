@@ -41,13 +41,13 @@ public class Map implements MechConstants, USSensorListener {
 	boolean stop;
 
 	// square map constructor 
-	public Map(Odometer odo, int rez , int threshold, double nodeDist) {
+	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
 		this.odo = odo;
 		this.X = rez;
 		this.Y = rez;
 
 		this.threshold = threshold;
-		this.map = new int [resolution][resolution];
+		this.map = new int[X][Y];
 
 		this.nodeDist = nodeDist;
 
@@ -76,7 +76,7 @@ public class Map implements MechConstants, USSensorListener {
 		this.Y = rezY;
 
 		this.threshold = threshold;
-		this.map = new int [resolution][resolution];
+		this.map = new int [X][Y];
 
 		this.nodeDist = nodeDist;
 
@@ -194,7 +194,7 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 	public int[] getRez() {
-		return int new[] {X,Y};
+		return new int[] {X,Y};
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) { //This is only called by the high sensor because we didn't register with the low one

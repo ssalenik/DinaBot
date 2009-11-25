@@ -84,7 +84,7 @@ public class Astar implements MechConstants{
 		}
 
 		// initialize open array to impossibe node coords
-		for(i = 0; i < open_limit; i++) {
+		for(int i = 0; i < open_limit; i++) {
 			open[i][0] = -1;
 			open[i][1] = -1;
 		}
@@ -116,7 +116,7 @@ public class Astar implements MechConstants{
 		}
 
 		// initialize open array to impossibe node coords
-		for(i = 0; i < open_limit; i++) {
+		for(int i = 0; i < open_limit; i++) {
 			open[i][0] = -1;
 			open[i][1] = -1;
 		}
