@@ -284,8 +284,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//Run some tests
 		dinaBOTmaster.connect();
 		dinaBOTmaster.run();
-		//dinaBOTmaster.dropTest();
-		//dinaBOTmaster.moveTest();
 
 		while(true); //Never quit
 	}

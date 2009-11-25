@@ -69,6 +69,10 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public boolean latchedStack = false;
 	double x1,x2,y1,y2;
 
+	public int[][] dropArea;
+	public int coordPointer = 0;
+	boolean firstTry = true;
+
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
 	 * Works using a supplied Odometer and Movement.
@@ -87,6 +91,23 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		this.localizer = localizer;
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
+	
+		boolean firstTry = true;
+
+		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
+			new int[] {drop_x - 1, drop_y - 1},
+			new int[] {drop_x - 1, drop_y},
+			new int[] {drop_x - 1,drop_y + 1},
+			new int[] {drop_x - 1,drop_y + 2},
+			new int[] {drop_x,drop_y + 2},
+			new int[] {drop_x + 1,drop_y + 2},
+			new int[] {drop_x + 2,drop_y + 2},
+			new int[] {drop_x + 2,drop_y + 1},
+			new int[] {drop_x + 2,drop_y - 1},
+			new int[] {drop_x + 1,drop_y - 1},
+			new int[] {drop_x,drop_y - 1}
+		};
+		
 		USSensor.low_sensor.registerListener(this);
 	}
 
@@ -100,6 +121,26 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	}
 
 
+	/**
+	 * This method should be called by DinaBOTMaster if the node it goes to is covered by an obstacle. This method returns the next possible
+	 * dropoff set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
+	 * a circular clockwise order.
+	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
+	 */
+	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
+		boolean found = false;
+		if (firstTry) { //If this is the first time it asks for an alternate dropoff set up point
+			firstTry = false;
+			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
+				found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
+				if (found) {
+					coordPointer = (i + 1) % dropArea.length;
+				}
+			}
+		}
+		return dropArea[(coordPointer++) % dropArea.length];
+	}
+	
 	/**
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
 	 *
