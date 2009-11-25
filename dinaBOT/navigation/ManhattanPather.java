@@ -134,9 +134,8 @@ public class ManhattanPather implements Pathing, MechConstants {
 
 		for(i = 0; i < rez; i++) {
 			for(j = 0; j < rez; j++) {
-				if(map[i][j] != 0) {
-					pather.addObstacle(new int[] {i, j}, 2);
-				}
+				if(map[i][j] == DANGER) pather.addObstacle(new int[] {i, j}, DANGER);	//danger zone
+				else if(map[i][j] > DANGER) pather.addObstacle(new int[] {i, j}, OBSTACLE);	//obstacle
 			}
 		}
 

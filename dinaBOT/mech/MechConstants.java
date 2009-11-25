@@ -49,5 +49,20 @@ public interface MechConstants {
 	* Size in degrees of the arc the robot should sweep = {@value}
 	*/
 	public final double SWEEP_ARC = Math.PI/3;
+	
+	/**
+	 * 
+	 */
+	static final int OBSTACLE = 3;	// value which node is considered unpassable
+	static final int DANGER = 2;	// value at which node is considered a danger zoen
+	static final int DANGER_COST = 10;	//cost of going through danger zone 
+	static final int TURN_COST = 1;	//cost of turning
+	static final int WALL = 10;
+	static final int DROP_ZONE = 5;
+	
+	static final int NORTH = 90;
+	static final int SOUTH = 270;
+	static final int EAST = 0;
+	static final int WEST = 180;
 
 }

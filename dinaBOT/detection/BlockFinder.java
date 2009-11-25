@@ -161,6 +161,8 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			//gets too close to obstacle while moving
 			if(too_close) {
+				slave_connection.request(ARMS_UP); //Pickup
+
 				return false;
 			}
 			return true;

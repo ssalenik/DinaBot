@@ -2,6 +2,8 @@ package dinaBOT.navigation;
 
 import java.lang.Math;
 
+import dinaBOT.mech.*;
+
 /**
  * The Astar class is an implementation of the A* pathfinding algorithm mostly following the tutorial found at <a href="http://www.policyalmanac.org/games/aStarTutorial.htm">http://www.policyalmanac.org/games/aStarTutorial.htm</a>.
  * <p>
@@ -16,7 +18,7 @@ import java.lang.Math;
  * @see Map
  * @version 1
 */
-public class Astar {
+public class Astar implements MechConstants{
 	/* -- Class Variables --*/
 
 	/* algo critical arrays*/
@@ -40,6 +42,8 @@ public class Astar {
 				pathInfo[x][y][3] = x pos of parent
 				pathInfo[x][y][4] = y pos of parent
 				pathInfo[x][y][5] = direction of robot at this tile
+				pathInfo[x][y][6] = node value (0 = clear, 2 = danger, 3 = obstacle)
+
 
 				simple, eh?
 				*/
@@ -56,15 +60,6 @@ public class Astar {
 
 
 
-	/* constants ... should probably be put in MechConstants or something similar*/
-
-	static final int OBSTACLE = 2;	// value which is considered unpassable
-	static final int NORTH = 90;
-	static final int SOUTH = 270;
-	static final int EAST = 0;
-	static final int WEST = 180;
-
-
 	/**
 	 * creates a new Astar path
 	 *
@@ -74,7 +69,7 @@ public class Astar {
 		int i, j;
 		this.rez = resolution;
 
-		pathInfo = new int [rez][rez][6];
+		pathInfo = new int [rez][rez][7];
 		open_limit = rez*rez;
 		open = new int[open_limit][2];
 		open_idx = 0;
@@ -184,7 +179,9 @@ public class Astar {
 	 * @param value value of the obstacle (should be at least 2)
 	*/
 	void addObstacle(int[] obstacle, int value) {
-		pathInfo[obstacle[0]][obstacle[1]][0] = value;
+		pathInfo[obstacle[0]][obstacle[1]][6] = value;
+
+		if(value == OBSTACLE) pathInfo[obstacle[0]][obstacle[1]][0] = OBSTACLE;
 	}
 
 
@@ -397,6 +394,9 @@ public class Astar {
 		int endDir;
 		int cost = 1;
 
+		//if in danger zone
+		if(pathInfo[end[0]][end[1]][6] == DANGER) cost = DANGER_COST;
+
 		startDir = pathInfo[start[0]][start[1]][5];
 
 		endDir = NORTH;
@@ -409,7 +409,7 @@ public class Astar {
 
 		// if not the same dir, add cost
 		if(endDir != startDir) {
-			cost = 2;
+			cost += TURN_COST;
 		}
 
 		// add local cost, to total cost

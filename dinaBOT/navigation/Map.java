@@ -40,10 +40,6 @@ public class Map implements MechConstants, USSensorListener {
 
 	boolean stop;
 
-	//constant that map marks the border with
-	final static int BORDER = 10;
-
-
 	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
 		this.odo = odo;
 		this.resolution = rez;
@@ -60,8 +56,8 @@ public class Map implements MechConstants, USSensorListener {
 		listeners = new DinaList<MapListener>();
 
 		//initialize border
-		for(int x = 0; x < resolution; x++) map[x][0] = map[x][resolution-1] = BORDER;
-		for(int y = 0; y < resolution; y++) map[0][y] = map[resolution-1][y] = BORDER;
+		for(int x = 0; x < resolution; x++) map[x][0] = map[x][resolution-1] = WALL;
+		for(int y = 0; y < resolution; y++) map[0][y] = map[resolution-1][y] = WALL;
 
 
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
@@ -228,13 +224,13 @@ public class Map implements MechConstants, USSensorListener {
 					Sound.twoBeeps();
 					
 					//mark obstacle
-					map[node[0]][node[1]] = 2;
+					map[node[0]][node[1]] = OBSTACLE;
 					
 					//determine which node is in front of obstacle
-					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = 1;	//robot south of obstacle
-					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = 1;	//robot north of obstacle
-					else if(node[1] > curr_node[1] && map[node[0]][node[1] - 1] < 2) map[node[0]][node[1] - 1] = 1;	//robot west of obstacle
-					else if(node[1] < curr_node[1] && map[node[0]][node[1] + 1] < 2) map[node[0]][node[1] + 1] = 1;	//robot east of obstacle
+					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = DANGER;	//robot south of obstacle
+					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = DANGER;	//robot north of obstacle
+					else if(node[1] > curr_node[1] && map[node[0]][node[1] - 1] < 2) map[node[0]][node[1] - 1] = DANGER;	//robot west of obstacle
+					else if(node[1] < curr_node[1] && map[node[0]][node[1] + 1] < 2) map[node[0]][node[1] + 1] = DANGER;	//robot east of obstacle
 
 
 					notifyListeners(node[0], node[1]);
@@ -259,7 +255,7 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 	//Do not pass reference
-	public boolean editMap(int x, int y, int value) {
+	public synchronized boolean editMap(int x, int y, int value) {
 		this.map[x][y] = value;
 
 		return true;	//sucess
@@ -282,6 +278,14 @@ public class Map implements MechConstants, USSensorListener {
 
 	public synchronized void start() {
 		stop = false;
+	}
+	
+	public void reset() {
+		for(int x = 0; x < resolution; x++) {
+			for(int y = 0; y < resolution; y++) {
+				if(this.map[x][y] != DROP_ZONE || this.map[x][y] != WALL) this.map[x][y] = 0;
+			}
+		}
 	}
 
 }
