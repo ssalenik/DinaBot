@@ -28,7 +28,7 @@ import dinaBOT.comm.*;
  			#4(x1,y2)		#3(x2,y2)
 				 	 -------
 			 		|		|
-					| drop	|
+					| drop	|	
 			 		| point	|
 			 		 -------
  			#1(x1,y1)		#2(x2,y1)
@@ -63,16 +63,11 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public Localization localizer;
 
 	public int[] dropCoords = new int[2];
-	public int[][] dropArea;
-	public int coordPointer = 0;
-
 	public int phase =0;
 	public double[] left_side,right_side,top_side,bottom_side;
 	public double stackAngle = 0;
 	public boolean latchedStack = false;
 	double x1,x2,y1,y2;
-
-	boolean firstTry = true;
 
 	/**
 	 * Creates a drop off mechanism to drop piles off in a designated grid tile.
@@ -90,25 +85,8 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		this.mover = mover;
 		this.slave_connection = slave_connection;
 		this.localizer = localizer;
-
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
-
-		boolean firstTry = true;
-
-		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
-			new int[] {drop_x - 1, drop_y - 1},
-			new int[] {drop_x - 1, drop_y},
-			new int[] {drop_x - 1,drop_y + 1},
-			new int[] {drop_x - 1,drop_y + 2},
-			new int[] {drop_x,drop_y + 2},
-			new int[] {drop_x + 1,drop_y + 2},
-			new int[] {drop_x + 2,drop_y + 2},
-			new int[] {drop_x + 2,drop_y + 1},
-			new int[] {drop_x + 2,drop_y - 1},
-			new int[] {drop_x + 1,drop_y - 1},
-			new int[] {drop_x,drop_y - 1}
-		};
 		USSensor.low_sensor.registerListener(this);
 	}
 
@@ -119,26 +97,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 */
 	public int[] getDropCoords() {
 		return dropCoords;
-	}
-
-	/**
-	 * This method should be called by DinaBOTMaster if the node it goes to is covered by an obstacle. This method returns the next possible
-	 * drop-off set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
-	 * a circular clockwise order.
-	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
-	 */
-	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
-		boolean found = false;
-		if (firstTry) { //If this is the first time it asks for an alternate drop-off set up point
-			firstTry = false;
-			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
-				found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
-				if (found) {
-					coordPointer = (i + 1) % dropArea.length;
-				}
-			}
-		}
-		return dropArea[(coordPointer++) % dropArea.length];
 	}
 
 
@@ -174,10 +132,10 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			dropPoint[1] = y1;
 		} else {
 			dropPoint[1] = y2;
-			if (corner == 1) {
-				corner = 3;
-			} else {
+			if (dropPoint[0] == x1) {
 				corner = 4;
+			} else {
+				corner = 3;
 			}
 		}
 
@@ -206,12 +164,12 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Move to drop point.
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
 			//localizer.localizeAnywhere();
-			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
+			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
 
 			//Perform Drop off
-			odometer.enableSnapping(true);
+			odometer.enableSnapping(false);
 			mover.turnTo(facing, SPEED_ROTATE);
-			mover.goForward(0.5*UNIT_TILE, SPEED_SLOW);
+			mover.goForward(0.68*UNIT_TILE, SPEED_SLOW);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
@@ -220,7 +178,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Go back to initial node after this returns
 			success = true;
 			odometer.enableSnapping(true);
-			mover.goTo(odometer.getPosition()[1], position[1], SPEED_MED);
+			mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
 			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
 		} else if (stack == 2) {
