@@ -130,7 +130,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 * Searches for a pellet in the immediate vicinity and picks it up if found (also increments pallet_count)
 	 *
 	*/
-	public void pickUpPallet() {
+	public boolean pickUpPallet() {
 		double[] initial_position = odometer.getPosition(); //Remember start position
 		System.out.println("Go");
 		odometer.enableSnapping(false); //Disable snapping for diagonal movement
@@ -148,13 +148,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
+			odometer.enableSnapping(true); //Renable snapping
+			
+			return true;
 		} else {
 			
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
+			odometer.enableSnapping(true); //Renable snapping
+	
+			return false;
 		}
 
-		odometer.enableSnapping(true); //Renable snapping
 	}
 
 	/**
@@ -174,10 +179,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
 		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
-		int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
+		int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true, true);
 		while (nav_status < 0) {
 			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
-			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true);
+			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
 		}
 	}
 					   
@@ -229,17 +234,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			int nav_status = -1;
 			
 			while( nav_status != 0) {
-				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //Start moving to node
+				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
 
 				while(nav_status > 0) { //Keep going till you get there
 					if(debug) System.out.println("Breaking for possible pellet");
-					pickUpPallet(); //Pick up pallet for interrupt
+					boolean pickup = pickUpPallet(); //Pick up pallet for interrupt
 					if(pallet_count == CAGE_FULL) {
 						if(debug) System.out.println("Run drop off...");
 						goToDropArea(); //This should return us to the same point
 						dropper.dropOff(1);
 					}
-					nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //And keep moving to node
+					nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
 				}
 
 				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
