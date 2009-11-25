@@ -54,7 +54,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	//Experimental values
 	public final int BACK_UP_DISTANCE = -15;
-	public final int DUMP_DISTANCE = 22 ;
+	public final int DUMP_DISTANCE = 23 ;
 
 	//Fields
 	public Odometer odometer;
@@ -189,6 +189,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
+			odometer.enableSnapping(false);
 			mover.turnTo(facing, SPEED_ROTATE);
 
 			//Button.waitForPress();
@@ -219,6 +220,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			slave_connection.request(CLOSE_CAGE);
 
 			success = true;
+			odometer.enableSnapping(true);
 			mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(position[0], position[1], SPEED_MED);
 		}
