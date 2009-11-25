@@ -5,7 +5,7 @@ package dinaBOT.util;
  *
 */
 public class DinaList<E> {
-	
+
 	/* -- Class Variables -- */
 
 	public static int default_capacity = 3;
@@ -23,7 +23,7 @@ public class DinaList<E> {
 		size = 0; //Inital size 0
 		element_data = new Object[3];
 	}
-	
+
 	/**
 	 * Adds an element to the DinaList. if the DinaList is full it will expand by a factor of 2.
 	 *
@@ -52,7 +52,7 @@ public class DinaList<E> {
 		return false;
 	}
 
-	/** 
+	/**
 	 * Removes an element from the DinaList according to it's index in the DinaList. If the element at index is null or if the index is invalid the method will return null. If the index is valid the element will be returned.
 	 *
 	 * @param index the index of the element to remove
@@ -73,7 +73,7 @@ public class DinaList<E> {
 		return null;
 	}
 
-	/** 
+	/**
 	 * Returns an element from the DinaList according to it's index in the DinaList. If the element at index is null or if the index is invalid the method will return null. If the index is valid the element will be returned.
 	 *
 	 * @param index the index of the element to remove
@@ -84,7 +84,7 @@ public class DinaList<E> {
 		if(rangeCheck(index)) return (E)element_data[index];
 		else return null;
 	}
-	
+
 	/**
 	 * Returns the current size of the DinaList. This is the number of elements in the DinaList right now
 	 *

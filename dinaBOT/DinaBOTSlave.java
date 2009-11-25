@@ -93,7 +93,7 @@ public class DinaBOTSlave implements CommConstants{
 					case RELEASE:
 						success = stacker.release();
 						break;
-						
+
 					case ARMS_UP:
 						success = stacker.armsUp();
 						break;

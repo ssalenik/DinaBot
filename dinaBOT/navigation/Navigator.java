@@ -21,7 +21,7 @@ import lejos.nxt.*;
 public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	/* -- Instance Variables -- */
-	
+
 	Odometer odometer;
 	Movement movement;
 
@@ -50,7 +50,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		this.movement = movement;
 
 		suspend_count = 2;
-		
+
 		this.map = map;
 		this.pathing = pathing;
 
@@ -70,10 +70,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 		if(suspend_interrupt && !pickup_sucess) {
 			suspend_count = 0;
-		} 
-		
+		}
+
 		while(repath(x, y)) {
-			
+
 			soft_interrupt = false;
 			for(node = 0; node < path.length; node++) {
 				active = true;

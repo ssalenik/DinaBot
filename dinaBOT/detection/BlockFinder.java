@@ -38,7 +38,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 	int[] latest_low_readings;
 	int[] latest_high_readings;
-	
+
 	int lowest_high_reading;
 
 	//True when data sets for low & high are acquired
@@ -72,9 +72,9 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 		this.mover = mover;
 		this.mapper = mapper;
-		
+
 		this.slave_connection = slave_connection;
-		
+
 		latest_low_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 		latest_high_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 
@@ -96,13 +96,13 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 	public boolean sweep(double blockAngle) {
 		//Reset all the variables
 		too_close = false;
-		
+
 		blockDistance_A = 255;
 		blockDistance_B = 255;
-		
+
 		latest_low_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
 		latest_high_readings = new int[] {255, 255, 255, 255, 255, 255, 255, 255};
-		
+
 		lowest_high_reading = 255;
 
 		double initialOrientation = odometer.getPosition()[2];
@@ -124,21 +124,21 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 		//To the bisecting angle !
 		// or back to start in case of FAIL
 		phase = 0;
-		
+
 		if(debug) {
 			System.out.println("----");
 			System.out.println(blockDistance_A);
 			System.out.println(blockDistance_B);
 			System.out.println(lowest_high_reading);
 		}
-		
-		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD 
-				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD 
+
+		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD
+				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD
 				&& Math.abs(blockDistance_A - blockDistance_B) < 10
 				&& blockDistance_A != 255
 				&& blockDistance_B !=255) {
 			lowest_high_reading = 255;
-		
+
 			double angle = (angleA+angleB)/2;
 			double blockDistance = (blockDistance_A+blockDistance_B)/2;
 
@@ -147,8 +147,8 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			// go to phase 3; go to pallet phase
 			phase = 3;
-			
-			
+
+
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
 			double offset = 0;
 			if((blockDistance_A+blockDistance_B)/2 < 17) {
@@ -177,7 +177,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			phase = 0;
 			return false;
 		}
-		
+
 	}
 
 	void findEdgeA() {
@@ -189,7 +189,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			blockDistance_A = minLow;
 			angleA = odometer.getPosition()[2];
 			Sound.buzz();
-			
+
 		}
 	}
 
@@ -201,7 +201,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			blockDistance_B = minLow;
 			angleB = odometer.getPosition()[2];
-			Sound.buzz();		
+			Sound.buzz();
 
 		}
 	}
@@ -257,7 +257,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) {
 						lowest_high_reading = latest_high_readings[0];
-						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) ) { //|| (latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2 )) {
+						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) || (latest_high_readings[1] != 255 && latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2 )) {
 							too_close = true;
 							mover.stop();
 						}

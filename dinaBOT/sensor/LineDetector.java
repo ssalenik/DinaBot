@@ -24,7 +24,7 @@ public class LineDetector implements Runnable {
 	static final int THRESHOLD = 450;
 
 	/* -- Instance Variables --*/
-	
+
 	LightSensor sensor; //The light sensor associated with this LineDetector
 
 	int previous_reading; //The latest LightSensor value

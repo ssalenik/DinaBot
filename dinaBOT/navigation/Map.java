@@ -45,13 +45,11 @@ public class Map implements MechConstants, USSensorListener {
 		this.resolution = rez;
 
 		this.threshold = threshold;
-		this.map = new int [resolution][resolution];
+		this.map = new int[resolution][resolution];
 
 		this.nodeDist = nodeDist;
 
 		this.newObstacle = false;
-
-		this.start();
 
 		listeners = new DinaList<MapListener>();
 
@@ -145,7 +143,7 @@ public class Map implements MechConstants, USSensorListener {
 		}
 
 	}
-	
+
 	public int[] getNode(double[] coord) {
 		int[] node = new int[2];
 
@@ -222,10 +220,10 @@ public class Map implements MechConstants, USSensorListener {
 				 */
 				if(map[node[0]][node[1]] == 0 || map[node[0]][node[1]] == 1) {
 					Sound.twoBeeps();
-					
+
 					//mark obstacle
 					map[node[0]][node[1]] = OBSTACLE;
-					
+
 					//determine which node is in front of obstacle
 					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = DANGER;	//robot south of obstacle
 					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = DANGER;	//robot north of obstacle
@@ -279,7 +277,7 @@ public class Map implements MechConstants, USSensorListener {
 	public synchronized void start() {
 		stop = false;
 	}
-	
+
 	public void reset() {
 		this.stop();
 		for(int x = 0; x < resolution; x++) {

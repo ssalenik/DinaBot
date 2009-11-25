@@ -8,7 +8,7 @@ import dinaBOT.mech.MechConstants; //The odometer will need to know the robot di
  * <p>
  * All external packages using odometry should use this interface rather than directly using implementing subclasses.
  * <p>
- * All standard odometers should implement a standard mathematical coordinate systems which follow the right hand rule and have increasing angles in the counterclockwise direction. Angles readings should be continous (eg not bounded to [0,2pi]) in radians. Distances should be measured in cm.
+ * All standard odometers should implement a standard mathematical coordinate systems which follow the right hand rule and have increasing angles in the counterclockwise direction. Angles readings should be continous (eg not bounded to[0,2pi]) in radians. Distances should be measured in cm.
  *
  * @author Severin Smith
  * @see ArcOdometer

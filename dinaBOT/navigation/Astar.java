@@ -69,7 +69,7 @@ public class Astar implements MechConstants{
 		int i, j;
 		this.rez = resolution;
 
-		pathInfo = new int [rez][rez][7];
+		pathInfo = new int[rez][rez][7];
 		open_limit = rez*rez;
 		open = new int[open_limit][2];
 		open_idx = 0;

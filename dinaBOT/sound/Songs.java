@@ -27,17 +27,17 @@ public class Songs {
 											{1, 2, 3, 4}	};
 
 	static final Song example = new Song(100, "Example", exampleChart);
-	
-	static final int[][] testChart = {	
+
+	static final int[][] testChart = {
 		 {ut, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36}		};
 
 	static final Song test = new Song(200, "Test", testChart);
-	
+
 	static final int[][] beeperChart = {
 		 {la,	0, 	5, 	12},
 		 {s, 	0, 	0, 	1200}		};
-	
+
 	static final int[][] beeperChart2 = {
 		 {re,	0, 	6, 	12},
 		 {s, 	0, 	0, 	1200}		};
@@ -45,7 +45,7 @@ public class Songs {
 	public static final Song beeper = new Song(200, "beeperMaster", beeperChart);
 
 	public static final Song beeper2 = new Song(200, "beeperSlave", beeperChart2);
-	
+
 	static final int[][] marioOverworldChart = {
 		 //INTRO
 		 {mi,	0, 	5, 	12},
@@ -60,7 +60,7 @@ public class Songs {
 		 {s, 	0, 	0, 	36},
 		 {sol, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //A
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	24},
@@ -118,7 +118,7 @@ public class Songs {
 		 {re, 	0, 	5, 	12},
 		 {si, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //B
 		 {s, 	0, 	0, 	24},
 		 {sol, 	0, 	5, 	12},
@@ -170,7 +170,7 @@ public class Songs {
 		 {s, 	0, 	0, 	24},
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	84},
-		
+
 		 //B
 		 {s, 	0, 	0, 	24},
 		 {sol, 	0, 	5, 	12},
@@ -222,7 +222,7 @@ public class Songs {
 		 {s, 	0, 	0, 	24},
 		 {ut, 	0, 	5, 	12},
 		 {s, 	0, 	0, 	84},
-		
+
 		 //C
 		 {ut, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -331,7 +331,7 @@ public class Songs {
 		 {re, 	0, 	5, 	12},
 		 {si, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //D
 		 {mi, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -437,7 +437,7 @@ public class Songs {
 		 {mi, 	0, 	4, 	12},
 		 {ut, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //C
 		 {ut, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -488,7 +488,7 @@ public class Songs {
 		 {s, 	0, 	0, 	36},
 		 {sol, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //D
 		 {mi, 	0, 	5, 	12},
 		 {ut, 	0, 	5, 	12},
@@ -544,10 +544,10 @@ public class Songs {
 
 	public static final Song marioOverworld = new Song(214.8, "Super Mario Bros: Overworld - melody",
 			marioOverworldChart);
-	
+
 
 	static final int[][] marioOverworldChart2 = {
-		
+
 		 //INTRO
 		 {fa,	d, 	4, 	12},
 		 {fa, 	d, 	4, 	12},
@@ -621,7 +621,7 @@ public class Songs {
 		 {fa, 	0, 	4, 	12},
 		 {re, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //B
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	24},
@@ -721,7 +721,7 @@ public class Songs {
 		 {s, 	0, 	0, 	12},
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	12},
-		
+
 		 //C
 		 {la, 	b, 	2, 	12},
 		 {s, 	0, 	0, 	24},
@@ -829,7 +829,7 @@ public class Songs {
 		 {fa, 	0, 	4, 	12},
 		 {re, 	0, 	4, 	12},
 		 {s, 	0, 	0, 	24},
-		
+
 		 //D
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	24},
@@ -947,7 +947,7 @@ public class Songs {
 		 {s, 	0, 	0, 	12},
 		 {ut, 	0, 	3, 	12},
 		 {s, 	0, 	0, 	36},
-		
+
 		 //C
 		 {la, 	b, 	2, 	12},
 		 {s, 	0, 	0, 	24},
@@ -1059,19 +1059,19 @@ public class Songs {
 			marioOverworldChart2);
 
 	static final int[][] jurassicParkChart = {
-		 /*{si, 	b, 	3, 	24},	
+		 /*{si, 	b, 	3, 	24},
 		 {mi, 	b, 	4, 	24},
-		 {ut, 	b, 	4, 	24},	
-		 {si, 	b, 	4, 	72},	
-		 {si, 	b, 	3, 	24},	
-		 {mi, 	b, 	4, 	24},
-		 {ut, 	b, 	4, 	24},	
+		 {ut, 	b, 	4, 	24},
 		 {si, 	b, 	4, 	72},
-		 {si, 	b, 	3, 	24},	
+		 {si, 	b, 	3, 	24},
 		 {mi, 	b, 	4, 	24},
-		 {ut, 	b, 	4, 	24},	
+		 {ut, 	b, 	4, 	24},
+		 {si, 	b, 	4, 	72},
+		 {si, 	b, 	3, 	24},
+		 {mi, 	b, 	4, 	24},
+		 {ut, 	b, 	4, 	24},
 		 {si, 	b, 	4, 	72},*/
-		 
+
 		 {fa, 	0, 	5, 	24},
 		 {la, 	0, 	5, 	24},
 		 {si, 	b, 	5, 	12},
@@ -1082,8 +1082,8 @@ public class Songs {
 
 
 								};
-	
+
 	public static final Song jurassicPark = new Song(100, "Jurassic Park main theme - melody",
 			jurassicParkChart);
-	
+
 }

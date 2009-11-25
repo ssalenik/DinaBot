@@ -83,14 +83,14 @@ public class Localization implements MechConstants, USSensorListener {
 			//The first wall seen is "south" wall.
 			//The second wall seen is "west" wall.
 			finalAngle = ((angleA+angleB)/2) + (Math.PI/4);
-		} 
+		}
 		/*else {
 			//The first wall seen is "east" wall.
 			//The second wall seen is "south" wall.
 			finalAngle = ((angleA+angleB)/2) - (Math.PI/4);
 		}*/
 
-		mover.turnTo (finalAngle, SPEED_ROTATE);
+		mover.turnTo(finalAngle, SPEED_ROTATE);
 
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
 		// update the odometer position (this will be a vague estimation)
@@ -106,35 +106,23 @@ public class Localization implements MechConstants, USSensorListener {
 		odometer.enableSnapping(true);
 		odometer.enableLateralSnapping(false);
 
-		mover.goForward(UNIT_TILE, SPEED_SLOW);
-		mover.goForward(-UNIT_TILE, SPEED_SLOW);
 		mover.goForward(3*UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(UNIT_TILE/2, SPEED_SLOW);
-		mover.turnTo(Math.PI/2, SPEED_ROTATE);
-		mover.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
-		mover.turnTo(Math.PI/2, SPEED_ROTATE);
-		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
 
 		mover.goTo(3*UNIT_TILE/4, UNIT_TILE, SPEED_SLOW);
 
 		mover.turnTo(0, SPEED_ROTATE);
-		mover.goForward(UNIT_TILE, SPEED_SLOW);
-		mover.goForward(-UNIT_TILE, SPEED_SLOW);
 		mover.goForward(3*UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-3*UNIT_TILE/4, SPEED_SLOW);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(UNIT_TILE/2, SPEED_SLOW);
-		mover.turnTo(0, SPEED_ROTATE);
-		mover.goForward(-3*UNIT_TILE/8, SPEED_SLOW);
-		mover.turnTo(0, SPEED_ROTATE);
-		mover.goForward(UNIT_TILE/4, SPEED_SLOW);
-		mover.turnTo(0, SPEED_ROTATE);
+		mover.turnTo(Math.PI/2, SPEED_ROTATE);
 		mover.goForward(-UNIT_TILE/4, SPEED_SLOW);
 
 		mover.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);

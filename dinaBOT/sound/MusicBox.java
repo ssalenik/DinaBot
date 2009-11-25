@@ -25,7 +25,7 @@ public class MusicBox extends Thread implements MusicPlayer{
 
 		playStatus = false;
 
-		if(slave){
+		if(slave) {
 			try {Thread.sleep(350);} catch(Exception e) {}
 		}
 		else{

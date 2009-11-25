@@ -28,7 +28,7 @@ import dinaBOT.comm.*;
  			#4(x1,y2)		#3(x2,y2)
 				 	 -------
 			 		|		|
-					| drop	|	
+					| drop	|
 			 		| point	|
 			 		 -------
  			#1(x1,y1)		#2(x2,y1)
@@ -65,13 +65,13 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public int[] dropCoords = new int[2];
 	public int[][] dropArea;
 	public int coordPointer = 0;
-	
+
 	public int phase =0;
 	public double[] left_side,right_side,top_side,bottom_side;
 	public double stackAngle = 0;
 	public boolean latchedStack = false;
 	double x1,x2,y1,y2;
-	
+
 	boolean firstTry = true;
 
 	/**
@@ -90,12 +90,12 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		this.mover = mover;
 		this.slave_connection = slave_connection;
 		this.localizer = localizer;
-		
+
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
-		
+
 		boolean firstTry = true;
-		
+
 		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
 			new int[] {drop_x - 1, drop_y - 1},
 			new int[] {drop_x - 1, drop_y},
@@ -120,9 +120,9 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public int[] getDropCoords() {
 		return dropCoords;
 	}
-	
+
 	/**
-	 * This method should be called by DinaBOTMaster if the node it goes to is covered by an obstacle. This method returns the next possible 
+	 * This method should be called by DinaBOTMaster if the node it goes to is covered by an obstacle. This method returns the next possible
 	 * drop-off set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
 	 * a circular clockwise order.
 	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
@@ -134,7 +134,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
 				found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
 				if (found) {
-					coordPointer = i;
+					coordPointer = (i + 1) % dropArea.length;
 				}
 			}
 		}
