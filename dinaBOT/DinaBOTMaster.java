@@ -198,6 +198,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		blockFind.setDebug(false);
 		
+		localization.localize();
+		
 		int[][] pattern = { new int[] {7,7}, new int[] {1,1} //Zig-zag pattern
 			
 			/*new int[] {6,1},
