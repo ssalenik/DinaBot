@@ -66,9 +66,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	public int goTo(double x, double y, boolean full, boolean pickup_sucess) {
 		this.full_mode = full;
 
+		suspend_interrupt = false;
+
 		if(suspend_interrupt && !pickup_sucess) {
 			suspend_count = 0;
-			suspend_interrupt = false;
 		} 
 		
 		while(repath(x, y)) {

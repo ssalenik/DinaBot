@@ -281,11 +281,13 @@ public class Map implements MechConstants, USSensorListener {
 	}
 	
 	public void reset() {
+		this.stop();
 		for(int x = 0; x < resolution; x++) {
 			for(int y = 0; y < resolution; y++) {
-				if(this.map[x][y] != DROP_ZONE || this.map[x][y] != WALL) this.map[x][y] = 0;
+				if(this.map[x][y] != DROP_ZONE && this.map[x][y] != WALL) this.map[x][y] = 0;
 			}
 		}
+		this.start();
 	}
 
 }

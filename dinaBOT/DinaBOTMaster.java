@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 6;
+	static final int CAGE_FULL = 3;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -196,8 +196,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		int[][] pattern = { //Zig-zag pattern
-			new int[] {6,1},
+		blockFind.setDebug(false);
+		
+		int[][] pattern = { new int[] {7,7}, new int[] {1,1} //Zig-zag pattern
+			
+			/*new int[] {6,1},
 			new int[] {6,2},
 			new int[] {1,2},
 			new int[] {1,3},
@@ -207,7 +210,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			new int[] {1,5},
 			new int[] {6,5},
 			new int[] {6,6},
-			new int[] {1,1}  // Go back to starting node
+			new int[] {1,1}*/  // Go back to starting node
 		};
 		
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
@@ -227,14 +230,16 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		}
 
+
+		boolean done = false;
+
+		//right now finishes once it has dropped off the stack!
+		while( !done ) {
 		for(int i = 0;i < pattern.length;i++) { //For each node in search path
 
 			if(debug) System.out.println("Leg number: "+i);
-
-			int nav_status = -1;
-			
-			while( nav_status != 0) {
-				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
+				
+				int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
 
 				while(nav_status > 0) { //Keep going till you get there
 					if(debug) System.out.println("Breaking for possible pellet");
@@ -243,9 +248,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 						if(debug) System.out.println("Run drop off...");
 						goToDropArea(); //This should return us to the same point
 						dropper.dropOff(1);
-					}
-					nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
+						done = true;
+					} else nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
 				}
+				
+				if(done) continue;
 
 				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
 					if(debug) System.out.println("Impossible Path ..");
@@ -333,7 +340,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(0,7); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5,4); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();

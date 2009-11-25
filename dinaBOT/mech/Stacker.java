@@ -22,7 +22,7 @@ public class Stacker implements Stacking {
 	final int clawTopStraight = -120;
 
 	final int gatesRotation = 110;
-	final int gatesPickUpRotation = 40;
+	final int gatesPickUpRotation = 0;	//doesn't do anything!!!
 
 	final int gateSpeed = 175;
 	final int clawSpeed = 200;

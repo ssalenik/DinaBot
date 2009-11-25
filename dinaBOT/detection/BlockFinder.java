@@ -134,7 +134,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 		
 		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD 
 				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD 
-				&& Math.abs(blockDistance_A - blockDistance_B) < 5
+				&& Math.abs(blockDistance_A - blockDistance_B) < 10
 				&& blockDistance_A != 255
 				&& blockDistance_B !=255) {
 			lowest_high_reading = 255;
@@ -155,13 +155,17 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 				offset = -(20-(blockDistance_A+blockDistance_B)/2);
 				mover.goForward(-(20-(blockDistance_A+blockDistance_B)/2), SPEED_MED);
 			}
+			mapper.stop();
 			slave_connection.request(RELEASE);
+			mapper.start();
 			mover.goForward((blockDistance_A+blockDistance_B)/2-offset, SPEED_MED);
  			phase = 0;
 
 			//gets too close to obstacle while moving
 			if(too_close) {
+				mapper.stop();
 				slave_connection.request(ARMS_UP); //Pickup
+				mapper.start();
 
 				return false;
 			}
@@ -253,7 +257,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) {
 						lowest_high_reading = latest_high_readings[0];
-						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) || (latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2)) {
+						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) ) { //|| (latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2 )) {
 							too_close = true;
 							mover.stop();
 						}

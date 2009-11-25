@@ -96,7 +96,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		
 		boolean firstTry = true;
 		
-		int[][] dropArea = { //Clockwise from the bottom left of the drop off area
+		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
 			new int[] {drop_x - 1, drop_y - 1},
 			new int[] {drop_x - 1, drop_y},
 			new int[] {drop_x - 1,drop_y + 1},
@@ -210,7 +210,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Perform Drop off
 			mover.turnTo(facing, SPEED_ROTATE);
-			mover.goForward(0.7*UNIT_TILE, SPEED_SLOW);
+			mover.goForward(0.5*UNIT_TILE, SPEED_SLOW);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			slave_connection.request(OPEN_CAGE);
 			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
