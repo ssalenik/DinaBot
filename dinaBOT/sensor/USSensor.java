@@ -76,6 +76,17 @@ public class USSensor implements Runnable {
 				for(int i = 0;i < 8;i++) {
 					if(latest_values[i] != 255) latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);
 				}
+				/*
+				if(latest_values[1] == 255) {
+					for(int i = 0;i < 8;i++) {
+						if(latest_values[i] != 255) latest_values[i] = (int)(1.010638*(double)latest_values[i]-11.042534);
+					}
+				} else {
+					for(int i = 0;i < 8;i++) {
+						if(latest_values[i] != 255) latest_values[i] = (int)(1.0619082*(double)latest_values[i]-2.3686924);
+					}
+				}
+				*/
 			}
 
 			notifyListeners();

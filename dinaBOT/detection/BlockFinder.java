@@ -137,7 +137,6 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 				&& Math.abs(blockDistance_A - blockDistance_B) < 5
 				&& blockDistance_A != 255
 				&& blockDistance_B !=255) {
-		
 			lowest_high_reading = 255;
 		
 			double angle = (angleA+angleB)/2;
@@ -148,17 +147,26 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			// go to phase 3; go to pallet phase
 			phase = 3;
-			slave_connection.request(RELEASE);
+			
+			
 			mover.turnTo((angleA+angleB)/2, SPEED_ROTATE);
-			mover.goForward((blockDistance_A+blockDistance_B)/2, SPEED_MED);
+			double offset = 0;
+			if((blockDistance_A+blockDistance_B)/2 < 15) {
+				offset = -(20-(blockDistance_A+blockDistance_B)/2);
+				mover.goForward(-(20-(blockDistance_A+blockDistance_B)/2), SPEED_MED);
+			}
+			slave_connection.request(RELEASE);
+			mover.goForward((blockDistance_A+blockDistance_B)/2-offset, SPEED_MED);
  			phase = 0;
 
 			//gets too close to obstacle while moving
-			if(too_close) return false;
-			
+			if(too_close) {
+				return false;
+			}
 			return true;
 		} else {
 			//Fail-safe technique for now.
+			System.out.println("fail");
 			mover.turnTo(initialOrientation, SPEED_ROTATE);
 			phase = 0;
 			return false;
@@ -176,11 +184,6 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			angleA = odometer.getPosition()[2];
 			Sound.buzz();
 			
-			if(debug) {
-				LCD.drawInt(minLow, 0, 0);
-				LCD.drawInt(minHigh, 0, 2);
-				LCD.drawInt(latest_low_readings[1], 0, 1);
-			}
 		}
 	}
 
@@ -192,13 +195,8 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			blockDistance_B = minLow;
 			angleB = odometer.getPosition()[2];
-			Sound.buzz();
-			
-			if(debug) {
-				LCD.drawInt(minLow, 0, 3);
-				LCD.drawInt(minHigh, 0, 5);
-				LCD.drawInt(latest_low_readings[1], 0, 4);
-			}
+			Sound.buzz();		
+
 		}
 	}
 

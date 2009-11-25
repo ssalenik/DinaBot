@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 1;
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -132,7 +132,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	*/
 	public void pickUpPallet() {
 		double[] initial_position = odometer.getPosition(); //Remember start position
-
+		System.out.println("Go");
 		odometer.enableSnapping(false); //Disable snapping for diagonal movement
 
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
@@ -149,6 +149,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
 		} else {
+			slave_connection.request(ARMS_UP); //Pickup
 			
 			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
 			movement.turnTo(initial_position[2], SPEED_ROTATE);
@@ -291,10 +292,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 	
 	public void dropTest() {
-		odometer.setPosition(new double[] {UNIT_TILE*2,5,5.5 * UNIT_TILE, 0}, new boolean[] {true, true, true});
+		odometer.setPosition(new double[] {UNIT_TILE*2,5.5 * UNIT_TILE, 0}, new boolean[] {true, true, true});
 		goToDropArea();
 		dropper.dropOff(1);
-
+	}
+	
+	public void indeed() {
+		movement.turnTo(Math.PI/2, SPEED_ROTATE);
 	}
 
 	/**
@@ -305,7 +309,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(3, 3); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(2,2); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
