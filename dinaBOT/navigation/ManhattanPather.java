@@ -22,7 +22,7 @@ public class ManhattanPather implements Pathing, MechConstants {
 	Map mapper;
 	Movement movement;
 
-	int rez;
+	int X, Y;
 
 	static final int NORTH = 90;
 	static final int SOUTH = 270;
@@ -41,7 +41,8 @@ public class ManhattanPather implements Pathing, MechConstants {
 		this.mapper = mapper;
 		this.movement = movement;
 
-		this.rez = mapper.getRez();
+		this.X = mapper.getRez()[0];
+		this.Y = mapper.getRez()[1];
 	}
 
 
@@ -69,7 +70,7 @@ public class ManhattanPather implements Pathing, MechConstants {
 		nodeDist = UNIT_TILE;
 
 
-		pather = new Astar(rez);
+		pather = new Astar(X,Y);
 
 		updateMap(pather);	//sends coords of obstacles to path
 
@@ -79,11 +80,11 @@ public class ManhattanPather implements Pathing, MechConstants {
 
 		start[0] = (int)Math.round(x1/nodeDist);
 		if(start[0] < 0) start[0] = 0;
-		else if(start[0] > rez - 1) start[0] = rez - 1;
+		else if(start[0] > X - 1) start[0] = X - 1;
 
 		start[1] = (int)Math.round(y1/nodeDist);
 		if(start[1] < 0) start[1] = 0;
-		else if(start[1] > rez - 1) start[1] = rez - 1;
+		else if(start[1] > Y - 1) start[1] = Y - 1;
 
 		//determine ending coordinate
 		// again, ensures coords fit into the grid
@@ -91,11 +92,11 @@ public class ManhattanPather implements Pathing, MechConstants {
 
 		end[0] = (int)Math.round(x2/nodeDist);
 		if(end[0] < 0) end[0] = 0;
-		else if(end[0] > rez - 1) end[0] = rez - 1;
+		else if(end[0] > X - 1) end[0] = X - 1;
 
 		end[1] = (int)Math.round(y2/nodeDist);
 		if(end[1] < 0) end[1] = 0;
-		else if(end[1] > rez - 1) end[1] = rez - 1;
+		else if(end[1] > Y - 1) end[1] = Y - 1;
 
 		//determine current direction (closest)
 		heading = (180*heading/Math.PI)%360;
@@ -128,14 +129,13 @@ public class ManhattanPather implements Pathing, MechConstants {
 
 	private void updateMap(Astar pather) {
 		int[][] map;
-		int i = 0, j = 0;
 
 		map = mapper.getMap();
 
-		for(i = 0; i < rez; i++) {
-			for(j = 0; j < rez; j++) {
-				if(map[i][j] == DANGER) pather.addObstacle(new int[] {i, j}, DANGER);	//danger zone
-				else if(map[i][j] > DANGER) pather.addObstacle(new int[] {i, j}, OBSTACLE);	//obstacle
+		for(int x = 0; x < X; x++) {
+			for(int y = 0; y < Y; y++) {
+				if(map[x][y] == DANGER) pather.addObstacle(new int[] {x, y}, DANGER);	//danger zone
+				else if(map[x][y] > DANGER) pather.addObstacle(new int[] {x, y}, OBSTACLE);	//obstacle
 			}
 		}
 

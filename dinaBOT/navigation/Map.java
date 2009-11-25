@@ -26,7 +26,7 @@ public class Map implements MechConstants, USSensorListener {
 	Odometer odo;
 
 	int[][] map;
-	int resolution;
+	int X, Y;
 
 	double nodeDist;
 	int threshold;
@@ -40,22 +40,55 @@ public class Map implements MechConstants, USSensorListener {
 
 	boolean stop;
 
-	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
+	// square map constructor 
+	public Map(Odometer odo, int rez , int threshold, double nodeDist) {
 		this.odo = odo;
-		this.resolution = rez;
+		this.X = rez;
+		this.Y = rez;
 
 		this.threshold = threshold;
-		this.map = new int[resolution][resolution];
+		this.map = new int [resolution][resolution];
 
 		this.nodeDist = nodeDist;
 
 		this.newObstacle = false;
 
+		this.start();
+
 		listeners = new DinaList<MapListener>();
 
 		//initialize border
-		for(int x = 0; x < resolution; x++) map[x][0] = map[x][resolution-1] = WALL;
-		for(int y = 0; y < resolution; y++) map[0][y] = map[resolution-1][y] = WALL;
+		for(int x = 0; x < X; x++) map[x][0] = map[x][X-1] = WALL;
+		for(int y = 0; y < Y; y++) map[0][y] = map[Y-1][y] = WALL;
+
+
+		low_Readings = new int[] {255,255,255,255,255,255,255,255};
+		high_Readings = new int[] {255,255,255,255,255,255,255,255};
+
+		USSensor.high_sensor.registerListener(this);
+		USSensor.low_sensor.registerListener(this);
+	}
+	
+	//rectangular map constructor
+	public Map(Odometer odo, int rezX, int rezY , int threshold, double nodeDist) {
+		this.odo = odo;
+		this.X = rezX;
+		this.Y = rezY;
+
+		this.threshold = threshold;
+		this.map = new int [resolution][resolution];
+
+		this.nodeDist = nodeDist;
+
+		this.newObstacle = false;
+
+		this.start();
+
+		listeners = new DinaList<MapListener>();
+
+		//initialize border
+		for(int x = 0; x < X; x++) map[x][0] = map[x][X-1] = WALL;
+		for(int y = 0; y < Y; y++) map[0][y] = map[Y-1][y] = WALL;
 
 
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
@@ -87,10 +120,10 @@ public class Map implements MechConstants, USSensorListener {
 		// make sure there are no negative coords
 		if (coord[0] < 0) {
 			coord[0] = 0;
-		} else if (coord[0] > (resolution - 1) * nodeDist) coord[0] = (resolution -1)*nodeDist;
+		} else if (coord[0] > (X - 1) * nodeDist) coord[0] = (X -1)*nodeDist;
 		if (coord[1] < 0) {
 			coord[1] = 0;
-		} else if (coord[1] > (resolution - 1) * nodeDist) coord[1] = (resolution -1)*nodeDist;
+		} else if (coord[1] > (Y - 1) * nodeDist) coord[1] = (Y -1)*nodeDist;
 
 		return coord;
 
@@ -110,10 +143,10 @@ public class Map implements MechConstants, USSensorListener {
 		// make sure there are no negative coords
 		if (coord[0] < 0) {
 			coord[0] = 0;
-		} else if (coord[0] > (resolution - 1) * nodeDist) coord[0] = (resolution -1)*nodeDist;
+		} else if (coord[0] > (X - 1) * nodeDist) coord[0] = (X -1)*nodeDist;
 		if (coord[1] < 0) {
 			coord[1] = 0;
-		} else if (coord[1] > (resolution - 1) * nodeDist) coord[1] = (resolution -1)*nodeDist;
+		} else if (coord[1] > (Y - 1) * nodeDist) coord[1] = (Y -1)*nodeDist;
 
 		return coord;
 
@@ -132,9 +165,9 @@ public class Map implements MechConstants, USSensorListener {
 
 		// make sure there are no negative coords
 		if (coord[0] < 0
-					|| coord[0] > (resolution - 1) * nodeDist
+					|| coord[0] > (X - 1) * nodeDist
 					|| coord[1] < 0
-					|| coord[1] > (resolution - 1) * nodeDist) {
+					|| coord[1] > (Y - 1) * nodeDist) {
 						return false;
 		} else if(map[(int)Math.round(coord[0]/UNIT_TILE)][(int)Math.round(coord[1]/UNIT_TILE)] > 0) {
 			return false;
@@ -143,7 +176,7 @@ public class Map implements MechConstants, USSensorListener {
 		}
 
 	}
-
+	
 	public int[] getNode(double[] coord) {
 		int[] node = new int[2];
 
@@ -160,8 +193,8 @@ public class Map implements MechConstants, USSensorListener {
 		return map;
 	}
 
-	public int getRez() {
-		return resolution;
+	public int[] getRez() {
+		return int new[] {X,Y};
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) { //This is only called by the high sensor because we didn't register with the low one
@@ -220,10 +253,10 @@ public class Map implements MechConstants, USSensorListener {
 				 */
 				if(map[node[0]][node[1]] == 0 || map[node[0]][node[1]] == 1) {
 					Sound.twoBeeps();
-
+					
 					//mark obstacle
 					map[node[0]][node[1]] = OBSTACLE;
-
+					
 					//determine which node is in front of obstacle
 					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = DANGER;	//robot south of obstacle
 					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = DANGER;	//robot north of obstacle
@@ -277,11 +310,11 @@ public class Map implements MechConstants, USSensorListener {
 	public synchronized void start() {
 		stop = false;
 	}
-
+	
 	public void reset() {
 		this.stop();
-		for(int x = 0; x < resolution; x++) {
-			for(int y = 0; y < resolution; y++) {
+		for(int x = 0; x < X; x++) {
+			for(int y = 0; y < Y; y++) {
 				if(this.map[x][y] != DROP_ZONE && this.map[x][y] != WALL) this.map[x][y] = 0;
 			}
 		}

@@ -56,31 +56,66 @@ public class Astar implements MechConstants{
 	int open_limit;	// max number of nodes which can be stored in open
 
 
-	int rez;	// resolution of map
+	int X,Y;	// resolution of map
 
 
 
 	/**
-	 * creates a new Astar path
+	 * creates a new Astar path on a square map
 	 *
 	 * @param resolution the number of nodes on each axis; total number of nodes is the resolution squared.
 	*/
 	public Astar(int resolution) {
-		int i, j;
-		this.rez = resolution;
+		int x, y;
+		this.X = resolution;
+		this.Y = resolution;
 
-		pathInfo = new int[rez][rez][7];
-		open_limit = rez*rez;
+		pathInfo = new int [X][Y][7];
+		open_limit = X*Y;
 		open = new int[open_limit][2];
 		open_idx = 0;
 
 
-		for(i = 0; i < rez; i++) {
-			for(j = 0; j < rez; j++) {
-				pathInfo[i][j][0] = 1;
+		// initialize status to default status
+		for(x = 0; x < X; x++) {
+			for(y = 0; y < Y; y++) {
+				pathInfo[x][y][0] = 1;
 			}
 		}
 
+		// initialize open array to impossibe node coords
+		for(i = 0; i < open_limit; i++) {
+			open[i][0] = -1;
+			open[i][1] = -1;
+		}
+
+	}
+	
+	/**
+	 * creates a new Astar path on a rectangular map
+	 *
+	 * @param rezX the number of nodes on the X axis.
+	 * @param rezY the number of nodes on the Y axis.
+	*/
+	public Astar(int rezX, int rezY) {
+		int x, y;
+		this.X = rezX;
+		this.Y = rezY;
+
+		pathInfo = new int [X][Y][7];
+		open_limit = X*Y;
+		open = new int[open_limit][2];
+		open_idx = 0;
+
+
+		// initialize status to default status
+		for(x = 0; x < X; x++) {
+			for(y = 0; y < Y; y++) {
+				pathInfo[x][y][0] = 1;
+			}
+		}
+
+		// initialize open array to impossibe node coords
 		for(i = 0; i < open_limit; i++) {
 			open[i][0] = -1;
 			open[i][1] = -1;
@@ -307,7 +342,7 @@ public class Astar implements MechConstants{
 
 
 		// north
-		if(curr[1] + 1 < rez) {
+		if(curr[1] + 1 < Y) {
 			adj[0] = curr[0];
 			adj[1] = curr[1] + 1;
 
@@ -323,7 +358,7 @@ public class Astar implements MechConstants{
 		}
 
 		// east
-		if(curr[0] + 1 < rez) {
+		if(curr[0] + 1 < X) {
 			adj[0] = curr[0] + 1;
 			adj[1] = curr[1];
 
