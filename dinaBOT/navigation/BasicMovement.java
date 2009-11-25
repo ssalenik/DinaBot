@@ -117,6 +117,7 @@ public class BasicMovement implements Movement, MechConstants {
 			movement_daemon.turnTo(angle, speed);
 			while(!movement_daemon.isActive()) Thread.yield();
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
+			
 		}
 
 		return !interrupted_flag;
@@ -281,9 +282,13 @@ public class BasicMovement implements Movement, MechConstants {
 						double dmax = Math.sqrt((target_position[0]-current_position[0])*(target_position[0]-current_position[0])+(target_position[1]-current_position[1])*(target_position[1]-current_position[1]));
 						target_distance = Math.cos(current_position[2]-target_angle)*dmax;
 
-						left_motor.setSpeed((int)(target_speed+target_speed*spline_correction_gain*(current_position[2]-target_angle)));
-						right_motor.setSpeed((int)(target_speed-target_speed*spline_correction_gain*(current_position[2]-target_angle)));
-
+						if(dmax > 5) {
+							left_motor.setSpeed((int)(target_speed+target_speed*spline_correction_gain*(current_position[2]-target_angle)));
+							right_motor.setSpeed((int)(target_speed-target_speed*spline_correction_gain*(current_position[2]-target_angle)));
+						} else {
+							left_motor.setSpeed((int)target_speed);
+							right_motor.setSpeed((int)target_speed);
+						}
 						if(target_distance < 1) end();
 					}
 					Thread.yield(); //Yield for a little while
@@ -389,6 +394,7 @@ public class BasicMovement implements Movement, MechConstants {
 		 * @param speed the speed to advance at
 		*/
 		void turnTo(double angle, int speed) {
+			System.out.println("Turn To");
 			previous_snap_enable = odometer.isSnapping();
 			if(previous_snap_enable) odometer.enableSnapping(false);
 			//Set motor speed
@@ -410,11 +416,13 @@ public class BasicMovement implements Movement, MechConstants {
 				left_motor.backward();
 				right_motor.forward();
 				//And set mode
+				System.out.println("mode set");
 				mode = Mode.ROTATE_CCW;
 			} else { //If the realtive angle is negative go clockwise
 				left_motor.forward();
 				right_motor.backward();
 				//And set mode
+				System.out.println("mode set");
 				mode = Mode.ROTATE_CW;
 			}
 		}
@@ -424,6 +432,8 @@ public class BasicMovement implements Movement, MechConstants {
 		 *
 		*/
 		void end() {
+			System.out.println("Ending");
+			if(mode == Mode.ROTATE_CW || mode == Mode.ROTATE_CCW) System.out.println("Was Rotate");
 			if(mode == Mode.GOTO_ROTATE_CW || mode == Mode.GOTO_ROTATE_CCW) {
 				left_motor.forward();
 				right_motor.forward();

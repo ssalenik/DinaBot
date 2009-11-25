@@ -146,17 +146,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			pallet_count++; //Increment pallet count
 
-			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
-			movement.turnTo(initial_position[2], SPEED_ROTATE);
+			double[] current_position = odometer.getPosition();
+			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
+			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
 			odometer.enableSnapping(true); //Renable snapping
 
 			return true;
 		} else {
-
-			movement.goTo(initial_position[0], initial_position[1], SPEED_MED); //Return to start position
-			movement.turnTo(initial_position[2], SPEED_ROTATE);
+			double[] current_position = odometer.getPosition();
+			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
+			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
 			odometer.enableSnapping(true); //Renable snapping
-
 			return false;
 		}
 
@@ -184,6 +184,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
 			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
 		}
+		
+		localization.localizeAnywhere();
 	}
 
 	/**
@@ -199,7 +201,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		localization.localize();
 
 		map.start();
-
+		
 		int[][] pattern = { new int[] {7,7}, new int[] {1,1} //Zig-zag pattern
 
 			/*new int[] {6,1},
@@ -232,11 +234,10 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		}
 
-
 		boolean done = false;
 
 		//right now finishes once it has dropped off the stack!
-		while( !done ) {
+		while(!done) {
 		for(int i = 0;i < pattern.length;i++) { //For each node in search path
 
 			if(debug) System.out.println("Leg number: "+i);

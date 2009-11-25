@@ -257,7 +257,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) {
 						lowest_high_reading = latest_high_readings[0];
-						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) || (latest_high_readings[1] != 255 && latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2 )) {
+						if((latest_high_readings[1] < 150 && lowest_high_reading < SAFE_DIST) || (latest_high_readings[1] != 255 && latest_high_readings[1] >= 150 && lowest_high_reading < SAFE_DIST*2)) {
 							too_close = true;
 							mover.stop();
 						}
