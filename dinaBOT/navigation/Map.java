@@ -217,9 +217,25 @@ public class Map implements MechConstants, USSensorListener {
 
 
 				// mark map with obstacle
-				if(map[node[0]][node[1]] == 0) {
+				/* TODO: put this info somewhere else
+				 * 10 = barrier
+				 * 2 = detected obstacle
+				 * 1 = area in front of detected obstacle
+				 * 0 = clear
+				 * 20 = drop off area corner?? -not yet decided
+				 */
+				if(map[node[0]][node[1]] == 0 || map[node[0]][node[1]] == 1) {
 					Sound.twoBeeps();
+					
+					//mark obstacle
 					map[node[0]][node[1]] = 2;
+					
+					//determine which node is in front of obstacle
+					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = 1;	//robot south of obstacle
+					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = 1;	//robot north of obstacle
+					else if(node[1] > curr_node[1] && map[node[0]][node[1] - 1] < 2) map[node[0]][node[1] - 1] = 1;	//robot west of obstacle
+					else if(node[1] < curr_node[1] && map[node[0]][node[1] + 1] < 2) map[node[0]][node[1] + 1] = 1;	//robot east of obstacle
+
 
 					notifyListeners(node[0], node[1]);
 				}
