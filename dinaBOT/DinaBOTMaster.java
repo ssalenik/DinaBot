@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 3;
+	static final int CAGE_FULL = 2;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -93,7 +93,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		while(!slave_connection.connect());
 		slave_connection.setDebug(false);
 	}
-
+	
 	/**
 	 * This is a heuristic method for block alignment using brick to brick communication (currently over bluetooth). It assumes the block is directly in front if the robot in an unknown orientation.
 	 *
@@ -277,7 +277,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(5,4); //Instantiate the DinaBOT Master
+		//int[] dropCoords = userInput();
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(3,3); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
@@ -287,5 +288,65 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		while(true); //Never quit
 	}
+	
+	/**
+	 * User coordinates input method. This is a static method called at the beginning of runtime for all the setup to be done.
+	 * This would include the drop coordinates and the search pattern to be used.
+	 */
+	
+	public static int[] userInput() {
+		
+		boolean enterPressed = false;
+		int[] input= {0,0,0};
+		
+		//User Input
+		while(!enterPressed) {
+			LCD.clear();
+			LCD.drawString(input[0] + "   " + input[1]+ " " + input[2], 0,0);
+			int buttonID = Button.waitForPress();
+			switch(buttonID) {
+				case Button.ID_LEFT:
+					input[0]--;
+					break;
+				case Button.ID_RIGHT:
+					input[0]++;
+					break;
+				case Button.ID_ENTER:
+					enterPressed = true;
+					break;
+			}
+		}
+		
+		enterPressed = false;
+		
+		while(!enterPressed) {
+			LCD.clear();
+			LCD.drawString(input[0] + "   " + input[1]+ " " + input[2], 0,0);
+			int buttonID = Button.waitForPress();
+			switch(buttonID) {
+				case Button.ID_LEFT:
+					input[0]--;
+					break;
+				case Button.ID_RIGHT:
+					input[0]++;
+					break;
+				case Button.ID_ENTER:
+					enterPressed = true;
+					break;
+			}
+		}
+		
+		try {
+			Thread.sleep(2000);
+			LCD.drawString("Loading main program...", 0,0);
+		} catch(Exception e) {
+			
+		}
+		
+		return input;
+		
+	}
+	
+	
 
 }
