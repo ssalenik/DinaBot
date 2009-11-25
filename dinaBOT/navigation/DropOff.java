@@ -54,7 +54,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	//Experimental values
 	public final int BACK_UP_DISTANCE = -15;
-	public final int DUMP_DISTANCE = 22;
+	public final int DUMP_DISTANCE = 22 ;
 
 	//Fields
 	public Odometer odometer;
@@ -170,7 +170,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			dropPoint[0] = x2;
 			corner = 2;
 		}
-		if (Math.abs(position[1] - y1) < Math.abs(position[0] - y2)) {
+		if (Math.abs(position[1] - y1) < Math.abs(position[1] - y2)) {
 			dropPoint[1] = y1;
 		} else {
 			dropPoint[1] = y2;
@@ -190,10 +190,10 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			facing = 3*Math.PI/4;
 			break;
 		case 3:
-			facing = -Math.PI/4;
+			facing = 5*Math.PI/4;
 			break;
 		case 4:
-			facing = -3*Math.PI/4;
+			facing = 7*Math.PI/4;
 			break;
 		}
 
@@ -209,6 +209,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.goTo(dropPoint[0], dropPoint[1], SPEED_SLOW);
 
 			//Perform Drop off
+			odometer.enableSnapping(true);
 			mover.turnTo(facing, SPEED_ROTATE);
 			mover.goForward(0.5*UNIT_TILE, SPEED_SLOW);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
@@ -218,6 +219,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Go back to initial node after this returns
 			success = true;
+			odometer.enableSnapping(true);
 			mover.goTo(odometer.getPosition()[1], position[1], SPEED_MED);
 			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
