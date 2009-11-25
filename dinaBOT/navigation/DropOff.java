@@ -92,6 +92,8 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
 		
+		boolean firstTry = true;
+		
 		int[][] dropArea = { //Clockwise from the bottom left of the drop off area
 			new int[] {drop_x - 1, drop_y - 1},
 			new int[] {drop_x - 1, drop_y},
@@ -105,9 +107,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			new int[] {drop_x + 1,drop_y - 1},
 			new int[] {drop_x,drop_y - 1}
 		};
-		
-		
-		
 		USSensor.low_sensor.registerListener(this);
 	}
 
@@ -121,10 +120,23 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	}
 	
 	/**
-	 *
+	 * This method should be called by DinaBOTMaster if the node it goes to is covered by an obstacle. This method returns the next possible 
+	 * drop-off set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
+	 * a circular clockwise order.
+	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
 	 */
-	public int[] getNextCoordinate() {
-		return dropArea[coordPointer++ % dropArea.length];
+	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
+		
+		if (firstTry) { //If this is the first time it asks for an alternate drop-off set up point
+			firstTry = false;
+			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
+				boolean found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
+				if (found) {
+					coordPointer = i;
+				}
+			}
+		}
+		return dropArea[(coordPointer++) % dropArea.length];
 	}
 
 

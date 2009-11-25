@@ -175,8 +175,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]), dropCoords[0]-1, dropCoords[0]+2);
 		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]), dropCoords[1]-1, dropCoords[1]+2);
 		
-		//int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
-		
+		int nav_status = navigator.goTo(dropSetUpCoords[0] * UNIT_TILE, dropSetUpCoords[1] * UNIT_TILE, true);
+		while (nav_status < 0) {
+			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
+			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true);
+		}
 	}
 					   
 	/**
@@ -189,9 +192,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		int[][] pattern = {
-			new int[] {7,7},
-			new int[] {1,1} // Go back to starting node
+		int[][] pattern = { //Zig-zag pattern
+			new int[] {6,1},
+			new int[] {6,2},
+			new int[] {1,2},
+			new int[] {1,3},
+			new int[] {6,3},
+			new int[] {6,4},
+			new int[] {1,4},
+			new int[] {1,5},
+			new int[] {6,5},
+			new int[] {6,6},
+			new int[] {1,1}  // Go back to starting node
 		};
 		
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
@@ -221,7 +233,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				pickUpPallet(); //Pick up pallet for interrupt
 				if(pallet_count == CAGE_FULL) {
 					if(debug) System.out.println("Run drop off...");
-					goToDropArea(); //This should return us to the same point
+					goToDropArea(); //This should make us go to the drop off area
 					dropper.dropOff(1);
 				}
 				nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false); //And keep moving to node
