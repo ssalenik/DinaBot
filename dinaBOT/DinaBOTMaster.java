@@ -76,7 +76,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 
-		map = new Map(odometer, 9, 45, UNIT_TILE);
+		map = new Map(odometer, 13, 9, 45, UNIT_TILE);
 		pather = new ManhattanPather(map, movement);
 
 		navigator = new Navigator(odometer, movement, map, pather);
@@ -202,7 +202,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		map.start();
 		
-		int[][] pattern = { new int[] {7,7}, new int[] {1,1} //Zig-zag pattern
+		int[][] pattern = { new int[] {12,12}, new int[] {1,1} //Zig-zag pattern
 
 			/*new int[] {6,1},
 			new int[] {6,2},
@@ -270,6 +270,16 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		if(debug) System.out.println("Done");
 	}
 
+	public void indeed() {
+		while(true) {
+			Button.waitForPress();
+			slave_connection.request(PICKUP);
+			Button.waitForPress();
+			slave_connection.request(OPEN_CAGE);
+			slave_connection.request(CLOSE_CAGE);
+		}
+	}
+
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -279,11 +289,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = userInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(3,3); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(12,2); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		dinaBOTmaster.run();
+		dinaBOTmaster.indeed();
 
 		while(true); //Never quit
 	}
