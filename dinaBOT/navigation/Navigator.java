@@ -86,6 +86,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			}
 			active = false;
 			if(suspend_interrupt) {
+				path = null;
 				return 1;
 			}
 		}
@@ -154,7 +155,6 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 						&& low_Readings[1] < 75 && map.checkUSCoord((double)low_Readings[0], position[2])) {
 				interrupt();
-
 			}
 		}
 	}
