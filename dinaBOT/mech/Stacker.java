@@ -58,8 +58,9 @@ public class Stacker implements Stacking {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
+			
 		claw.setSpeed(clawSpeed);
-
+		
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 
@@ -139,6 +140,7 @@ public class Stacker implements Stacking {
 	public boolean armsUp() {
 
 		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawTopAngle);
 		claw.rotateTo(clawTopStraight);
 		claw.stop();
 

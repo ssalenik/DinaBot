@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 2;
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -272,8 +272,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	public void indeed() {
 		while(true) {
+			slave_connection.request(RELEASE);
 			Button.waitForPress();
 			slave_connection.request(PICKUP);
+			Button.waitForPress();
+			slave_connection.request(RELEASE);
+			slave_connection.request(ARMS_UP);
 			Button.waitForPress();
 			slave_connection.request(OPEN_CAGE);
 			slave_connection.request(CLOSE_CAGE);
@@ -289,7 +293,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = userInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(12,2); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(9,2); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();

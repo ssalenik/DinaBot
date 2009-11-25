@@ -58,8 +58,8 @@ public class Map implements MechConstants, USSensorListener {
 		listeners = new DinaList<MapListener>();
 
 		//initialize border
-		for(int x = 0; x < X; x++) map[x][0] = map[x][X-1] = WALL;
-		for(int y = 0; y < Y; y++) map[0][y] = map[Y-1][y] = WALL;
+		for(int x = 0; x < X; x++) map[x][0] = map[x][Y-1] = WALL;
+		for(int y = 0; y < Y; y++) map[0][y] = map[X-1][y] = WALL;
 
 
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
@@ -76,7 +76,7 @@ public class Map implements MechConstants, USSensorListener {
 		this.Y = rezY;
 
 		this.threshold = threshold;
-		this.map = new int [X][Y];
+		this.map = new int[X][Y];
 
 		this.nodeDist = nodeDist;
 
@@ -87,8 +87,8 @@ public class Map implements MechConstants, USSensorListener {
 		listeners = new DinaList<MapListener>();
 
 		//initialize border
-		for(int x = 0; x < X; x++) map[x][0] = map[x][X-1] = WALL;
-		for(int y = 0; y < Y; y++) map[0][y] = map[Y-1][y] = WALL;
+		for(int x = 0; x < X; x++) map[x][0] = map[x][Y-1] = WALL;
+		for(int y = 0; y < Y; y++) map[0][y] = map[X-1][y] = WALL;
 
 
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
