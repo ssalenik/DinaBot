@@ -55,7 +55,7 @@ public class USSensor implements Runnable {
 			sensor.ping();
 
 			try {
-				Thread.sleep(50);
+				Thread.sleep(150);
 			} catch(Exception e) {
 
 			}
@@ -74,6 +74,7 @@ public class USSensor implements Runnable {
 				}
 			} else if (this == USSensor.high_sensor) {
 				for(int i = 0;i < 8;i++) {
+					// if(i == 0 && latest_values[i] == 23) latest_values[i] = 255;
 					if(latest_values[i] != 255) latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);
 				}
 				/*

@@ -49,6 +49,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	//Variables
 	int pallet_count;
 	int drop_count;
+	int[] dropSetUpCoords;
 	boolean debug;
 
 	/**
@@ -149,6 +150,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			pallet_count++; //Increment pallet count
 
+			if(pallet_count < 5) slave_connection.request(RELEASE);
+			if(pallet_count < 5) slave_connection.request(ARMS_UP);
+			
 			double[] current_position = odometer.getPosition();
 			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
@@ -156,6 +160,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			return true;
 		} else {
+			if(pallet_count < 5) slave_connection.request(RELEASE);
+			if(pallet_count < 5) slave_connection.request(ARMS_UP);
+			
 			double[] current_position = odometer.getPosition();
 			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
@@ -173,14 +180,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		//Getting drop off coordinates
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int[] dropCoords = dropper.getDropCoords();
 
 		double[] start_position = odometer.getPosition();
-
-		int[] dropSetUpCoords = new int[2];
-		dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]/UNIT_TILE), dropCoords[0]-1, dropCoords[0]+2);
-		dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]/UNIT_TILE), dropCoords[1]-1, dropCoords[1]+2);
-
+		
+		if(dropSetUpCoords == null) {
+			int[] dropCoords = dropper.getDropCoords();
+		
+			dropSetUpCoords = new int[2];
+			dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]/UNIT_TILE), dropCoords[0]-1, dropCoords[0]+2);
+			dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]/UNIT_TILE), dropCoords[1]-1, dropCoords[1]+2);
+		}
+		
 		int nav_status = navigator.goTo(dropSetUpCoords[0]*UNIT_TILE, dropSetUpCoords[1]*UNIT_TILE, true, true);
 	
 		for(int i = 0;nav_status < 0;i++) {
@@ -201,6 +211,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		localization.localizeAnywhere();
 		dropper.dropOff(drop_count%2);
 		drop_count++;
+		
+		if(drop_count == 1) {
+			//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
+			int[] dropCoords = dropper.getDropCoords();
+
+			//Consider the nodes around the drop off zone as obstacles.
+			map.editMap(dropCoords[0],dropCoords[1], DROP_ZONE);
+			map.editMap(dropCoords[0]+1,dropCoords[1], DROP_ZONE);
+			map.editMap(dropCoords[0],dropCoords[1]+1, DROP_ZONE);
+			map.editMap(dropCoords[0]+1,dropCoords[1]+1, DROP_ZONE);
+		}
+		
 		pallet_count = 0;
 		//Go back to start_position?
 	}
@@ -216,7 +238,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-	//	localization.localize();
+		localization.localize();
 
 		map.start();
 		
@@ -228,15 +250,6 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			new int[] {1,7},
 			new int[] {1,1} // Go back to starting node
 		};
-
-		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
-		int[] dropCoords = dropper.getDropCoords();
-
-		//Consider the nodes around the drop off zone as obstacles.
-		map.editMap(dropCoords[0],dropCoords[1], DROP_ZONE);
-		map.editMap(dropCoords[0]+1,dropCoords[1], DROP_ZONE);
-		map.editMap(dropCoords[0],dropCoords[1]+1, DROP_ZONE);
-		map.editMap(dropCoords[0]+1,dropCoords[1]+1, DROP_ZONE);
 
 		if(debug) System.out.println("Starting...");
 

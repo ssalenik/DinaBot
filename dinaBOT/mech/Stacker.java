@@ -5,7 +5,7 @@ import lejos.nxt.Motor;
 /**
  * This is the class for all the methods that control the stacking processes which use the claw and cage.
  *
- * @author Gabriel Olteanu, François Ouellet Delorme
+ * @author Gabriel Olteanu, François Ouellet Delorme, Severin Smith
  * @see Stacking
  * @version 2
 */
@@ -18,8 +18,8 @@ public class Stacker implements Stacking {
 	//in degrees
 	final int clawOpenAngle = 95;
 	final int clawClosedAngle = 20;
-	final int clawTopAngle = -130;
-	final int clawTopStraight = -120;
+	final int clawTopAngle = -170;
+	final int clawTopStraight = -135;
 
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 30;	//doesn't do anything!!!
@@ -46,7 +46,6 @@ public class Stacker implements Stacking {
 		claw.resetTachoCount();
 
 		claw.rotateTo(clawTopAngle);
-		claw.rotateTo(clawTopStraight);
 	}
 
 	/**
@@ -69,17 +68,10 @@ public class Stacker implements Stacking {
 			rightGate.rotateTo(gatesPickUpRotation);
 		}
 
-		if(brickCount >= 5) {
-			claw.stop();
-			claw.rotateTo(clawTopStraight);
-		} else {
-			claw.rotateTo(clawTopAngle);
-			claw.stop();
-			claw.rotateTo(clawTopStraight);
-		}
-
+		claw.stop();
+		claw.rotateTo(clawTopStraight);
+	
 		try {Thread.sleep(1000);} catch(Exception e) {}
-
 
 		if(brickCount < 2) {
 			leftGate.rotateTo(0, true);
@@ -146,7 +138,14 @@ public class Stacker implements Stacking {
 
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(clawTopAngle);
+		try {
+			Thread.sleep(500);
+		} catch(Exception e) {
+			
+		}
+		claw.setSpeed(clawSpeed/2);
 		claw.rotateTo(clawTopStraight);
+		claw.setSpeed(clawSpeed);
 		claw.stop();
 
 		return true;
