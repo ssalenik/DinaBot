@@ -58,7 +58,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 * @param drop_x the x coordinate of the drop off (in tile units)
 	 * @param drop_y the y coordinate of the drop off (in tile units)
 	*/
-	public DinaBOTMaster(int drop_x, int drop_y) {
+	public DinaBOTMaster(int[] input) {
 		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonPressed(Button b) {
@@ -85,7 +85,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		localization = new Localization(odometer, movement);
 		blockFind = new BlockFinder(odometer, movement, map, slave_connection);
-		dropper = new DropOff(odometer, movement, slave_connection,localization, drop_x, drop_y);
+		dropper = new DropOff(odometer, movement, slave_connection,localization, input[0], input[1]);
 
 		debug = true;
 	}
@@ -319,7 +319,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = userInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(9,2); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {3,3,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
