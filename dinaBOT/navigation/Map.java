@@ -240,7 +240,7 @@ public class Map implements MechConstants, USSensorListener {
 
 
 			// if obstacle is not detected as in current node
-			if(!((node[0] == curr_node[0]) && (node[1] == curr_node[1]))) {
+			//if(!((node[0] == curr_node[0]) && (node[1] == curr_node[1]))) {
 
 
 				// mark map with obstacle
@@ -251,7 +251,7 @@ public class Map implements MechConstants, USSensorListener {
 				 * 0 = clear
 				 * 20 = drop off area corner?? -not yet decided
 				 */
-				if(map[node[0]][node[1]] == 0 || map[node[0]][node[1]] == 1) {
+				if(map[node[0]][node[1]] < OBSTACLE) {
 					Sound.twoBeeps();
 					
 					//mark obstacle
@@ -265,7 +265,7 @@ public class Map implements MechConstants, USSensorListener {
 					
 					notifyListeners(node[0], node[1]);
 				}
-			}
+			//}
 		} else {
 			// mark nodes within threshold as clear
 			/*distance = threshold;
