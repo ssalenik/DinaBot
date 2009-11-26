@@ -333,7 +333,7 @@ public class BasicMovement implements Movement, MechConstants {
 			while(target_angle < (initial_position[2] - Math.PI)) target_angle += 2*Math.PI;
 			while(target_angle > (initial_position[2] + Math.PI)) target_angle -= 2*Math.PI;
 
-			if((target_angle - initial_position[2]) > Math.PI/8 || (target_angle - initial_position[2]) < -Math.PI/8) {
+			if((target_angle - initial_position[2]) > Math.PI/16 || (target_angle - initial_position[2]) < -Math.PI/16) {
 				previous_snap_enable = odometer.isSnapping();
 				if(previous_snap_enable) odometer.enableSnapping(false);
 				left_motor.setSpeed(SPEED_ROTATE);

@@ -54,7 +54,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 	//Experimental values
 	public final int BACK_UP_DISTANCE = -15;
-	public final int DUMP_DISTANCE = 23 ;
+	public final int DUMP_DISTANCE = 30 ;
 
 	//Fields
 	public Odometer odometer;
@@ -200,8 +200,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		//Drop in the middle of the tile
 		if (stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
-			slave_connection.request(ARMS_UP);
-
 			//Move to drop point.
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
 			//localizer.localizeAnywhere();
@@ -226,7 +224,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
-			slave_connection.request(ARMS_UP);
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
