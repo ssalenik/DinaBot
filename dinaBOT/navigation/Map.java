@@ -161,6 +161,30 @@ public class Map implements MechConstants, USSensorListener {
 
 		return node;
 	}
+	
+	public boolean checkNodeBounds(int[] node) {
+		if( node[0] < 0 || node[0] > X - 1
+						|| node[1] < 0
+						|| node[1] > Y - 1) return false;
+		else return true;
+	}
+	
+	public boolean checkNode(int[] node) {
+		if(!checkNodeBounds(node)) return false;
+		else if ( map[node[0]][node[1]] > DANGER ) return false;
+		else return true;
+	}
+	
+	public int nodeValue(int[] node) {
+		if(!checkNodeBounds(node)) return -1;
+		else return map[node[0]][node[1]];
+	}
+	
+	public int coordValue(double[] coord) {
+		int[] node = getNode(coord);
+		if(!checkNodeBounds(node)) return -1;
+		else return map[node[0]][node[1]];
+	}
 
 	public int[][] getMap() {
 
@@ -220,10 +244,10 @@ public class Map implements MechConstants, USSensorListener {
 
 
 				// mark map with obstacle
-				/* TODO: put this info somewhere else
-				 * 10 = barrier
-				 * 2 = detected obstacle
-				 * 1 = area in front of detected obstacle
+				/* 10 = WALL
+				 * 5 = DROP ZONE
+				 * 3 = OBSTACLE
+				 * 2 = DANGER ZONE
 				 * 0 = clear
 				 * 20 = drop off area corner?? -not yet decided
 				 */
@@ -233,13 +257,12 @@ public class Map implements MechConstants, USSensorListener {
 					//mark obstacle
 					map[node[0]][node[1]] = OBSTACLE;
 					
-					//determine which node is in front of obstacle
-					if(node[0] > curr_node[0] && map[node[0] - 1][node[1]] < 2) map[node[0] - 1][node[1]] = DANGER;	//robot south of obstacle
-					else if(node[0] < curr_node[0] && map[node[0] + 1][node[1]] < 2) map[node[0] + 1][node[1]] = DANGER;	//robot north of obstacle
-					else if(node[1] > curr_node[1] && map[node[0]][node[1] - 1] < 2) map[node[0]][node[1] - 1] = DANGER;	//robot west of obstacle
-					else if(node[1] < curr_node[1] && map[node[0]][node[1] + 1] < 2) map[node[0]][node[1] + 1] = DANGER;	//robot east of obstacle
-
-
+					//mark danger zone(s) all those adjacent to obstacle except the one behind the obstacle
+					if(checkNode(new int[] {node[0] + 1, node[1]}) && (node[0] < curr_node[0])) map[node[0] + 1][node[1]] = DANGER;
+					if(checkNode(new int[] {node[0] - 1, node[1]}) && (node[0] > curr_node[0])) map[node[0] - 1][node[1]] = DANGER;
+					if(checkNode(new int[] {node[0], node[1] + 1}) && (node[1] < curr_node[1])) map[node[0]][node[1] + 1] = DANGER;
+					if(checkNode(new int[] {node[0], node[1] - 1}) && (node[1] > curr_node[1])) map[node[0]][node[1] - 1] = DANGER;
+					
 					notifyListeners(node[0], node[1]);
 				}
 			}
