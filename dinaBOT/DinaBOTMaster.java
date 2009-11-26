@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 3;
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -150,6 +150,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			pallet_count++; //Increment pallet count
 
+			if(pallet_count < 5) slave_connection.request(RELEASE);
+			if(pallet_count < 5) slave_connection.request(ARMS_UP);
+			
 			double[] current_position = odometer.getPosition();
 			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
@@ -157,6 +160,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			return true;
 		} else {
+			if(pallet_count < 5) slave_connection.request(RELEASE);
+			if(pallet_count < 5) slave_connection.request(ARMS_UP);
+			
 			double[] current_position = odometer.getPosition();
 			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
@@ -232,7 +238,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-	//	localization.localize();
+		localization.localize();
 
 		map.start();
 		
