@@ -332,16 +332,21 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 * User coordinates input method. This is a static method called at the beginning of runtime for all the setup to be done.
 	 * This would include the drop coordinates and the search pattern to be used.
 	 */
-	
-	public static int[] userInput() {
+	/**
+	 * User coordinates input method. This is a static method called at the beginning of runtime for all the setup to be done.
+	 * This would include the drop coordinates and the search pattern to be used.
+	 * @return input Array containing the x-coordinate and y-coordinate of the drop-off tile, and which search pattern to execute.
+	 */
+	public static int[] getUserInput() {
 		
 		boolean enterPressed = false;
+		int nameIndex= 0;
 		int[] input= {0,0,0};
 		
-		//User Input
+		// Enter the y coordinate of the dropoff tile
 		while(!enterPressed) {
 			LCD.clear();
-			LCD.drawString(input[0] + "   " + input[1]+ " " + input[2], 0,0);
+			LCD.drawString(input[0] + "   " + input[1]+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex], 0,0);
 			int buttonID = Button.waitForPress();
 			switch(buttonID) {
 				case Button.ID_LEFT:
@@ -358,22 +363,48 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		enterPressed = false;
 		
+		//Enter the y coordinate of the dropoff tile
 		while(!enterPressed) {
 			LCD.clear();
-			LCD.drawString(input[0] + "   " + input[1]+ " " + input[2], 0,0);
+			LCD.drawString(input[0] + "   " + input[1]+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex], 0,0);
 			int buttonID = Button.waitForPress();
 			switch(buttonID) {
 				case Button.ID_LEFT:
-					input[0]--;
+					input[1]--;
 					break;
 				case Button.ID_RIGHT:
-					input[0]++;
+					input[1]++;
 					break;
 				case Button.ID_ENTER:
 					enterPressed = true;
 					break;
 			}
 		}
+		
+		enterPressed = false;
+		
+		//Enter the search pattern
+		while(!enterPressed) { 
+			LCD.clear();
+			LCD.drawString(input[0] + "   " + input[1]+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex], 0,0);
+			int buttonID = Button.waitForPress();
+			switch(buttonID) {
+				case Button.ID_LEFT:
+					if (nameIndex == 0) 
+						nameIndex = PatternNames.length - 1;
+					else 
+						nameIndex--;
+					break;
+				case Button.ID_RIGHT:
+					nameIndex = (++nameIndex) % SearchPatterns.PatternNames.length;
+					break;
+				case Button.ID_ENTER:
+					enterPressed = true;
+					input[3] = nameIndex;
+					break;
+			}
+		}
+		
 		
 		try {
 			Thread.sleep(2000);
