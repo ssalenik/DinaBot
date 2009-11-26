@@ -258,10 +258,10 @@ public class Map implements MechConstants, USSensorListener {
 					map[node[0]][node[1]] = OBSTACLE;
 					
 					//mark danger zone(s) all those adjacent to obstacle except the one behind the obstacle
-					if(checkNode(new int[] {node[0] + 1, node[1]}) && (node[0] < curr_node[0])) map[node[0] + 1][node[1]] = DANGER;
-					if(checkNode(new int[] {node[0] - 1, node[1]}) && (node[0] > curr_node[0])) map[node[0] - 1][node[1]] = DANGER;
-					if(checkNode(new int[] {node[0], node[1] + 1}) && (node[1] < curr_node[1])) map[node[0]][node[1] + 1] = DANGER;
-					if(checkNode(new int[] {node[0], node[1] - 1}) && (node[1] > curr_node[1])) map[node[0]][node[1] - 1] = DANGER;
+					if(checkNode(new int[] {node[0] + 1, node[1]})) map[node[0] + 1][node[1]] = DANGER;
+					if(checkNode(new int[] {node[0] - 1, node[1]})) map[node[0] - 1][node[1]] = DANGER;
+					if(checkNode(new int[] {node[0], node[1] + 1})) map[node[0]][node[1] + 1] = DANGER;
+					if(checkNode(new int[] {node[0], node[1] - 1})) map[node[0]][node[1] - 1] = DANGER;
 					
 					notifyListeners(node[0], node[1]);
 				}
