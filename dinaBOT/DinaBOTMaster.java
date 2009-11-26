@@ -78,7 +78,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 
-		map = new Map(odometer, 13, 9, 45, UNIT_TILE);
+		map = new Map(odometer, 13, 9);
 		pather = new ManhattanPather(map, movement);
 
 		navigator = new Navigator(odometer, movement, map, pather);

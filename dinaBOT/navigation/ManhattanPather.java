@@ -128,14 +128,11 @@ public class ManhattanPather implements Pathing, MechConstants {
 	}
 
 	private void updateMap(Astar pather) {
-		int[][] map;
-
-		map = mapper.getMap();
 
 		for(int x = 0; x < X; x++) {
 			for(int y = 0; y < Y; y++) {
-				if(map[x][y] == DANGER) pather.addObstacle(new int[] {x, y}, DANGER);	//danger zone
-				else if(map[x][y] > DANGER) pather.addObstacle(new int[] {x, y}, OBSTACLE);	//obstacle
+				if(mapper.nodeValue(x,y) == DANGER) pather.addObstacle(new int[] {x, y}, DANGER);	//danger zone
+				else if(mapper.nodeValue(x,y) > DANGER) pather.addObstacle(new int[] {x, y}, OBSTACLE);	//obstacle
 			}
 		}
 

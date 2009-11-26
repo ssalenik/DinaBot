@@ -50,9 +50,11 @@ public interface MechConstants {
 	*/
 	public final double SWEEP_ARC = Math.PI/3;
 
-	/**
-	 *
+	/**Maximum distance at which the map will map an obstacle = {@value}.
 	 */
+	static final int OBSTACLE_THRESHOLD = 45;
+	
+	
 	static final int OBSTACLE = 3;	// value which node is considered unpassable
 	static final int DANGER = 2;	// value at which node is considered a danger zoen
 	static final int DANGER_COST = 10;	//cost of going through danger zone

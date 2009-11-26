@@ -143,7 +143,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			double blockDistance = (blockDistance_A+blockDistance_B)/2;
 
 			//check if coord is outside of map
-			if(!mapper.checkUSCoord(blockDistance, angle)) return false;
+			if(!mapper.checkCoord(blockDistance, angle)) return false;
 
 			// go to phase 3; go to pallet phase
 			phase = 3;

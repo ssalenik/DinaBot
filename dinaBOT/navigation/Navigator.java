@@ -140,7 +140,6 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
-		double[] position = odometer.getPosition();
 
 		if(active && !full_mode && suspend_count >= 2) {
 			int minLow, minHigh;
@@ -154,7 +153,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 			if(minLow < 20
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
-						/*&& low_Readings[1] < 75*/ && map.checkUSCoord((double)low_Readings[0], position[2])) {
+						/*&& low_Readings[1] < 75*/ && map.checkUSCoord(low_Readings[0])) {
 				interrupt();
 			}
 		}
