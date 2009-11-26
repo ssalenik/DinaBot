@@ -85,7 +85,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		blockFind = new BlockFinder(odometer, movement, map, slave_connection);
 		dropper = new DropOff(odometer, movement, slave_connection,localization, drop_x, drop_y);
 
-		debug = false;
+		debug = true;
 	}
 
 	public void connect() {
@@ -132,7 +132,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	*/
 	public boolean pickUpPallet() {
 		double[] initial_position = odometer.getPosition(); //Remember start position
-		System.out.println("Go");
+
 		odometer.enableSnapping(false); //Disable snapping for diagonal movement
 
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
@@ -198,11 +198,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
 
-		localization.localize();
+	//	localization.localize();
 
 		map.start();
 		
-		int[][] pattern = { new int[] {12,12}, new int[] {1,1} //Zig-zag pattern
+		int[][] pattern = { new int[] {11, 7}, new int[] {1, 1} //Zig-zag pattern
 
 			/*new int[] {6,1},
 			new int[] {6,2},
@@ -260,9 +260,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
 					if(debug) System.out.println("Impossible Path ..");
 					map.reset();
-					try{
-					Thread.sleep(1500);
-					} catch (Exception e) {}
+					try {
+						Thread.sleep(1500);
+					} catch (Exception e) {
+						
+					}
+					Button.waitForPress();
 				}
 			}
 		}
@@ -270,7 +273,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		if(debug) System.out.println("Done");
 	}
 
-	public void indeed() {
+	public void grabTest() {
 		while(true) {
 			slave_connection.request(RELEASE);
 			Button.waitForPress();
@@ -297,7 +300,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		dinaBOTmaster.indeed();
+		dinaBOTmaster.run();
 
 		while(true); //Never quit
 	}

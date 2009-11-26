@@ -394,7 +394,6 @@ public class BasicMovement implements Movement, MechConstants {
 		 * @param speed the speed to advance at
 		*/
 		void turnTo(double angle, int speed) {
-			System.out.println("Turn To");
 			previous_snap_enable = odometer.isSnapping();
 			if(previous_snap_enable) odometer.enableSnapping(false);
 			//Set motor speed
@@ -416,13 +415,11 @@ public class BasicMovement implements Movement, MechConstants {
 				left_motor.backward();
 				right_motor.forward();
 				//And set mode
-				System.out.println("mode set");
 				mode = Mode.ROTATE_CCW;
 			} else { //If the realtive angle is negative go clockwise
 				left_motor.forward();
 				right_motor.backward();
 				//And set mode
-				System.out.println("mode set");
 				mode = Mode.ROTATE_CW;
 			}
 		}
@@ -432,8 +429,6 @@ public class BasicMovement implements Movement, MechConstants {
 		 *
 		*/
 		void end() {
-			System.out.println("Ending");
-			if(mode == Mode.ROTATE_CW || mode == Mode.ROTATE_CCW) System.out.println("Was Rotate");
 			if(mode == Mode.GOTO_ROTATE_CW || mode == Mode.GOTO_ROTATE_CCW) {
 				left_motor.forward();
 				right_motor.forward();

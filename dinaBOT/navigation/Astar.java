@@ -66,29 +66,7 @@ public class Astar implements MechConstants{
 	 * @param resolution the number of nodes on each axis; total number of nodes is the resolution squared.
 	*/
 	public Astar(int resolution) {
-		int x, y;
-		this.X = resolution;
-		this.Y = resolution;
-
-		pathInfo = new int [X][Y][7];
-		open_limit = X*Y;
-		open = new int[open_limit][2];
-		open_idx = 0;
-
-
-		// initialize status to default status
-		for(x = 0; x < X; x++) {
-			for(y = 0; y < Y; y++) {
-				pathInfo[x][y][0] = 1;
-			}
-		}
-
-		// initialize open array to impossibe node coords
-		for(int i = 0; i < open_limit; i++) {
-			open[i][0] = -1;
-			open[i][1] = -1;
-		}
-
+		this(resolution, resolution);
 	}
 	
 	/**

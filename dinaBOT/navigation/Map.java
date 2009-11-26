@@ -42,31 +42,7 @@ public class Map implements MechConstants, USSensorListener {
 
 	// square map constructor 
 	public Map(Odometer odo, int rez, int threshold, double nodeDist) {
-		this.odo = odo;
-		this.X = rez;
-		this.Y = rez;
-
-		this.threshold = threshold;
-		this.map = new int[X][Y];
-
-		this.nodeDist = nodeDist;
-
-		this.newObstacle = false;
-
-		this.start();
-
-		listeners = new DinaList<MapListener>();
-
-		//initialize border
-		for(int x = 0; x < X; x++) map[x][0] = map[x][Y-1] = WALL;
-		for(int y = 0; y < Y; y++) map[0][y] = map[X-1][y] = WALL;
-
-
-		low_Readings = new int[] {255,255,255,255,255,255,255,255};
-		high_Readings = new int[] {255,255,255,255,255,255,255,255};
-
-		USSensor.high_sensor.registerListener(this);
-		USSensor.low_sensor.registerListener(this);
+		this(odo, rez, rez, threshold, nodeDist);
 	}
 	
 	//rectangular map constructor
