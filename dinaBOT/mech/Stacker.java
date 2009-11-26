@@ -18,7 +18,7 @@ public class Stacker implements Stacking {
 	//in degrees
 	final int clawOpenAngle = 95;
 	final int clawClosedAngle = 20;
-	final int clawTopAngle = -170;
+	final int clawTopAngle = -130;
 	final int clawTopStraight = -120;
 
 	final int gatesRotation = 110;
@@ -69,9 +69,14 @@ public class Stacker implements Stacking {
 			rightGate.rotateTo(gatesPickUpRotation);
 		}
 
-		claw.rotateTo(clawTopAngle);
-		claw.stop();
-		claw.rotateTo(clawTopStraight);
+		if(brickCount >= 5) {
+			claw.stop();
+			claw.rotateTo(clawTopStraight);
+		} else {
+			claw.rotateTo(clawTopAngle);
+			claw.stop();
+			claw.rotateTo(clawTopStraight);
+		}
 
 		try {Thread.sleep(1000);} catch(Exception e) {}
 

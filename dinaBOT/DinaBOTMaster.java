@@ -48,6 +48,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	//Variables
 	int pallet_count;
+	int drop_count;
 	boolean debug;
 
 	/**
@@ -139,7 +140,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			if(debug) System.out.println("Picking up");
 
 			alignPallet(); //If successfull align pallet
-
+			
+			if(pallet_count >= 5) movement.goForward(-3, SPEED_MED);
+			
 			map.stop(); //Temporarily disable map (stuff will pass in front of the sensor)
 			slave_connection.request(PICKUP); //Pickup
 			map.start(); //Reenable map
@@ -166,7 +169,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	 * This method makes the robot move to the correct drop off point, depending on where it is positioned with respect to it.
 	 *
 	*/
-	public void goToDropArea() {
+	public void performDropOff() {
 
 		//Getting drop off coordinates
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
@@ -180,12 +183,26 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		int nav_status = navigator.goTo(dropSetUpCoords[0]*UNIT_TILE, dropSetUpCoords[1]*UNIT_TILE, true, true);
 	
-		while (nav_status < 0) {
+		for(int i = 0;nav_status < 0;i++) {
 			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
 			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
+			if(i == 8) {
+				if(debug) System.out.println("Impossible Drop Off ..");
+				map.reset();
+				try {
+					Thread.sleep(1500);
+				} catch (Exception e) {
+				
+				}
+				Button.waitForPress();
+			}
 		}
 		
 		localization.localizeAnywhere();
+		dropper.dropOff(drop_count%2);
+		drop_count++;
+		pallet_count = 0;
+		//Go back to start_position?
 	}
 
 	/**
@@ -194,6 +211,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	*/
 	public void run() {
 		//Setup
+		
 		odometer.enableSnapping(true);
 		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
@@ -202,19 +220,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		map.start();
 		
-		int[][] pattern = { new int[] {11, 7}, new int[] {1, 1} //Zig-zag pattern
-
-			/*new int[] {6,1},
-			new int[] {6,2},
-			new int[] {1,2},
-			new int[] {1,3},
-			new int[] {6,3},
-			new int[] {6,4},
-			new int[] {1,4},
-			new int[] {1,5},
-			new int[] {6,5},
-			new int[] {6,6},
-			new int[] {1,1}*/ // Go back to starting node
+		int[][] pattern = {//Zig-zag pattern
+			new int[] {6,7},
+			new int[] {11,1},
+			new int[] {11,7},
+			new int[] {6,1},
+			new int[] {1,7},
+			new int[] {1,1} // Go back to starting node
 		};
 
 		//Assuming that the coordinate of the drop-off point is the bottom left node of the tile
@@ -234,39 +246,43 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		}
 
-		boolean done = false;
-
 		//right now finishes once it has dropped off the stack!
-		while(!done) {
-		for(int i = 0;i < pattern.length;i++) { //For each node in search path
+		for(int i = 0;i < pattern.length;) { //For each node in search path
 
 			if(debug) System.out.println("Leg number: "+i);
 
-				int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
+			int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
 
-				while(nav_status > 0) { //Keep going till you get there
-					if(debug) System.out.println("Breaking for possible pellet");
-					boolean pickup = pickUpPallet(); //Pick up pallet for interrupt
-					if(pallet_count == CAGE_FULL) {
-						if(debug) System.out.println("Run drop off...");
-						goToDropArea(); //This should return us to the same point
-						dropper.dropOff(1);
-						done = true;
-					} else nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
-				}
+			while(nav_status > 0) { //Keep going till you get there
+				if(debug) System.out.println("Breaking for possible pellet");
+				boolean pickup = pickUpPallet(); //Pick up pallet for interrupt
+				if(pallet_count == CAGE_FULL) {
+					if(debug) System.out.println("Run drop off...");
+					performDropOff(); //This should return us to the same point
+				} else nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
+			}
 
-				if(done) continue;
-
-				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
+			if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
+				double[] current_position = odometer.getPosition();
+				System.out.println("neg1");
+				System.out.println(map.coordValue(new double[] {pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE}));
+				if(map.coordValue(current_position) >= OBSTACLE) {
+					System.out.println("Inside Obstacle Ooops ...");
+					Button.waitForPress();
+				} else if(map.coordValue(new double[] {pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE}) >= OBSTACLE) {
+					i++;
+				} else {
 					if(debug) System.out.println("Impossible Path ..");
 					map.reset();
 					try {
 						Thread.sleep(1500);
 					} catch (Exception e) {
-						
+					
 					}
 					Button.waitForPress();
 				}
+			} else {
+				i++;
 			}
 		}
 

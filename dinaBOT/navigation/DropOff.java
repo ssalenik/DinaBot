@@ -198,7 +198,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 		//First stack drop off
 		//Drop in the middle of the tile
-		if (stack == 1) {
+		if (stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			slave_connection.request(ARMS_UP);
 
@@ -222,7 +222,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
 			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
-		} else if (stack == 2) {
+		} else if (stack == 1) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)

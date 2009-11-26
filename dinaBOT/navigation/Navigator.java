@@ -154,7 +154,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 			if(minLow < 20
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
-						&& low_Readings[1] < 75 && map.checkUSCoord((double)low_Readings[0], position[2])) {
+						/*&& low_Readings[1] < 75*/ && map.checkUSCoord((double)low_Readings[0], position[2])) {
 				interrupt();
 			}
 		}
