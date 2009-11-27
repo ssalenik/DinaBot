@@ -56,7 +56,10 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.rotate(false, SPEED_ROTATE);
 		phase = 1;
 		while (mover.isMoving());
-
+		//Reset odometer once empty space is seen.
+		//(Should fix the problem when the robot starts facing roughly where AngleA should be) 
+		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
+		
 		// keep rotating until the robot sees a wall
 		//then latch the angleA
 		phase = 2;
@@ -80,19 +83,12 @@ public class Localization implements MechConstants, USSensorListener {
 		// angles to the right of angleB is 4.05 degrees past 'north'
 		//Find 90 degree orientation approximation
 		phase = 0;
-		angleA = angleA%(Math.PI*2);
-		angleB = angleB%(Math.PI*2);
 
-		if (angleA < angleB) {
-			//The first wall seen is "south" wall.
-			//The second wall seen is "west" wall.			
-			finalAngle = ((angleA+angleB)/2.0) + (Math.PI/4.0);
-		} else {
-			//The first wall seen is "east" wall.
-			//The second wall seen is "south" wall.
-			finalAngle = ((angleA+angleB)/2.0) - (Math.PI/4.0);
-		}
-
+		//The robot is always in the South-West corner of the Arena (Bottom-Left).
+		//The first wall seen is "south" wall.
+		//The second wall seen is "west" wall.			
+		finalAngle = ((angleA+angleB)/2.0) + (Math.PI/4.0);
+		
 		mover.turnTo(finalAngle, SPEED_ROTATE);
 		
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
