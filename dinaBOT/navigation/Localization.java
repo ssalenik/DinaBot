@@ -71,11 +71,12 @@ public class Localization implements MechConstants, USSensorListener {
 		// switch direction and wait until it sees no wall
 		phase = 0;
 		boolean error = mover.turn(Math.PI/2.0, SPEED_ROTATE);
-		if (error == true) {
-			System.out.println("Help!");
+		//DEBUG
+		if (error == false) {
+			System.out.println("Interrupted");
 		}
 		while (mover.isMoving());
-		phase =1;
+		phase = 1;
 		mover.rotate(true, SPEED_ROTATE);
 		while (mover.isMoving());
 
@@ -86,7 +87,7 @@ public class Localization implements MechConstants, USSensorListener {
 		while(!angleBLatched && mover.isMoving());
 
 		// angleA is clockwise from angleB, so assume the average of the
-		// angles to the right of angleB is 4.05 degrees past 'north'
+		// angles to the right of angleB is 45.0 degrees past 'north'
 		//Find 90 degree orientation approximation
 		phase = 0;
 
@@ -96,6 +97,7 @@ public class Localization implements MechConstants, USSensorListener {
 		finalAngle = ((angleA+angleB)/2.0) + (Math.PI/4.0);
 		
 		mover.turnTo(finalAngle, SPEED_ROTATE);
+		while(mover.isMoving());
 		
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
 		// update the odometer position (this will be a vague estimation)
