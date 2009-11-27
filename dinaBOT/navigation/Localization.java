@@ -54,7 +54,7 @@ public class Localization implements MechConstants, USSensorListener {
 		odometer.enableSnapping(false);
 		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
 
-		// rotate the robot until it sees no wall
+		//Rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
 		phase = 1;
 		while (mover.isMoving() && !startLocalization);
@@ -62,17 +62,17 @@ public class Localization implements MechConstants, USSensorListener {
 		//(Should fix the problem when the robot starts facing roughly where AngleA should be)
 		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
 		
-		// keep rotating until the robot sees a wall
-		//then latch the angleA
+		//Keep rotating until the robot sees a wall
+		//Then latch the angleA
 		phase = 2;
 		mover.rotate(false, SPEED_ROTATE);
-		while(!angleALatched && mover.isMoving());
+		while(!angleALatched || mover.isMoving());
 
 		// switch direction and wait until it sees no wall
 		phase = 0;
 		boolean error = mover.turn(Math.PI/2.0, SPEED_ROTATE);
 		//DEBUG
-		if (error == false) {
+		if (error == true) {
 			System.out.println("Interrupted");
 		}
 		while (mover.isMoving());
@@ -80,14 +80,14 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.rotate(true, SPEED_ROTATE);
 		while (mover.isMoving());
 
-		// keep rotating until the robot sees a wall
-		//then latch the angleB (this wall is further)
+		//Keep rotating until the robot sees a wall
+		//Then latch the angleB (this wall is further)
 		phase = 3;
 		mover.rotate(true, SPEED_ROTATE);
-		while(!angleBLatched && mover.isMoving());
+		while(!angleBLatched || mover.isMoving());
 
-		// angleA is clockwise from angleB, so assume the average of the
-		// angles to the right of angleB is 45.0 degrees past 'north'
+		//angleA is clockwise from angleB, so assume the average of the
+		//Angles to the right of angleB is 45.0 degrees past 'north'
 		//Find 90 degree orientation approximation
 		phase = 0;
 
