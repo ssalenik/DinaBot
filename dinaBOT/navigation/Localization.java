@@ -23,6 +23,7 @@ public class Localization implements MechConstants, USSensorListener {
 	int last_values[] = new int[10];
 	int median = 5;
 	int idx = 0;
+	boolean startLocalization = false;
 
 	/**
 	 * The maximum distance at which the localizer will recongize that a wall is seen.
@@ -51,13 +52,14 @@ public class Localization implements MechConstants, USSensorListener {
 		angleALatched = false;
 		angleBLatched = false;
 		odometer.enableSnapping(false);
+		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
 
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
 		phase = 1;
-		while (mover.isMoving());
+		while (mover.isMoving() && !startLocalization);
 		//Reset odometer once empty space is seen.
-		//(Should fix the problem when the robot starts facing roughly where AngleA should be) 
+		//(Should fix the problem when the robot starts facing roughly where AngleA should be)
 		odometer.setPosition(new double[] {0,0,0}, new boolean[] {true, true, true});
 		
 		// keep rotating until the robot sees a wall
@@ -68,7 +70,11 @@ public class Localization implements MechConstants, USSensorListener {
 
 		// switch direction and wait until it sees no wall
 		phase = 0;
-		mover.turn(Math.PI/2.0, SPEED_ROTATE);
+		boolean error = mover.turn(Math.PI/2.0, SPEED_ROTATE);
+		if (error == true) {
+			System.out.println("Help!");
+		}
+		while (mover.isMoving());
 		phase =1;
 		mover.rotate(true, SPEED_ROTATE);
 		while (mover.isMoving());
@@ -202,6 +208,7 @@ public class Localization implements MechConstants, USSensorListener {
 				if (last_values[median] > WALL_DISTANCE+20) {
 					mover.stop();
 					Sound.twoBeeps();
+					startLocalization = true;
 				}
 			}
 			break;
