@@ -63,6 +63,16 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		USSensor.low_sensor.registerListener(this);
 	}
 
+	/**
+	 * Finds a path and goes to the given coordinate (the nearest map node to that coordinate).
+	 * 
+	 * @param x x of the coordinate (in cm).
+	 * @param y y of the coordinate (in cm).
+	 * @param full if true, dissables interrupts for pallets.
+	 * @param pickup_sucess should be false if the last pickup attempt failed.
+	 * 
+	 * @return 0 if succesfully reached the destination coordinate, 1 if interrupted for pallet, -1 if path is impossible.
+	 */
 	public int goTo(double x, double y, boolean full, boolean pickup_sucess) {
 		this.full_mode = full;
 
@@ -126,6 +136,9 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		movement.stop();
 	}
 
+	/**
+	 * Interrupts the goTo method if a newly mapped obstacle lies on the current path.
+	 */
 	public void newObstacle(int x, int y) {
 		if(active) {
 			System.out.println(x+"--"+y);
@@ -139,6 +152,9 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		}
 	}
 
+	/**
+	 * Interrupts path if a pallet withing the DETECTION_THRESHOLD is seen.
+	 */
 	public void newValues(int[] new_values, USSensor sensor) {
 
 		if(active && !full_mode && suspend_count >= 2) {
