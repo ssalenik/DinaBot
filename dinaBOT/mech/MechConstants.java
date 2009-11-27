@@ -8,11 +8,11 @@ package dinaBOT.mech;
 */
 public interface MechConstants {
 
-	/**The radius of the robot wheels
+	/**The radius of the robot wheels = {@value}.
 	*/
 	static final double WHEEL_RADIUS = 2.659;
 
-	/**The distance from on wheel to the other = {@value}
+	/**The distance from on wheel to the other = {@value}.
 	*/
 	static final double WHEEL_BASE = 12.8;
 
@@ -54,17 +54,41 @@ public interface MechConstants {
 	 */
 	static final int OBSTACLE_THRESHOLD = 45;
 	
-	
+	/**Value assigned to nodes containing obstacles in the map and A* pathing algorithm = {@value}.
+	 */
 	static final int OBSTACLE = 3;	// value which node is considered unpassable
+	
+	/**value assigned to nodes in danger zones in the map and A* pathing algorithm = {@value}.
+	 */
 	static final int DANGER = 2;	// value at which node is considered a danger zoen
+
+	/**Cost of going through a node in a danger zone in the A* pathing algorithm = {@value}.
+	 */
 	static final int DANGER_COST = 10;	//cost of going through danger zone
+	
+	/**Cost of turning (rather than going straight) in the A* pathing algorithm = {@value}.
+	 */
 	static final int TURN_COST = 1;	//cost of turning
+	
+	/**Value assigned to nodes cointaining walls in the map = {@value}.
+	 */
 	static final int WALL = 10;
+	
+	/**Value assigned to nodes which are corners of the drop-off zone in the map = {@value}.
+	 */
 	static final int DROP_ZONE = 5;
 
+	/**Absolute angle on the map which corresponds to "north" = {@value}; used in pathing related code do determine direction).
+	 */
 	static final int NORTH = 90;
+	/**Absolute angle on the map which corresponds to "south" = {@value}; used in pathing related code do determine direction).
+	 */
 	static final int SOUTH = 270;
+	/**Absolute angle on the map which corresponds to "east" = {@value}; used in pathing related code do determine direction).
+	 */
 	static final int EAST = 0;
+	/**Absolute angle on the map which corresponds to "west" = {@value}; used in pathing related code do determine direction).
+	 */
 	static final int WEST = 180;
 
 }
