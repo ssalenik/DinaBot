@@ -315,6 +315,15 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			slave_connection.request(CLOSE_CAGE);
 		}
 	}
+	
+	public void grabConfirm() {
+		while (true) {
+			slave_connection.request(PICKUP);
+			Button.waitForPress();
+			slave_connection.request(CLOSE);
+			Button.waitForPress();
+		}
+	}
 
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
@@ -324,20 +333,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public static void main(String[] args) {
 		//DO some drop off input stuff here
 
-		//int[] dropCoords = userInput();
+		int[] dropCoords = getUserInput();
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {3,3,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		dinaBOTmaster.run();
+		dinaBOTmaster.grabTest();
+		//dinaBOTmaster.run();
 
 		while(true); //Never quit
 	}
 	
-	/**
-	 * User coordinates input method. This is a static method called at the beginning of runtime for all the setup to be done.
-	 * This would include the drop coordinates and the search pattern to be used.
-	 */
 	/**
 	 * User coordinates input method. This is a static method called at the beginning of runtime for all the setup to be done.
 	 * This would include the drop coordinates and the search pattern to be used.
@@ -347,12 +353,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		
 		boolean enterPressed = false;
 		int nameIndex= 0;
-		int[] input= {0,0,0};
+		int[] input= {0,0/*,0*/};
 		
-		// Enter the y coordinate of the dropoff tile
+		// Enter the x coordinate of the dropoff tile
 		while(!enterPressed) {
 			LCD.clear();
-			LCD.drawString(input[0] + "   " + input[1]+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex], 0,0);
+			LCD.drawString(input[0] + "   " + input[1]/*+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex]*/, 0,0);
 			int buttonID = Button.waitForPress();
 			switch(buttonID) {
 				case Button.ID_LEFT:
@@ -372,7 +378,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//Enter the y coordinate of the dropoff tile
 		while(!enterPressed) {
 			LCD.clear();
-			LCD.drawString(input[0] + "   " + input[1]+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex], 0,0);
+			LCD.drawString(input[0] + "   " + input[1]/*+ "\nPattern: " + SearchPatterns.PatternNames[nameIndex]*/, 0,0);
 			int buttonID = Button.waitForPress();
 			switch(buttonID) {
 				case Button.ID_LEFT:
@@ -388,7 +394,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 		
 		enterPressed = false;
-		
+		/*
 		//Enter the search pattern
 		while(!enterPressed) { 
 			LCD.clear();
@@ -410,7 +416,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 					break;
 			}
 		}
-		
+		*/
 		
 		try {
 			Thread.sleep(2000);
