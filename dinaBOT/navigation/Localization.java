@@ -20,8 +20,8 @@ public class Localization implements MechConstants, USSensorListener {
 	double[] position;
 	boolean angleALatched = false, angleBLatched = false;
 
-	int last_values[] = new int[6];
-	int median = 3;
+	int last_values[] = new int[10];
+	int median = 5;
 	int idx = 0;
 
 	/**
@@ -50,6 +50,7 @@ public class Localization implements MechConstants, USSensorListener {
 		last_values = new int[6];
 		angleALatched = false;
 		angleBLatched = false;
+		odometer.enableSnapping(false);
 
 		// rotate the robot until it sees no wall
 		mover.rotate(false, SPEED_ROTATE);
@@ -82,7 +83,12 @@ public class Localization implements MechConstants, USSensorListener {
 		if (angleA < angleB) {
 			//The first wall seen is "south" wall.
 			//The second wall seen is "west" wall.
+			angleA = angleA%(Math.PI*2);
+			angleB = angleB%(Math.PI*2);
+			
 			finalAngle = ((angleA+angleB)/2.0) + (Math.PI/4.0);
+		} else {
+			LCD.drawString("I Failed ...", 0, 7);
 		}
 		/*else {
 			//The first wall seen is "east" wall.
@@ -91,10 +97,11 @@ public class Localization implements MechConstants, USSensorListener {
 		}*/
 
 		mover.turnTo(finalAngle, SPEED_ROTATE);
-
+		
 		LCD.drawInt((int) Math.toDegrees(odometer.getPosition()[2]), 0, 3);
 		// update the odometer position (this will be a vague estimation)
 		odometer.setPosition(new double[] {3.0*UNIT_TILE/4.0,3.0*UNIT_TILE/4.0,Math.PI/2.0}, new boolean[] {true,true,true});
+		odometer.enableSnapping(true);
 	}
 
 	/**
@@ -136,8 +143,10 @@ public class Localization implements MechConstants, USSensorListener {
 	 * Call to USLocalize and LightLocalize simply.
 	 */
 	public void localize() {
+		odometer.enableSnapping(false);
 		this.localizeUS();
 		this.localizeLight();
+		odometer.enableLateralSnapping(true);
 	}
 
 	/**
@@ -195,7 +204,7 @@ public class Localization implements MechConstants, USSensorListener {
 			//Stop when no wall is seen
 
 			if (sensor == USSensor.low_sensor) {
-				last_values[idx%6] = new_values[0];
+				last_values[idx%last_values.length] = new_values[0];
 				idx++;
 				if (last_values[median] > WALL_DISTANCE+20) {
 					mover.stop();
@@ -211,7 +220,7 @@ public class Localization implements MechConstants, USSensorListener {
 				angleA = odometer.getPosition()[2];
 				angleALatched = true;
 				try {
-					Sound.playTone(12, 2);
+					Sound.playTone(200, 100,80);
 				} catch (Exception e) {}
 				mover.stop();
 				LCD.drawInt((int)Math.toDegrees(angleA), 0, 0);
@@ -225,7 +234,7 @@ public class Localization implements MechConstants, USSensorListener {
 				angleB = odometer.getPosition()[2];
 				angleBLatched = true;
 				try {
-					Sound.playTone(12, 2);
+					Sound.playTone(200, 100,80);
 				} catch (Exception e) {}
 				mover.stop();
 				LCD.drawInt((int)Math.toDegrees(angleB), 0, 1);
