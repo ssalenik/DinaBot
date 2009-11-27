@@ -30,7 +30,7 @@ public class Test {
 
 			@Override
 			public void buttonPressed(Button arg0) {
-				if (!paused) {
+				if(!paused) {
 				music.pause();
 				paused = true;
 				} else {

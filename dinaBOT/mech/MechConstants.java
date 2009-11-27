@@ -51,44 +51,44 @@ public interface MechConstants {
 	public final double SWEEP_ARC = Math.PI/3;
 
 	/**Maximum distance at which the map will map an obstacle = {@value}.
-	 */
+	*/
 	static final int OBSTACLE_THRESHOLD = 45;
-	
+
 	/**Value assigned to nodes containing obstacles in the map and A* pathing algorithm = {@value}.
-	 */
+	*/
 	static final int OBSTACLE = 3;	// value which node is considered unpassable
-	
+
 	/**value assigned to nodes in danger zones in the map and A* pathing algorithm = {@value}.
-	 */
+	*/
 	static final int DANGER = 2;	// value at which node is considered a danger zoen
 
 	/**Cost of going through a node in a danger zone in the A* pathing algorithm = {@value}.
-	 */
+	*/
 	static final int DANGER_COST = 10;	//cost of going through danger zone
-	
+
 	/**Cost of turning (rather than going straight) in the A* pathing algorithm = {@value}.
-	 */
+	*/
 	static final int TURN_COST = 1;	//cost of turning
-	
+
 	/**Value assigned to nodes cointaining walls in the map = {@value}.
-	 */
+	*/
 	static final int WALL = 10;
-	
+
 	/**Value assigned to nodes which are corners of the drop-off zone in the map = {@value}.
-	 */
+	*/
 	static final int DROP_ZONE = 5;
 
 	/**Absolute angle on the map which corresponds to "north" = {@value}; used in pathing related code do determine direction).
-	 */
+	*/
 	static final int NORTH = 90;
 	/**Absolute angle on the map which corresponds to "south" = {@value}; used in pathing related code do determine direction).
-	 */
+	*/
 	static final int SOUTH = 270;
 	/**Absolute angle on the map which corresponds to "east" = {@value}; used in pathing related code do determine direction).
-	 */
+	*/
 	static final int EAST = 0;
 	/**Absolute angle on the map which corresponds to "west" = {@value}; used in pathing related code do determine direction).
-	 */
+	*/
 	static final int WEST = 180;
 
 }

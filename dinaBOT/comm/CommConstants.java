@@ -22,7 +22,7 @@ public interface CommConstants {
 	public static final byte HOLD = 6;
 	public static final byte RELEASE = 7;
 	public static final byte ARMS_UP = 8;
-	
+
 	public static final byte DISCONNECT = 10;
 
 	/* -- Sound Constants -- */

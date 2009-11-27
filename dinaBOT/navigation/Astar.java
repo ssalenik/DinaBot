@@ -19,7 +19,7 @@ import dinaBOT.mech.*;
  * @version 1
 */
 public class Astar implements MechConstants{
-	/* -- Class Variables --*/
+	/* -- Class Variables -- */
 
 	/* algo critical arrays*/
 
@@ -68,7 +68,7 @@ public class Astar implements MechConstants{
 	public Astar(int resolution) {
 		this(resolution, resolution);
 	}
-	
+
 	/**
 	 * creates a new Astar path on a rectangular map
 	 *
@@ -80,7 +80,7 @@ public class Astar implements MechConstants{
 		this.X = rezX;
 		this.Y = rezY;
 
-		pathInfo = new int [X][Y][7];
+		pathInfo = new int[X][Y][7];
 		open_limit = X*Y;
 		open = new int[open_limit][2];
 		open_idx = 0;

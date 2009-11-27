@@ -132,7 +132,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			System.out.println(lowest_high_reading);
 		}
 
-		if (blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD
+		if(blockDistance_A < lowest_high_reading-DETECTION_THRESHOLD
 				&& blockDistance_B < lowest_high_reading-DETECTION_THRESHOLD
 				&& Math.abs(blockDistance_A - blockDistance_B) < 10
 				&& blockDistance_A != 255
@@ -162,17 +162,10 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
  			phase = 0;
 
 			//gets too close to obstacle while moving
-			if(too_close) {
-				mapper.stop();
-				slave_connection.request(ARMS_UP); //Pickup
-				mapper.start();
-
-				return false;
-			}
+			if(too_close) return false;
 			return true;
 		} else {
 			//Fail-safe technique for now.
-			System.out.println("fail");
 			mover.turnTo(initialOrientation, SPEED_ROTATE);
 			phase = 0;
 			return false;
@@ -207,22 +200,22 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
-		switch (phase) {
+		switch(phase) {
 			case 0:
 				//Do nothing
 				break;
 
 			case 1:
 				//Latching A
-				if (sensor == USSensor.low_sensor) {
+				if(sensor == USSensor.low_sensor) {
 					latest_low_readings = new_values;
-					if (data_acquired) {
+					if(data_acquired) {
 						data_acquired = false;
 					}
-				} else if (sensor == USSensor.high_sensor) {
+				} else if(sensor == USSensor.high_sensor) {
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) lowest_high_reading = latest_high_readings[0];
-					if (!data_acquired) {
+					if(!data_acquired) {
 						minLow = latest_low_readings[0];
 						minHigh = lowest_high_reading;
 						findEdgeA();
@@ -234,15 +227,15 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 
 			case 2:
 				//Latching B
-				if (sensor == USSensor.low_sensor) {
+				if(sensor == USSensor.low_sensor) {
 					latest_low_readings = new_values;
-					if (data_acquired) {
+					if(data_acquired) {
 						data_acquired = false;
 					}
-				} else if (sensor == USSensor.high_sensor) {
+				} else if(sensor == USSensor.high_sensor) {
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) lowest_high_reading = latest_high_readings[0];
-					if (!data_acquired) {
+					if(!data_acquired) {
 						minLow = latest_low_readings[0];
 						minHigh = lowest_high_reading;
 						findEdgeB();
@@ -253,7 +246,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 				break;
 
 			case 3:
-			if (sensor == USSensor.high_sensor) {
+			if(sensor == USSensor.high_sensor) {
 					latest_high_readings = new_values;
 					if(latest_high_readings[0] < lowest_high_reading) {
 						lowest_high_reading = latest_high_readings[0];

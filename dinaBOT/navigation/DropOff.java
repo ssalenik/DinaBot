@@ -21,14 +21,14 @@ import dinaBOT.comm.*;
  *time, it will always use the same time each time it needs to drop off
  *another stack. The inputed data for the drop off will be given at
  *startup and would be two ints passed from the main.
- */
+*/
 
 /*
  * Drop off point sketch
  			#4(x1,y2)		#3(x2,y2)
 				 	 -------
 			 		|		|
-					| drop	|	
+					| drop	|
 			 		| point	|
 			 		 -------
  			#1(x1,y1)		#2(x2,y1)
@@ -36,13 +36,13 @@ import dinaBOT.comm.*;
 		This set of coordinates designates the middle of the each of the corners of the drop point.
 		Corners are ordered counter-clockwise starting from (x1,y1), the given drop off coordinates
 		This is only used to perform the drop for the second stack.
- */
+*/
 
 /**
  *This class contains the drop off routine
  *
  *@author Alexandre Courtemanche, Vinh Phong Buu
- */
+*/
 
 public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
@@ -83,7 +83,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * @param localizer
 	 * @param drop_x X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 * @param drop_y Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
-	 */
+	*/
 	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -91,7 +91,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		this.localizer = localizer;
 		dropCoords[0] = drop_x;
 		dropCoords[1] = drop_y;
-	
+
 		boolean firstTry = true;
 
 		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
@@ -107,7 +107,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			new int[] {drop_x + 1,drop_y - 1},
 			new int[] {drop_x,drop_y - 1}
 		};
-		
+
 		USSensor.low_sensor.registerListener(this);
 	}
 
@@ -115,7 +115,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Obtains the coordinates of the drop off area.
 	 *
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
-	 */
+	*/
 	public int[] getDropCoords() {
 		return dropCoords;
 	}
@@ -126,26 +126,26 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * dropoff set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
 	 * a circular clockwise order.
 	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
-	 */
+	*/
 	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
 		boolean found = false;
-		if (firstTry) { //If this is the first time it asks for an alternate dropoff set up point
+		if(firstTry) { //If this is the first time it asks for an alternate dropoff set up point
 			firstTry = false;
 			for (int i = 0; i < dropArea.length && !found; i++) { //Linear search through the array
 				found = (setUpCoords[0] != dropArea[i][0]) && (setUpCoords[1] != dropArea[i][1]);
-				if (found) {
+				if(found) {
 					coordPointer = (i + 1) % dropArea.length;
 				}
 			}
 		}
 		return dropArea[(coordPointer++) % dropArea.length];
 	}
-	
+
 	/**
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
 	 *
 	 * @return Success status
-	 */
+	*/
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
 	public boolean dropOff(int stack) {
 		boolean success = false;
@@ -162,25 +162,25 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		y2 = dropCoords[1]*UNIT_TILE+UNIT_TILE;
 
 		//Find nearest drop off area corner.
-		if (Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
+		if(Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
 			dropPoint[0] = x1;
 			corner = 1;
 		} else {
 			dropPoint[0] = x2;
 			corner = 2;
 		}
-		if (Math.abs(position[1] - y1) < Math.abs(position[1] - y2)) {
+		if(Math.abs(position[1] - y1) < Math.abs(position[1] - y2)) {
 			dropPoint[1] = y1;
 		} else {
 			dropPoint[1] = y2;
-			if (dropPoint[0] == x1) {
+			if(dropPoint[0] == x1) {
 				corner = 4;
 			} else {
 				corner = 3;
 			}
 		}
 
-		switch (corner) {
+		switch(corner) {
 		//Face the stack location.
 		case 1:
 			facing = Math.PI/4;
@@ -198,7 +198,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 		//First stack drop off
 		//Drop in the middle of the tile
-		if (stack == 0) {
+		if(stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			//Move to drop point.
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
@@ -220,7 +220,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
 			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
-		} else if (stack == 1) {
+		} else if(stack == 1) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
@@ -267,7 +267,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	}
 
 	public void newValues(int[] new_values, USSensor sensor) {
-		switch (phase) {
+		switch(phase) {
 		case 0:
 			//Do Nothing
 			break;
@@ -276,7 +276,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			int lastValue1 = 255;
 			int lastValue0 = 255;
 
-			if (new_values[0] < UNIT_TILE*1.5 && new_values[1] < UNIT_TILE*1.5 && new_values[1] < lastValue1
+			if(new_values[0] < UNIT_TILE*1.5 && new_values[1] < UNIT_TILE*1.5 && new_values[1] < lastValue1
 					&& new_values[0] < lastValue0) {
 				stackAngle = odometer.getPosition()[2];
 				lastValue1 = new_values[1];

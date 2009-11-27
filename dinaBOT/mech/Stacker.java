@@ -1,9 +1,5 @@
 package dinaBOT.mech;
 
-import dinaBOT.sensor.*;
-
-import lejos.nxt.SensorPort;
-import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 
 /**
@@ -18,8 +14,6 @@ public class Stacker implements Stacking {
 	Motor leftGate;
 	Motor rightGate;
 	Motor claw;
-	
-	LiftDetector liftDetect;
 
 	//in degrees
 	final int clawOpenAngle = 95;
@@ -42,7 +36,7 @@ public class Stacker implements Stacking {
 	 * @param rightGate motor corresponding to right gate
 	 * @param claw motor corresponding to claw
 	*/
-	public Stacker(Motor leftGate, Motor rightGate, Motor claw, SensorPort sensor) {
+	public Stacker(Motor leftGate, Motor rightGate, Motor claw) {
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
 		this.claw = claw;
@@ -52,8 +46,6 @@ public class Stacker implements Stacking {
 		claw.resetTachoCount();
 
 		claw.rotateTo(clawTopAngle);
-		
-		liftDetect = new LiftDetector(new LightSensor(sensor));
 	}
 
 	/**
@@ -65,9 +57,9 @@ public class Stacker implements Stacking {
 
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
-			
+
 		claw.setSpeed(clawSpeed);
-		
+
 		leftGate.resetTachoCount();
 		rightGate.resetTachoCount();
 
@@ -78,7 +70,7 @@ public class Stacker implements Stacking {
 
 		claw.stop();
 		claw.rotateTo(clawTopStraight);
-	
+
 		try {Thread.sleep(1000);} catch(Exception e) {}
 
 		if(brickCount < 2) {
@@ -88,7 +80,7 @@ public class Stacker implements Stacking {
 
 		brickCount += 1;
 
-		return liftDetect.armsUp();
+		return true;
 	}
 
 	/**
@@ -149,14 +141,14 @@ public class Stacker implements Stacking {
 		try {
 			Thread.sleep(500);
 		} catch(Exception e) {
-			
+
 		}
 		claw.setSpeed(clawSpeed/2);
 		claw.rotateTo(clawTopStraight);
 		claw.setSpeed(clawSpeed);
 		claw.stop();
 
-		return liftDetect.armsUp();
+		return true;
 	}
 
 	/**

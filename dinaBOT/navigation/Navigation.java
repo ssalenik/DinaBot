@@ -27,4 +27,6 @@ public interface Navigation extends MapListener {
 	*/
 	public void interrupt();
 
+	public void backtrack();
+
 }

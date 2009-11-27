@@ -16,12 +16,12 @@ import dinaBOT.mech.MechConstants;
 */
 public class BasicMovement implements Movement, MechConstants {
 
-	/* -- Class Variables --*/
+	/* -- Class Variables -- */
 
 	//Possible states for the movement daemon to be in
 	enum Mode { INACTIVE, SUSPENDED, ROTATE_CW, ROTATE_CCW, ADVANCE, GOTO_ROTATE_CW, GOTO_ROTATE_CCW, GOTO_SPLINE }
 
-	/* -- Instance Variables --*/
+	/* -- Instance Variables -- */
 
 	Odometer odometer;
 
@@ -117,7 +117,7 @@ public class BasicMovement implements Movement, MechConstants {
 			movement_daemon.turnTo(angle, speed);
 			while(!movement_daemon.isActive()) Thread.yield();
 			if(!returnImmediately) while(movement_daemon.isActive()) Thread.yield();
-			
+
 		}
 
 		return !interrupted_flag;
@@ -304,7 +304,7 @@ public class BasicMovement implements Movement, MechConstants {
 		 * @param speed the speed to advance at
 		*/
 		void goTo(double x, double y, int speed) {
-			/* Set permanents */
+			/* Set permanents*/
 			target_position[0] = x;
 			target_position[1] = y;
 
@@ -312,7 +312,7 @@ public class BasicMovement implements Movement, MechConstants {
 
 			current_position = odometer.getPosition();
 
-			/* Variable Quantities */
+			/* Variable Quantities*/
 
 			target_angle = Math.atan2((target_position[1]-current_position[1]),(target_position[0]-current_position[0]));
 

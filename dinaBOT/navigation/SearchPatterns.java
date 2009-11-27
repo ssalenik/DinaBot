@@ -4,14 +4,14 @@ package dinaBOT.navigation;
  * The SearchPatterns interface contains all the possible SearchPatterns we could use.
  *
  * @author Alexandre Courtemanche
- */
+*/
 
 public interface SearchPatterns {
 
-	
+
 	/**
 	 * Pattern list for when going through them in the user input module.
-	 */
+	*/
 	public static String[] PatternNames = {
 		"BASIC",
 		"PRACTICE_ZIGZAG_X",
@@ -21,16 +21,16 @@ public interface SearchPatterns {
 		"ZIGZAG_Y",
 		"CCW_SPIRAL"
 	};
-	
+
 	/**
 	 * Basic cross-map search pattern.
 	 * (Practice map)
-	 */
+	*/
 	public static final int[][] BASIC = {
 		new int[] {7,7},
 		new int[] {1,1}
 	};
-	
+
 	/**
 	 * ZigZag search pattern that makes the robot go up and down the x-axis.
 	 * (Practice map)
@@ -70,7 +70,7 @@ public interface SearchPatterns {
 	/**
 	 * Spiral patterns that makes the robot go around the obstacle course in a spiral.
 	 * (Practice map)
-	 */
+	*/
 	public static final int[][] PRACTICE_SPIRAL = {
 		new int[] {7,1},
 		new int[] {7,7},
@@ -87,10 +87,10 @@ public interface SearchPatterns {
 		new int[] {4,4},
 		new int[] {4,5},
 	};
-	
+
 	/**
 	 * ZigZag search pattern that makes the robot go up and down the x-axis.
-	 */
+	*/
 	public static final int[][] ZIGZAG_X = {
 		new int[] {11,1},
 		new int[] {11,3},
@@ -102,13 +102,13 @@ public interface SearchPatterns {
 		new int[] {1,9},
 		new int[] {11,9},
 		new int[] {11,11},
-		new int[] {1,11}, 
+		new int[] {1,11},
 		new int[] {1,1} // Go back to starting node
 	};
-	
+
 	/**
 	 * ZigZag search pattern that makes the robot go up and down the y-axis.
-	 */
+	*/
 	public static final int[][] ZIGZAG_Y = {
 		new int[] {1,11},
 		new int[] {3,11},
@@ -120,13 +120,13 @@ public interface SearchPatterns {
 		new int[] {9,1},
 		new int[] {9,11},
 		new int[] {11,11},
-		new int[] {11,1}, 
+		new int[] {11,1},
 		new int[] {1,1} //Go back to starting node
 	};
-	
+
 	/**
 	 * Search pattern that makes th robot go in a counter-clockwise spiral
-	 */
+	*/
 	public static final int[][] CCW_SPIRAL = {
 		new int[] {11,1},
 		new int[] {11,11},

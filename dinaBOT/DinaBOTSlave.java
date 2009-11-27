@@ -4,6 +4,7 @@ import lejos.nxt.*;
 
 import dinaBOT.comm.*;
 import dinaBOT.mech.*;
+import dinaBOT.sensor.*;
 //import dinaBOT.sound.*;
 
 /**
@@ -16,7 +17,8 @@ public class DinaBOTSlave implements CommConstants{
 //	MusicPlayer music;
 	Stacking stacker;
 	BTSlave master_connection;
-	
+	LiftDetector liftDetect;
+
 	boolean stayConnected;
 	boolean listeningForInstructions = true;
 
@@ -35,8 +37,10 @@ public class DinaBOTSlave implements CommConstants{
 			}
 		});
 
-		stacker = new Stacker(Motor.A, Motor.B, Motor.C, SensorPort.S4);
-		
+		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
+		liftDetect = new LiftDetector(new LightSensor(SensorPort.S4, true));
+		liftDetect.run();
+
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
 
@@ -53,12 +57,12 @@ public class DinaBOTSlave implements CommConstants{
 		boolean success = false;
 
 		while(listeningForInstructions) {
-			if (master_connection.isConnected()) {
+			if(master_connection.isConnected()) {
 				nextCommand = master_connection.waitForCommand();
 				LCD.clear();
 				LCD.drawString("Received "+ nextCommand,0,0);
 				//Button.waitForPress();
-				switch (nextCommand) {
+				switch(nextCommand) {
 
 					case DO_NOTHING:
 						success = true;
@@ -79,7 +83,8 @@ public class DinaBOTSlave implements CommConstants{
 						break;
 
 					case PICKUP:
-						success =stacker.pickUp();
+						stacker.pickUp();
+						success = liftDetect.armsUp();
 						break;
 
 					case TAP:
@@ -97,7 +102,7 @@ public class DinaBOTSlave implements CommConstants{
 					case ARMS_UP:
 						success = stacker.armsUp();
 						break;
-						
+
 					case DISCONNECT:
 						success = true;
 						LCD.clear();
@@ -137,7 +142,7 @@ public class DinaBOTSlave implements CommConstants{
 				try {
 					Thread.sleep(3500);
 				}
-				catch (Exception e) {
+				catch(Exception e) {
 
 				}
 				master_connection.waitForConnection();

@@ -48,7 +48,7 @@ public class Map implements MechConstants, USSensorListener {
 	public Map(Odometer odometer, int resolution) {
 		this(odometer, resolution, resolution, UNIT_TILE);
 	}
-	
+
 	/**
 	 * creates a new (square) Map where the resolution squared is the number of nodes.
 	 *
@@ -59,7 +59,7 @@ public class Map implements MechConstants, USSensorListener {
 	public Map(Odometer odometer, int resolution, double nodeDist) {
 		this(odometer, resolution, resolution, nodeDist);
 	}
-	
+
 	/**
 	 * creates a new (rectangular) Map where the product of the axis resolutions is the number of nodes.
 	 *
@@ -70,7 +70,7 @@ public class Map implements MechConstants, USSensorListener {
 	public Map(Odometer odometer, int resolution_X, int resolution_Y) {
 		this(odometer, resolution_X, resolution_Y, UNIT_TILE);
 	}
-	
+
 	/**
 	 * creates a new (rectangular) Map where the product of the axis resolutions is the number of nodes.
 	 *
@@ -89,7 +89,7 @@ public class Map implements MechConstants, USSensorListener {
 		this.nodeDist = nodeDist;
 
 		newObstacleSet(false);
-		
+
 		this.start();
 
 		listeners = new DinaList<MapListener>();
@@ -108,9 +108,9 @@ public class Map implements MechConstants, USSensorListener {
 
 	/**
 	 * registers the parameter as a listener of the map
-	 * 
-	 * @param listener the listener 
-	 */
+	 *
+	 * @param listener the listener
+	*/
 	public void registerListener(MapListener listener) {
 		listeners.add(listener);
 	}
@@ -123,50 +123,50 @@ public class Map implements MechConstants, USSensorListener {
 
 	/**
 	 * Checks if the coordinate is inside the map.
-	 * 
+	 *
 	 * @param coord the coordinate (x,y).
-	 */
+	*/
 	public boolean checkCoordBounds( double[] coord ) {
-		if (coord[0] < 0 || coord[0] > (X - 1) * nodeDist
+		if(coord[0] < 0 || coord[0] > (X - 1) * nodeDist
 						 || coord[1] < 0
 						 || coord[1] > (Y - 1) * nodeDist) return false;
 		else return true;
 	}
-	
+
 	/**
 	 * Returns the coordinate (in cm) of an object the given distance away from the front of the robot based on the current location (x,y, theta) of the robot.
-	 * 
-	 * Always returns a coordinate inside the map.  If the given distance maps to a coordinate outside the map, the the closest coordinate to that one which is inside the map is returned.
-	 * 
+	 *
+	 * Always returns a coordinate inside the map. If the given distance maps to a coordinate outside the map, the the closest coordinate to that one which is inside the map is returned.
+	 *
 	 * @param distance the distance (in cm) of the object from the centre of the robot.
-	 */
+	*/
 	public double[] getUSCoord(int distance) {
 		double angle = odo.getPosition()[2];
 
 		return getCoord(distance, angle);
 	}
-	
+
 	/**
 	 * Checks if an object the given distance away is inside the map, an obstacle, or danger zone.
-	 * 
+	 *
 	 * @param distance the distance (in cm) of the object from the centre of the robot.
-	 * 
+	 *
 	 * @return false if the object is outside the map, inside obstacle/wall/drop-off, or inside a danger zone; true otherwise.
-	 */
+	*/
 	public boolean checkUSCoord(int distance) {
 		double angle = odo.getPosition()[2];
-		
+
 		return checkCoord(distance, angle);
 	}
 
 	/**
 	 * Returns the coordinate (in cm) on the map of an object the given distance in the given direction (absolute angle) away from the center of the robot based on the current location (x,y) of the robot.
-	 * 
-	 * Always returns a coordinate inside the map.  If the given distance maps to a coordinate outside the map, the the closest coordinate to that one which is inside the map is returned.
-	 * 
+	 *
+	 * Always returns a coordinate inside the map. If the given distance maps to a coordinate outside the map, the the closest coordinate to that one which is inside the map is returned.
+	 *
 	 * @param distance the distance (in cm) of the object from the centre of the robot.
 	 * @param angle the absolute angle (in rads) of the object with respect to the centre of the robot (ie: the absolute angle the robot would have to turn to to face the object).
-	 */
+	*/
 	public double[] getCoord(double distance, double angle) {
 		double[] pos = new double[3];
 		double[] coord = new double[2];
@@ -179,12 +179,12 @@ public class Map implements MechConstants, USSensorListener {
 		coord[1] = Math.sin(pos[2])*distance + pos[1];
 
 		// make sure there are no negative coords
-		if (coord[0] < 0) {
+		if(coord[0] < 0) {
 			coord[0] = 0;
-		} else if (coord[0] > (X - 1) * nodeDist) coord[0] = (X -1)*nodeDist;
-		if (coord[1] < 0) {
+		} else if(coord[0] > (X - 1) * nodeDist) coord[0] = (X -1)*nodeDist;
+		if(coord[1] < 0) {
 			coord[1] = 0;
-		} else if (coord[1] > (Y - 1) * nodeDist) coord[1] = (Y -1)*nodeDist;
+		} else if(coord[1] > (Y - 1) * nodeDist) coord[1] = (Y -1)*nodeDist;
 
 		return coord;
 
@@ -192,12 +192,12 @@ public class Map implements MechConstants, USSensorListener {
 
 	/**
 	 * Checks if an object the given distance in the given direction (absolute angle) away is inside the map, an obstacle, or danger zone.
-	 * 
+	 *
 	 * @param distance the distance (in cm) of the object from the centre of the robot.
 	 * @param angle the absolute angle (in rads) of the object with respect to the centre of the robot (ie: the absolute angle the robot would have to turn to to face the object).
-	 * 
-	 * @return false if the object is outside the map, inside obstacle/wall/drop-off, or inside a danger zone; true otherwise. 
-	 */
+	 *
+	 * @return false if the object is outside the map, inside obstacle/wall/drop-off, or inside a danger zone; true otherwise.
+	*/
 	public boolean checkCoord(double distance, double angle) {
 		double[] pos = new double[3];
 		double[] coord = new double[2];
@@ -211,7 +211,7 @@ public class Map implements MechConstants, USSensorListener {
 
 		// make sure there are no coords out of bounds or in obstacles/danger zones
 		// !!! do we want to exclude coords in danger zones?
-		if (!checkCoordBounds(coord)) return false;
+		if(!checkCoordBounds(coord)) return false;
 		else if(coordValue(coord) > 0) {
 			return false;
 		} else {
@@ -219,14 +219,14 @@ public class Map implements MechConstants, USSensorListener {
 		}
 
 	}
-	
+
 	/**
 	 * Returns the node corresponding to the given coordinate.
-	 * 
+	 *
 	 * Does not check bounds.
-	 * 
+	 *
 	 * @param coord the coordinate (x,y).
-	 */
+	*/
 	public int[] getNode(double[] coord) {
 		int[] node = new int[2];
 
@@ -235,77 +235,77 @@ public class Map implements MechConstants, USSensorListener {
 
 		return node;
 	}
-	
+
 	/**
 	 * Checks that the given node is inside the bounds of the map.
-	 * 
+	 *
 	 * @param coord the coordinate (x,y).
-	 * 
+	 *
 	 * @return true if inside the bounds of the map; false otherwise.
-	 */
+	*/
 	public boolean checkNodeBounds(int[] node) {
 		if( node[0] < 0 || node[0] > X - 1
 						|| node[1] < 0
 						|| node[1] > Y - 1) return false;
 		else return true;
 	}
-	
+
 	/**
 	 * Checks that the given node is inside the bounds of the map.
-	 * 
+	 *
 	 * @param x.
 	 * @param y.
-	 * 
+	 *
 	 * @return true if inside the bounds of the map; false otherwise.
-	 */
+	*/
 	public boolean checkNodeBounds(int x, int y) {
 		if( x < 0 || x > X - 1
 						|| y < 0
 						|| y > Y - 1) return false;
 		else return true;
 	}
-	
+
 	/**
 	 * Checks if the given node is inside the map, an obstacle/wall/drop-off, or danger zone.
-	 * 
+	 *
 	 * @param node the node.
-	 * 
-	 * @return false if the node is outside the map, inside obstacle/wall/drop-off, or inside a danger zone; true otherwise. 
-	 */
+	 *
+	 * @return false if the node is outside the map, inside obstacle/wall/drop-off, or inside a danger zone; true otherwise.
+	*/
 	public boolean checkNode(int[] node) {
 		if(!checkNodeBounds(node)) return false;
-		else if ( map[node[0]][node[1]] > DANGER ) return false;
+		else if( map[node[0]][node[1]] > DANGER ) return false;
 		else return true;
 	}
-	
+
 	/**
 	 * Returns the value of the given node.
-	 * 
+	 *
 	 * @param node the node.
-	 */
+	*/
 	public int nodeValue(int[] node) {
 		if(!checkNodeBounds(node)) return -1;
 		else return map[node[0]][node[1]];
 	}
-	
+
 	/**
 	 * Returns the value of the given node.
-	 * 
+	 *
 	 * @param x
 	 * @param y
-	 */
+	*/
 	public int nodeValue(int x, int y) {
 		if(!checkNodeBounds(x,y)) return -1;
 		else return map[x][y];
 	}
-	
+
 	/**
 	 * Returns the value of the given coord.
-	 * 
+	 *
 	 * @param coord the coord.
-	 * 
+	 *
 	 * @return returns -1 if the coord is not inside the boundries of the map; otherwise the value of the node.
-	 */
+	*/
 	public int coordValue(double[] coord) {
 		int[] node = getNode(coord);
 		if(!checkNodeBounds(node)) return -1;
@@ -314,7 +314,7 @@ public class Map implements MechConstants, USSensorListener {
 
 	/**
 	 * Returns the current map.
-	 */
+	*/
 	public int[][] getMap() {
 
 		// FIX THIS SO IT RETURNS A COPY OF THE ARRAY
@@ -324,16 +324,16 @@ public class Map implements MechConstants, USSensorListener {
 
 	/**
 	 * Returns the resolution of each axis of the map.
-	 * 
+	 *
 	 * @return (resolution of x-axis, resolution of y-axis).
-	 */
+	*/
 	public int[] getRez() {
 		return new int[] {X,Y};
 	}
 
 	/**
 	 * Interrupts the map with new values from the USSensor
-	 */
+	*/
 	public void newValues(int[] new_values, USSensor sensor) { //This is only called by the high sensor because we didn't register with the low one
 		double[] coord = new double[2];
 		int[] node = new int[2];
@@ -347,7 +347,7 @@ public class Map implements MechConstants, USSensorListener {
 
 		// only care about high US sensor values
 		if(sensor == USSensor.low_sensor) low_Readings = new_values;
-		else if (sensor == USSensor.high_sensor) high_Readings = new_values;
+		else if(sensor == USSensor.high_sensor) high_Readings = new_values;
 		else return; //should never happen
 
 		minLow = low_Readings[0];
@@ -364,7 +364,7 @@ public class Map implements MechConstants, USSensorListener {
 		*/
 
 		// if ostacle distance is close enough, mark appropriate node
-		if (distance < OBSTACLE_THRESHOLD) {
+		if(distance < OBSTACLE_THRESHOLD) {
 
 			// get abs. coords from relative distance
 			coord = getUSCoord(distance);
@@ -387,19 +387,19 @@ public class Map implements MechConstants, USSensorListener {
 				 * 2 = DANGER ZONE
 				 * 0 = clear
 				 * 20 = drop off area corner?? -not yet decided
-				 */
+				*/
 				if(map[node[0]][node[1]] < OBSTACLE) {
 					Sound.twoBeeps();
-					
+
 					//mark obstacle
 					map[node[0]][node[1]] = OBSTACLE;
-					
+
 					//mark danger zone(s) all those adjacent to obstacle except the one behind the obstacle
 					if(checkNode(new int[] {node[0] + 1, node[1]})) map[node[0] + 1][node[1]] = DANGER;
 					if(checkNode(new int[] {node[0] - 1, node[1]})) map[node[0] - 1][node[1]] = DANGER;
 					if(checkNode(new int[] {node[0], node[1] + 1})) map[node[0]][node[1] + 1] = DANGER;
 					if(checkNode(new int[] {node[0], node[1] - 1})) map[node[0]][node[1] - 1] = DANGER;
-					
+
 					notifyListeners(node[0], node[1]);
 				}
 			//}
@@ -422,9 +422,9 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 	/**Assigns the given node of the map with given value.
-	 * 
+	 *
 	 * This value is not guranteed to not be changed (eg: if the map is reset).
-	 */
+	*/
 	public synchronized boolean editMap(int x, int y, int value) {
 		this.map[x][y] = value;
 
@@ -436,8 +436,8 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 
-	/**Checks if the map has been interrupted with a new obstacle.  Sets the boolean interrupt back to false (ie: can only return true once per new obstacle).
-	 */
+	/**Checks if the map has been interrupted with a new obstacle. Sets the boolean interrupt back to false (ie: can only return true once per new obstacle).
+	*/
 	public boolean obstacleCheck() {
 		if(newObstacle) {
 			newObstacleSet(false);
@@ -446,19 +446,19 @@ public class Map implements MechConstants, USSensorListener {
 	}
 
 	/**Stops the map (ie: it does not map new obstacles).
-	 */
+	*/
 	public synchronized void stop() {
 		stop = true;
 	}
 
 	/**Starts the map.
-	 */
+	*/
 	public synchronized void start() {
 		stop = false;
 	}
-	
-	/**Resets the map.  All node values except those which are marked as a wall or drop-off zone are reset to 0.
-	 */
+
+	/**Resets the map. All node values except those which are marked as a wall or drop-off zone are reset to 0.
+	*/
 	public void reset() {
 		this.stop();
 		for(int x = 0; x < X; x++) {

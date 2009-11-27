@@ -22,7 +22,7 @@ import dinaBOT.sensor.LineDetector;
 */
 public class ArcOdometer implements Odometer {
 
-	/* -- Class Variables --*/
+	/* -- Class Variables -- */
 
 	/* Odometer*/
 

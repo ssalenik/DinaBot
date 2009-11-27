@@ -14,12 +14,12 @@ import dinaBOT.util.DinaList;
 */
 public class USSensor implements Runnable {
 
-	/* Class Variables */
+	/* Class Variables*/
 
 	public static USSensor high_sensor = new USSensor(SensorPort.S3);
 	public static USSensor low_sensor = new USSensor(SensorPort.S1);
 
-	/* Instance Variables */
+	/* Instance Variables*/
 
 	UltrasonicSensor sensor;
 
@@ -62,7 +62,7 @@ public class USSensor implements Runnable {
 
 			sensor.getDistances(latest_values);
 
-			if (this == USSensor.low_sensor) {
+			if(this == USSensor.low_sensor) {
 				if(latest_values[0] <= 26) {
 					for(int i = 0;i < 8;i++) {
 						if(latest_values[i] != 255) latest_values[i] = (int)((double)(latest_values[i]*latest_values[i])*0.1091-3.3446*(double)latest_values[i]+35.629);
@@ -72,7 +72,7 @@ public class USSensor implements Runnable {
 						if(latest_values[i] != 255) latest_values[i] = (int)(0.9846*(double)latest_values[i]-0.1456);
 					}
 				}
-			} else if (this == USSensor.high_sensor) {
+			} else if(this == USSensor.high_sensor) {
 				for(int i = 0;i < 8;i++) {
 					// if(i == 0 && latest_values[i] == 23) latest_values[i] = 255;
 					if(latest_values[i] != 255) latest_values[i] = (int)(1.3013*(double)latest_values[i]-0.7027);

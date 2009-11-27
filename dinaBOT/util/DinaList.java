@@ -64,7 +64,7 @@ public class DinaList<E> {
 			E old_element = (E)element_data[index];
 
 			int num_moved = size-index-1;
-			if (num_moved > 0) System.arraycopy(element_data, index+1, element_data, index, num_moved);
+			if(num_moved > 0) System.arraycopy(element_data, index+1, element_data, index, num_moved);
 			element_data[--size] = null; // Let gc do its work
 
 			return old_element;

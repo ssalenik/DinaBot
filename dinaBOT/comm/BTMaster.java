@@ -57,7 +57,7 @@ public class BTMaster implements CommConstants {
 
 			btrd = Bluetooth.getKnownDevice(SLAVE_NAME);
 
-			if (btrd == null) {
+			if(btrd == null) {
 				if(debug) {
 					LCD.clear();
 					LCD.drawString("Cannot find device +"+ SLAVE_NAME, 0, 0);
@@ -73,7 +73,7 @@ public class BTMaster implements CommConstants {
 
 			connection = Bluetooth.connect(btrd);
 
-			if (connection == null) {
+			if(connection == null) {
 				if(debug) {
 					LCD.clear();
 					LCD.drawString("Connect failed", 0, 0);
@@ -130,7 +130,7 @@ public class BTMaster implements CommConstants {
 			dataIn.close();
 			dataOut.close();
 			connection.close();
-		} catch (IOException ioe) {
+		} catch(IOException ioe) {
 			LCD.clear();
 			LCD.drawString("IOError: "+ ioe.toString(), 0, 0);
 		}

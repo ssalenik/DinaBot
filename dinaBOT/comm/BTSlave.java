@@ -68,7 +68,7 @@ public class BTSlave implements CommConstants {
 
 		try {
 			nextInstruction = dataIn.readByte();
-		} catch (IOException ioe) {
+		} catch(IOException ioe) {
 			LCD.clear();
 			LCD.drawString("Error reading next command from master: \n"+ioe.toString(), 0, 0);
 		}
@@ -86,7 +86,7 @@ public class BTSlave implements CommConstants {
 		try {
 			dataOut.writeBoolean(success);
 			dataOut.flush();
-		} catch (IOException ioe) {
+		} catch(IOException ioe) {
 			LCD.clear();
 			LCD.drawString("Error sending success status: \n"+ioe.toString(), 0, 0);
 		}
