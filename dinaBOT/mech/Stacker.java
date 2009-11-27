@@ -1,5 +1,9 @@
 package dinaBOT.mech;
 
+import dinaBOT.sensor.*;
+
+import lejos.nxt.SensorPort;
+import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 
 /**
@@ -14,6 +18,8 @@ public class Stacker implements Stacking {
 	Motor leftGate;
 	Motor rightGate;
 	Motor claw;
+	
+	LiftDetector liftDetect;
 
 	//in degrees
 	final int clawOpenAngle = 95;
@@ -36,7 +42,7 @@ public class Stacker implements Stacking {
 	 * @param rightGate motor corresponding to right gate
 	 * @param claw motor corresponding to claw
 	*/
-	public Stacker(Motor leftGate, Motor rightGate, Motor claw) {
+	public Stacker(Motor leftGate, Motor rightGate, Motor claw, SensorPort sensor) {
 		this.leftGate = leftGate;
 		this.rightGate = rightGate;
 		this.claw = claw;
@@ -46,6 +52,8 @@ public class Stacker implements Stacking {
 		claw.resetTachoCount();
 
 		claw.rotateTo(clawTopAngle);
+		
+		liftDetect = new LiftDetector(new LightSensor(sensor));
 	}
 
 	/**
@@ -80,7 +88,7 @@ public class Stacker implements Stacking {
 
 		brickCount += 1;
 
-		return true;
+		return liftDetect.armsUp();
 	}
 
 	/**
@@ -148,7 +156,7 @@ public class Stacker implements Stacking {
 		claw.setSpeed(clawSpeed);
 		claw.stop();
 
-		return true;
+		return liftDetect.armsUp();
 	}
 
 	/**

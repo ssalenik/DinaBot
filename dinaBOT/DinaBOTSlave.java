@@ -4,7 +4,6 @@ import lejos.nxt.*;
 
 import dinaBOT.comm.*;
 import dinaBOT.mech.*;
-import dinaBOT.sensor.*;
 //import dinaBOT.sound.*;
 
 /**
@@ -17,8 +16,7 @@ public class DinaBOTSlave implements CommConstants{
 //	MusicPlayer music;
 	Stacking stacker;
 	BTSlave master_connection;
-	LiftDetector liftDetect;
-
+	
 	boolean stayConnected;
 	boolean listeningForInstructions = true;
 
@@ -37,8 +35,7 @@ public class DinaBOTSlave implements CommConstants{
 			}
 		});
 
-		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
-		liftDetect = new LiftDetector(new LightSensor(SensorPort.S4, true));
+		stacker = new Stacker(Motor.A, Motor.B, Motor.C, SensorPort.S4);
 		
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();
@@ -82,8 +79,7 @@ public class DinaBOTSlave implements CommConstants{
 						break;
 
 					case PICKUP:
-						stacker.pickUp();
-						success = liftDetect.armsUp();
+						success =stacker.pickUp();
 						break;
 
 					case TAP:
