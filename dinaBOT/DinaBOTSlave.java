@@ -39,7 +39,6 @@ public class DinaBOTSlave implements CommConstants{
 
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
 		liftDetect = new LiftDetector(new LightSensor(SensorPort.S4, true));
-		liftDetect.run();
 		
 		master_connection = new BTSlave();
 		master_connection.waitForConnection();

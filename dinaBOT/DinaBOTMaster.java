@@ -317,13 +317,27 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	}
 	
 	public void grabConfirm() {
+				
 		while (true) {
-			slave_connection.request(PICKUP);
+			
 			Button.waitForPress();
-			slave_connection.request(CLOSE);
+			slave_connection.request(RELEASE);
 			Button.waitForPress();
+			
+			if (slave_connection.request(PICKUP)) {
+				LCD.clear();
+				LCD.drawString("Success",0,0);
+			}
+			else {
+				LCD.clear();
+				LCD.drawString("Failure",0,0);
+			}
+			
+			
 		}
+		
 	}
+	
 
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
@@ -338,8 +352,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		//Run some tests
 		dinaBOTmaster.connect();
-		dinaBOTmaster.grabTest();
-		//dinaBOTmaster.run();
+		//dinaBOTmaster.grabConfirm();
+		dinaBOTmaster.run();
 
 		while(true); //Never quit
 	}
