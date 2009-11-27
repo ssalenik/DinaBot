@@ -14,10 +14,10 @@ import lejos.nxt.comm.*;
 */
 public class BTSlave implements CommConstants {
 
-	public DataInputStream dataIn;
-	public DataOutputStream dataOut;
-	public BTConnection connection;
-	public boolean connected;
+	DataInputStream dataIn;
+	DataOutputStream dataOut;
+	BTConnection connection;
+	boolean connected;
 
 
 	/**

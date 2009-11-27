@@ -8,7 +8,7 @@ public class DinaList<E> {
 
 	/* -- Class Variables -- */
 
-	public static int default_capacity = 3;
+	static int default_capacity = 3;
 
 	/* -- Instance Variables -- */
 

@@ -13,9 +13,10 @@ import dinaBOT.sensor.*;
  */
 public class Localization implements MechConstants, USSensorListener {
 
-	public Odometer odometer;
-	public Movement mover;
-	public int phase = 0;
+	Odometer odometer;
+	Movement mover;
+	
+	int phase = 0;
 	double angleA, angleB, finalAngle;
 	double[] position;
 	boolean angleALatched = false, angleBLatched = false;

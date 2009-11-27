@@ -57,20 +57,20 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	public final int DUMP_DISTANCE = 30 ;
 
 	//Fields
-	public Odometer odometer;
-	public Movement mover;
-	public BTMaster slave_connection;
-	public Localization localizer;
+	Odometer odometer;
+	Movement mover;
+	BTMaster slave_connection;
+	Localization localizer;
 
-	public int[] dropCoords = new int[2];
-	public int phase =0;
-	public double[] left_side,right_side,top_side,bottom_side;
-	public double stackAngle = 0;
-	public boolean latchedStack = false;
+	int[] dropCoords = new int[2];
+	int phase =0;
+	double[] left_side,right_side,top_side,bottom_side;
+	double stackAngle = 0;
+	boolean latchedStack = false;
 	double x1,x2,y1,y2;
 
-	public int[][] dropArea;
-	public int coordPointer = 0;
+	int[][] dropArea;
+	int coordPointer = 0;
 	boolean firstTry = true;
 
 	/**
