@@ -62,10 +62,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//Add a convenient quit button
 		Button.ESCAPE.addButtonListener(new ButtonListener() {
 			public void buttonPressed(Button b) {
+				map.printMap();
 				System.exit(0);
 			}
 
 			public void buttonReleased(Button b) {
+				map.printMap();
 				System.exit(0);
 			}
 		});
