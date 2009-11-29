@@ -99,7 +99,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				if(suspend_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
 				active = false;
 
-				history[history_pointer%history.length] = path[node];
+				history[history_pointer%history.length][0] = path[node][0];
+				history[history_pointer%history.length][1] = path[node][1];
 				history_pointer++;
 
 				if(node == path.length-1) {
@@ -156,7 +157,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	public void backtrack() {
 		if(history_pointer > 1) {
 			for(int i = 0;i < history.length;i++) {
-				movement.goTo(history[(history_pointer-i)%history.length][0], path[(history_pointer-i)%history.length][1], SPEED_MED);
+				movement.goTo(history[(history_pointer-i)%history.length][0], history[(history_pointer-i)%history.length][1], SPEED_MED);
 			}
 		}
 	}
@@ -195,6 +196,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			if(minLow < 20
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 						/*&& low_Readings[1] < 75*/ && map.checkUSCoord(low_Readings[0])) {
+				double[] pallet_position = map.getCoord(low_Readings[0]);
+				if(pallet_position[0]%(UNIT_TILE*4) < 3 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-3)) return;
 				interrupt();
 			}
 		}

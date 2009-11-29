@@ -24,13 +24,6 @@ public class ManhattanPather implements Pathing, MechConstants {
 
 	int X, Y;
 
-	static final int NORTH = 90;
-	static final int SOUTH = 270;
-	static final int EAST = 0;
-	static final int WEST = 180;
-
-
-
 	/**
 	 * creates a new ManhattanPather
 	 *

@@ -151,7 +151,7 @@ public class Map implements MechConstants, USSensorListener {
 	 *
 	 * @param distance the distance (in cm) of the object from the centre of the robot.
 	*/
-	public double[] getUSCoord(int distance) {
+	public double[] getCoord(int distance) {
 		double angle = odo.getPosition()[2];
 
 		return getCoord(distance, angle);
@@ -250,7 +250,7 @@ public class Map implements MechConstants, USSensorListener {
 	/**
 	 * Checks that the given node is inside the bounds of the map.
 	 *
-	 * @param coord the coordinate (x,y).
+	 * @param node the coordinate (x,y).
 	 *
 	 * @return true if inside the bounds of the map; false otherwise.
 	*/
@@ -264,8 +264,8 @@ public class Map implements MechConstants, USSensorListener {
 	/**
 	 * Checks that the given node is inside the bounds of the map.
 	 *
-	 * @param x.
-	 * @param y.
+	 * @param x the x coordinate to check
+	 * @param y the y coordinate to check
 	 *
 	 * @return true if inside the bounds of the map; false otherwise.
 	*/
@@ -378,8 +378,8 @@ public class Map implements MechConstants, USSensorListener {
 		if(distance < OBSTACLE_THRESHOLD) {
 
 			// get abs. coords from relative distance
-			coord = getUSCoord(distance);
-			curr_coord = getUSCoord(0);
+			coord = getCoord(distance);
+			curr_coord = getCoord(0);
 
 			// get node associated with coords
 			node = getNode(coord);
@@ -419,7 +419,7 @@ public class Map implements MechConstants, USSensorListener {
 			/*distance = threshold;
 			for(int i = 2; threshold >= UNIT_TILE; i++) {
 
-				coord = getUSCoord(distance);
+				coord = getCoord(distance);
 				node = getNode(coord);
 
 				if(map[node[0]][node[1]] > 0) {
