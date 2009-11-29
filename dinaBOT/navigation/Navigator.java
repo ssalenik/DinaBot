@@ -38,7 +38,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	double[][] history;
 	int history_pointer;
 
-	boolean active, suspend_interrupt, soft_interrupt, full_mode;
+	boolean active, suspend_interrupt, soft_interrupt, full_mode, backtrack;
 
 	/**
 	 * Instantiate a new Navigator
@@ -80,6 +80,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	*/
 	public int goTo(double x, double y, boolean full, boolean pickup_sucess) {
 		this.full_mode = full;
+		
+		if(backtrack) {
+			if(map.coordValue(new double[] {x,y}) >= DANGER) return -1;
+		}
 
 		if(suspend_interrupt && !pickup_sucess) {
 			suspend_count = 0;
@@ -143,6 +147,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	public void interrupt() {
 		suspend_interrupt = true;
 		movement.stop();
+	}
+	
+	public void setBacktrack(boolean set) {
+		this.backtrack = set;
 	}
 
 	public void backtrack() {
