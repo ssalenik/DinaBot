@@ -21,7 +21,7 @@ import dinaBOT.comm.*;
  *time, it will always use the same time each time it needs to drop off
  *another stack. The inputed data for the drop off will be given at
  *startup and would be two ints passed from the main.
-*/
+ */
 
 /*
  * Drop off point sketch
@@ -36,13 +36,13 @@ import dinaBOT.comm.*;
 		This set of coordinates designates the middle of the each of the corners of the drop point.
 		Corners are ordered counter-clockwise starting from (x1,y1), the given drop off coordinates
 		This is only used to perform the drop for the second stack.
-*/
+ */
 
 /**
  *This class contains the drop off routine
  *
  *@author Alexandre Courtemanche, Vinh Phong Buu
-*/
+ */
 
 public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
@@ -83,7 +83,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * @param localizer
 	 * @param drop_x X coordinate of the bottom left node of the drop off tile (in Unit Tiles).
 	 * @param drop_y Y coordinate of the bottom left node of the drop off tile (in Unit Tiles).
-	*/
+	 */
 	public DropOff(Odometer odometer, Movement mover, BTMaster slave_connection, Localization localizer, int drop_x, int drop_y) {
 		this.odometer = odometer;
 		this.mover = mover;
@@ -95,17 +95,17 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		boolean firstTry = true;
 
 		this.dropArea = new int[][] { //Clockwise from the bottom left of the drop off area
-			new int[] {drop_x - 1, drop_y - 1},
-			new int[] {drop_x - 1, drop_y},
-			new int[] {drop_x - 1,drop_y + 1},
-			new int[] {drop_x - 1,drop_y + 2},
-			new int[] {drop_x,drop_y + 2},
-			new int[] {drop_x + 1,drop_y + 2},
-			new int[] {drop_x + 2,drop_y + 2},
-			new int[] {drop_x + 2,drop_y + 1},
-			new int[] {drop_x + 2,drop_y - 1},
-			new int[] {drop_x + 1,drop_y - 1},
-			new int[] {drop_x,drop_y - 1}
+				new int[] {drop_x - 1, drop_y - 1},
+				new int[] {drop_x - 1, drop_y},
+				new int[] {drop_x - 1,drop_y + 1},
+				new int[] {drop_x - 1,drop_y + 2},
+				new int[] {drop_x,drop_y + 2},
+				new int[] {drop_x + 1,drop_y + 2},
+				new int[] {drop_x + 2,drop_y + 2},
+				new int[] {drop_x + 2,drop_y + 1},
+				new int[] {drop_x + 2,drop_y - 1},
+				new int[] {drop_x + 1,drop_y - 1},
+				new int[] {drop_x,drop_y - 1}
 		};
 
 		USSensor.low_sensor.registerListener(this);
@@ -115,7 +115,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Obtains the coordinates of the drop off area.
 	 *
 	 * @return Array containing XY coordinates of the bottom left corner of the drop off point.
-	*/
+	 */
 	public int[] getDropCoords() {
 		return dropCoords;
 	}
@@ -126,7 +126,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * dropoff set up point. The list of possible coordinates is implemented as an array of coordinates where the coordinates are stored in
 	 * a circular clockwise order.
 	 * @param setUpCoords Array containing the coordinates where it wanted to go at first
-	*/
+	 */
 	public int[] getNextCoordinates(int[] setUpCoords) { //This method has not been tested yet
 		boolean found = false;
 		if(firstTry) { //If this is the first time it asks for an alternate dropoff set up point
@@ -145,7 +145,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 	 * Executes the drop off routine once the robot is adjacent to the drop off point
 	 *
 	 * @return Success status
-	*/
+	 */
 	//TODO: Try USSensorListener to verify presence of first stack & maybe potential risks that could have dropoff interrupted and thus return false
 	public boolean dropOff(int stack) {
 		boolean success = false;
@@ -154,12 +154,17 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		double[] dropPoint = new double[2];
 		double[] position = odometer.getPosition();
 		int corner = 0;
+		boolean wall_case = false;
 
 		//Define 4 stacking area corners
 		x1 = dropCoords[0]*UNIT_TILE;
 		x2 = dropCoords[0]*UNIT_TILE+UNIT_TILE;
 		y1 = dropCoords[1]*UNIT_TILE;
 		y2 = dropCoords[1]*UNIT_TILE+UNIT_TILE;
+
+		if (dropCoords[0] == 0 || dropCoords[0] == 11 || dropCoords[1] == 0 || dropCoords[1] == 11) {
+			wall_case = true;
+		}
 
 		//Find nearest drop off area corner.
 		if(Math.abs(position[0] - x1) < Math.abs(position[0] - x2)) {
@@ -201,40 +206,53 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		if(stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			//Move to drop point.
+			localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
-			//localizer.localizeAnywhere();
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
 
 			//Perform Drop off
 			odometer.enableSnapping(false);
-			mover.turnTo(facing, SPEED_ROTATE);
-			mover.goForward(0.68*UNIT_TILE, SPEED_SLOW);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
-			slave_connection.request(OPEN_CAGE);
-			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
-			slave_connection.request(CLOSE_CAGE);
+			if (!wall_case) {
+				mover.goForward(0.10*UNIT_TILE, SPEED_SLOW);
+				mover.goForward(-5, SPEED_SLOW);
+				slave_connection.request(OPEN_CAGE);
+				mover.goForward(-0.43*UNIT_TILE, SPEED_SLOW);
+				mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
+				slave_connection.request(CLOSE_CAGE);
+				mover.goForward(5, SPEED_MED);
+			} else {
+				mover.goForward(5, SPEED_SLOW);
+				slave_connection.request(OPEN_CAGE);
+				mover.goForward(DUMP_DISTANCE-1, SPEED_SLOW);
+				slave_connection.request(CLOSE_CAGE);
+				mover.goForward(-DUMP_DISTANCE, SPEED_SLOW);
+				mover.goForward(0.5*DUMP_DISTANCE, SPEED_SLOW);
+			}
 
 			//Go back to initial node after this returns
 			success = true;
 			odometer.enableSnapping(true);
-			mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
-			mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
+			mover.goTo(position[0], position[1], SPEED_MED);
+			//mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
+			//mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
 
 		} else if(stack == 1) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
+			localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
 			odometer.enableSnapping(false);
 			mover.turnTo(facing, SPEED_ROTATE);
 
-			//Button.waitForPress();
 			//Probably should verify first stack's presence with US
 
 			mover.goForward(BACK_UP_DISTANCE, SPEED_MED);
-			//Redundant step
+
+			/*//Redundant step
 			mover.turnTo(facing, SPEED_ROTATE);
 			phase = 1;
 			//Very arbitrary check for stack presence (probably will be disabled)
@@ -243,24 +261,37 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				mover.turn(-Math.PI/4, SPEED_ROTATE);
 				mover.turn(Math.PI/8, SPEED_ROTATE);
 			}
-			phase = 0;
+			phase = 0;*/
+
 			//Turn 180 to be facing away
-			//TODO: Fix huge orientation error here.
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 
 			//Drop the second stack next to the first one.
-			slave_connection.request(OPEN_CAGE);
-			mover.goForward(BACK_UP_DISTANCE, SPEED_SLOW);
-			while(mover.isMoving());
+			if (!wall_case) {
+				mover.goForward(-5, SPEED_SLOW);
+				slave_connection.request(OPEN_CAGE);
+				mover.goForward(BACK_UP_DISTANCE+5, SPEED_SLOW);
+				while(mover.isMoving());
 
-			//Get away
-			mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
-			slave_connection.request(CLOSE_CAGE);
+				//Get away
+				mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
+				slave_connection.request(CLOSE_CAGE);
+				mover.goForward(5, SPEED_MED);
+			} else {
+				mover.goForward(-10, SPEED_SLOW);
+				mover.goForward(5, SPEED_SLOW);
+				slave_connection.request(OPEN_CAGE);
+				mover.goForward(DUMP_DISTANCE-5, SPEED_SLOW);
+				slave_connection.request(CLOSE_CAGE);
+				mover.goForward(-DUMP_DISTANCE, SPEED_SLOW);
+				mover.goForward(0.5*UNIT_TILE, SPEED_MED);
+			}
 
 			success = true;
 			odometer.enableSnapping(true);
-			mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(position[0], position[1], SPEED_MED);
+			//mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
+			//mover.goTo(position[0], position[1], SPEED_MED);
 		}
 
 		return success;
