@@ -206,7 +206,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		if(stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			//Move to drop point.
-			localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
 
@@ -226,7 +225,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				slave_connection.request(OPEN_CAGE);
 				mover.goForward(DUMP_DISTANCE-1, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
-				mover.goForward(-DUMP_DISTANCE, SPEED_SLOW);
+				mover.goForward(-DUMP_DISTANCE-5, SPEED_SLOW);
 				mover.goForward(0.5*DUMP_DISTANCE, SPEED_SLOW);
 			}
 
@@ -241,7 +240,6 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
-			localizer.localizeAnywhere();
 			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
 			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
