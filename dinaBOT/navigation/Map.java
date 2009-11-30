@@ -101,8 +101,6 @@ public class Map implements MechConstants, USSensorListener {
 
 		newObstacleSet(false);
 
-		this.start();
-
 		listeners = new DinaList<MapListener>();
 
 		//initialize border

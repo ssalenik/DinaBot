@@ -137,6 +137,15 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		}
 
 		path = pathing.generatePath(position[0], position[1], position[2], x, y);
+		
+		if(path != null && node != 0) {
+			double[][] tmp = new double[path.length+1][2];
+			tmp[0][0] = position[0];
+			tmp[0][1] = position[1];
+			System.arraycopy(path, 0, tmp, 1, path.length);
+			path = tmp;
+		}
+		
 		if(path == null) return false;
 		else return true;
 	}

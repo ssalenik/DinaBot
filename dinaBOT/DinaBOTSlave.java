@@ -36,14 +36,12 @@ public class DinaBOTSlave implements CommConstants{
 				System.exit(0);
 			}
 		});
-
 		stacker = new Stacker(Motor.A, Motor.B, Motor.C);
+
 		liftDetect = new LiftDetector(new LightSensor(SensorPort.S4, true));
-		liftDetect.run();
-
 		master_connection = new BTSlave();
-		master_connection.waitForConnection();
 
+		master_connection.waitForConnection();
 //		Song[] songSet = {Songs.marioOverworld2};
 //		music = new MusicBox(songSet);
 	}

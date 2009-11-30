@@ -155,6 +155,9 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 				offset = -(20-(blockDistance_A+blockDistance_B)/2);
 				mover.goForward(-(20-(blockDistance_A+blockDistance_B)/2), SPEED_MED);
 			}
+			mapper.stop();
+			slave_connection.request(RELEASE);
+			mapper.start();
 			mover.goForward((blockDistance_A+blockDistance_B)/2-offset, SPEED_MED);
  			phase = 0;
 

@@ -15,6 +15,9 @@ public class LiftDetector implements Runnable {
 	public LiftDetector(LightSensor l_sensor) {
 		latest_reading = 0;
 		this.l_sensor = l_sensor;
+		Thread liftdetect_thread = new Thread(this);
+		liftdetect_thread.setDaemon(true);
+		liftdetect_thread.start();
 	}
 
 	public void run() {
