@@ -7,7 +7,7 @@ package dinaBOT.mech;
  *
 */
 public interface MechConstants {
-	
+
 	/**The radius of the robot wheels = {@value}.
 	*/
 	static final double WHEEL_RADIUS = 2.659;

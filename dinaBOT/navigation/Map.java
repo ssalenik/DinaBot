@@ -40,7 +40,7 @@ public class Map implements MechConstants, USSensorListener {
 	DinaList<MapListener> listeners;
 
 	boolean stop;
-	
+
 	//file IO stuff
 	static final String fileName = "map.txt";
 	static String text;
@@ -477,63 +477,63 @@ public class Map implements MechConstants, USSensorListener {
 		}
 		this.start();
 	}
-	
+
 	//IO methods
-	private byte[] getBytes(String inputText){
-    	//Debug Point
-        byte[] nameBytes = new byte[inputText.length()+1];
-        
-        for(int i=0;i<inputText.length();i++){
-            nameBytes[i] = (byte) inputText.charAt(i);
-        }
-        nameBytes[inputText.length()] = 0;
- 
-        return nameBytes;
-    }
+	private byte[] getBytes(String inputText) {
+ 	//Debug Point
+ byte[] nameBytes = new byte[inputText.length()+1];
+
+ for(int i=0;i<inputText.length();i++) {
+ nameBytes[i] = (byte) inputText.charAt(i);
+ }
+ nameBytes[inputText.length()] = 0;
+
+ return nameBytes;
+ }
 
 	private void appendToFile(String text) throws IOException{
-        byteText = getBytes(text);
+ byteText = getBytes(text);
 
-        //Critic to add a useless character into file
-        //byteText.length-1
-        for(int i=0;i<byteText.length-1;i++){
-            fos.write((int) byteText[i]);
-		}    	
-    }
-	
+ //Critic to add a useless character into file
+ //byteText.length-1
+ for(int i=0;i<byteText.length-1;i++) {
+ fos.write((int) byteText[i]);
+		} 
+ }
+
 	public boolean printMap() {
-		
+
 		fileVersion = 1;
-        
-        try{
-            f = new File(fileName);
-            if(!f.exists()){
-                f.createNewFile();
-            }else{
-            	f.delete();         	
-            	f.createNewFile();
-            }
-            	
-            fos = new  FileOutputStream(f);
-            
+
+ try{
+ f = new File(fileName);
+ if(!f.exists()) {
+ f.createNewFile();
+ }else{
+ 	f.delete(); 
+ 	f.createNewFile();
+ }
+ 
+ fos = new FileOutputStream(f);
+
 			text = "";
-            for(int x = 0; x < X; x++){
-				for(int y = 0; y < Y; y++){
+ for(int x = 0; x < X; x++) {
+				for(int y = 0; y < Y; y++) {
 					text += this.map[x][y];
 					if(y != Y-1) text += "\t";
 				}
 				text +="\n";
 			}
-			
-            appendToFile(text);
-            
-            fos.close();
 
-        }catch(IOException e){
+ appendToFile(text);
+
+ fos.close();
+
+ }catch(IOException e) {
 			return false;
-        }
-        
-        return true;
+ }
+
+ return true;
 	}
 
 }

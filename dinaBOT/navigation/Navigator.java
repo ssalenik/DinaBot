@@ -38,7 +38,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	double[][] history;
 	int history_pointer;
 
-	boolean active, suspend_interrupt, soft_interrupt, full_mode, backtrack;
+	boolean active, suspend_interrupt, soft_interrupt, full_mode, backtrack, external_interrupt;
 
 	/**
 	 * Instantiate a new Navigator
@@ -80,7 +80,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	*/
 	public int goTo(double x, double y, boolean full, boolean pickup_sucess) {
 		this.full_mode = full;
-		
+
 		if(backtrack) {
 			if(map.coordValue(new double[] {x,y}) >= DANGER) return -1;
 		}
@@ -96,7 +96,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			soft_interrupt = false;
 			for(node = 0; node < path.length; node++) {
 				active = true;
-				if(suspend_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
+				if(external_interrupt || suspend_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
 				active = false;
 
 				history[history_pointer%history.length][0] = path[node][0];
@@ -109,10 +109,17 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				}
 				if(suspend_count < 2) suspend_count++;
 			}
+
 			active = false;
+
 			if(suspend_interrupt) {
 				path = null;
 				return 1;
+			}
+
+			if(external_interrupt) {
+				path = null;
+				return -2;
 			}
 		}
 		path = null;
@@ -137,7 +144,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		}
 
 		path = pathing.generatePath(position[0], position[1], position[2], x, y);
-		
+
 		if(path != null && node != 0) {
 			double[][] tmp = new double[path.length+1][2];
 			tmp[0][0] = position[0];
@@ -145,7 +152,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			System.arraycopy(path, 0, tmp, 1, path.length);
 			path = tmp;
 		}
-		
+
 		if(path == null) return false;
 		else return true;
 	}
@@ -155,10 +162,10 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	 *
 	*/
 	public void interrupt() {
-		suspend_interrupt = true;
+		external_interrupt = true;
 		movement.stop();
 	}
-	
+
 	public void setBacktrack(boolean set) {
 		this.backtrack = set;
 	}
@@ -206,8 +213,12 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
 						/*&& low_Readings[1] < 75*/ && map.checkUSCoord(low_Readings[0])) {
 				double[] pallet_position = map.getCoord(low_Readings[0]);
-				if(pallet_position[0]%(UNIT_TILE*4) < 3 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-3)) return;
-				interrupt();
+				if(pallet_position[0]%(UNIT_TILE*4) < 5 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-5) || pallet_position[1]%(UNIT_TILE*4) < 5 || pallet_position[1]%(UNIT_TILE*4) > (UNIT_TILE*4-5)) {
+					System.out.println("CRACK, IT'S BAD");
+					return;
+				}
+				suspend_interrupt = true;
+				movement.stop();
 			}
 		}
 	}
