@@ -206,14 +206,14 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		if(stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			//Move to drop point.
-			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
-			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
+			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
+			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
 
 			//Perform Drop off
 			odometer.enableSnapping(false);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 			if (!wall_case) {
-				mover.goForward(0.10*UNIT_TILE, SPEED_SLOW);
+				mover.goForward(0.10*UNIT_TILE, SPEED_MED);
 				mover.goForward(-5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
 				mover.goForward(-0.43*UNIT_TILE, SPEED_SLOW);
@@ -223,18 +223,18 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			} else {
 				mover.goForward(5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
-				mover.goForward(DUMP_DISTANCE-1, SPEED_SLOW);
+				mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
-				mover.goForward(-DUMP_DISTANCE-5, SPEED_SLOW);
+				mover.goForward(-DUMP_DISTANCE-6, SPEED_SLOW);
 				mover.goForward(0.5*DUMP_DISTANCE, SPEED_SLOW);
 			}
 
 			//Go back to initial node after this returns
 			success = true;
-			odometer.enableSnapping(true);
 			mover.goTo(position[0], position[1], SPEED_MED);
 			//mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
 			//mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
+			odometer.enableSnapping(true);
 
 		} else if(stack == 1) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
@@ -268,7 +268,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			if (!wall_case) {
 				mover.goForward(-5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
-				mover.goForward(BACK_UP_DISTANCE+5, SPEED_SLOW);
+				mover.goForward(BACK_UP_DISTANCE+2, SPEED_SLOW);
 				while(mover.isMoving());
 
 				//Get away
@@ -279,17 +279,17 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				mover.goForward(-10, SPEED_SLOW);
 				mover.goForward(5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
-				mover.goForward(DUMP_DISTANCE-5, SPEED_SLOW);
+				mover.goForward(DUMP_DISTANCE-8, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
 				mover.goForward(-DUMP_DISTANCE, SPEED_SLOW);
 				mover.goForward(0.5*UNIT_TILE, SPEED_MED);
 			}
 
 			success = true;
-			odometer.enableSnapping(true);
 			mover.goTo(position[0], position[1], SPEED_MED);
 			//mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
 			//mover.goTo(position[0], position[1], SPEED_MED);
+			odometer.enableSnapping(true);
 		}
 
 		return success;
