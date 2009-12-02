@@ -111,8 +111,8 @@ public class Localization implements MechConstants, USSensorListener {
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-UNIT_TILE/4.0, SPEED_SLOW);
 
-		mover.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
-		mover.turnTo(Math.PI/2.0, SPEED_ROTATE);
+//		mover.goTo(UNIT_TILE, UNIT_TILE, SPEED_SLOW);
+//		mover.turnTo(Math.PI/2.0, SPEED_ROTATE);
 
 		odometer.enableLateralSnapping(true);
 	}
@@ -151,6 +151,7 @@ public class Localization implements MechConstants, USSensorListener {
 
 		mover.turnTo(0, SPEED_ROTATE);
 		double x_offset = UNIT_TILE-odometer.getPosition()[0]%UNIT_TILE;
+	
 		mover.goForward(UNIT_TILE/2.0, SPEED_SLOW);
 		mover.turnTo(0, SPEED_ROTATE);
 		mover.goForward(-3.0*UNIT_TILE/4.0, SPEED_SLOW);

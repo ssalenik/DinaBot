@@ -305,7 +305,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
 			if(i >= 12) {
 				if(debug) System.out.println("Impossible Drop Off ..");
-				Sound.playTone(12, 10 - 15);
+				Sound.playTone(12, 100, 80);
 				map.reset();
 				try {
 					Thread.sleep(1500);
@@ -346,17 +346,17 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, Math.PI/2}, new boolean[] {true, true, true});
 		navigator.setBacktrack(false);
 
-		//localization.localize();
+		localization.localize();
 
 		map.start();
 
-		int[][] pattern = {//Zig-zag pattern
-			new int[] {6,7},
+		int[][] pattern = {
+			new int[] {11,6},
+			new int[] {1,11},
+			new int[] {11,11},
+			new int[] {1,6},
 			new int[] {11,1},
-			new int[] {11,7},
-			new int[] {6,1},
-			new int[] {1,7},
-			new int[] {1,1} // Go back to starting node
+			new int[] {1,1},
 		};
 
 		if(debug) System.out.println("Starting...");
@@ -401,13 +401,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 							System.out.println("Inside Obstacle Ooops ...");
 							System.out.println(map.coordValue(current_position));
 						}
-						Sound.playTone(12, 10 - 15);
+						Sound.playTone(12, 100, 80);
 						map.reset();
 					} else if(map.coordValue(new double[] {pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE}) >= OBSTACLE) {
 						i++;
 					} else {
 						if(debug) System.out.println("Impossible Path ..");
-						Sound.playTone(12, 10 - 15);
+						Sound.playTone(12, 100, 80);
 						map.reset();
 						try {
 							Thread.sleep(1500);
@@ -434,6 +434,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 					} catch(Exception e) {
 
 					}
+					Sound.playTone(12, 100, 80);
+					try {
+						Thread.sleep(500); //Sleep 7 minutes
+					} catch(Exception e) {
+
+					}
+					Sound.playTone(12, 100, 80);
 					timer_flag = true;
 				}
 			});
@@ -463,7 +470,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = getUserInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {5,9,4}); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {5,10,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();
