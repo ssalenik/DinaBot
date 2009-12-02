@@ -184,6 +184,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public void connect() {
 		slave_connection.setDebug(true);
 		while(!slave_connection.connect());
+	//	map.connect();
 		slave_connection.setDebug(false);
 	}
 
@@ -233,7 +234,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			alignPallet(); //If successfull align pallet
 
-			if(pallet_count >= 5) movement.goForward(-3, SPEED_MED);
+			if(pallet_count == 4) movement.goForward(-3, SPEED_MED);
+			if(pallet_count > 4) movement.goForward(-6, SPEED_MED);
 
 			map.stop();
 			boolean pickup = slave_connection.request(PICKUP); //Pickup
@@ -331,6 +333,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 
 		pallet_count = 0;
+		timer_flag = false;
+		startTimer();
 		//Go back to start_position?
 	}
 
@@ -426,11 +430,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	public void startTimer() {
 		timer_flag = false;
-		if(timer_thread != null && !timer_thread.isAlive()) {
+		if(timer_thread == null || !timer_thread.isAlive()) {
+			System.out.println("Thread Go");
 			timer_thread = new Thread(new Runnable() {
 				public void run() {
 					try {
-						Thread.sleep(3*1000*60); //Sleep 7 minutes
+						Thread.sleep(7*1000*60); //Sleep 7 minutes
 					} catch(Exception e) {
 
 					}
@@ -449,18 +454,23 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 	}
 	public void grabTest() {
-			while(true) {
-				slave_connection.request(RELEASE);
-				Button.waitForPress();
-				slave_connection.request(PICKUP);
-				Button.waitForPress();
-				slave_connection.request(RELEASE);
-				slave_connection.request(ARMS_UP);
+		blockFind.setDebug(true);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
+		int i = 0;
+		while(true) {
+			Button.waitForPress();
+			slave_connection.request(RELEASE);
+			Button.waitForPress();
+			System.out.println(slave_connection.request(PICKUP));
+			if(i > 5) {
 				Button.waitForPress();
 				slave_connection.request(OPEN_CAGE);
 				slave_connection.request(CLOSE_CAGE);
+				i = 0;
 			}
+			i++;
 		}
+	}
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -470,7 +480,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = getUserInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {5,10,4}); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {8,8,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
 		dinaBOTmaster.connect();

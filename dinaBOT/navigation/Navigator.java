@@ -216,11 +216,11 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			minLow = low_Readings[0];
 			minHigh = high_Readings[0];
 
-			if(minLow < 20
-						&& Math.abs(minLow - minHigh) > DETECTION_THRESHOLD
+			if(minLow < 30
+						&& (minHigh-minLow) > DETECTION_THRESHOLD
 						/*&& low_Readings[1] < 75*/ && map.checkUSCoord(low_Readings[0])) {
 				double[] pallet_position = map.getCoord(low_Readings[0]);
-				if(pallet_position[0]%(UNIT_TILE*4) < 5 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-5) || pallet_position[1]%(UNIT_TILE*4) < 5 || pallet_position[1]%(UNIT_TILE*4) > (UNIT_TILE*4-5)) {
+				if(pallet_position[0]%(UNIT_TILE*4) < 3 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-3) || pallet_position[1]%(UNIT_TILE*4) < 3 || pallet_position[1]%(UNIT_TILE*4) > (UNIT_TILE*4-3)) {
 					System.out.println("CRACK, IT'S BAD");
 					return;
 				}

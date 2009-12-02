@@ -160,7 +160,7 @@ public class PDC extends JFrame implements Runnable {
 		});
 		
 		connection = new NXTConnector();
-		if (!connection.connectTo("TERMINATOR", "00165301741F", 2)) {
+		if (!connection.connectTo("DinaBOTmaster", "001653014556", 2)) {
 		//if (!connection.connectTo("Pr0nBOT", "00165300E8DA", 2)) {
 			System.err.println("Failed to connect to any NXT");
 			System.exit(1);

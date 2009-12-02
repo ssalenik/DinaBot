@@ -16,15 +16,16 @@ public class Stacker implements Stacking {
 	Motor claw;
 
 	//in degrees
-	final int clawOpenAngle = 95;
+	final int clawOpenAngle = 85;
 	final int clawClosedAngle = 20;
-	final int clawTopAngle = -170;
-	final int clawTopStraight = -135;
+	final int clawPickupAngle = -130;
+	final int clawRaiseAngle = -165;
 
 	final int gatesRotation = 110;
 	final int gatesPickUpRotation = 30;	//doesn't do anything!!!
 
 	final int gateSpeed = 175;
+	final int clawSpeedLift = 95;
 	final int clawSpeed = 200;
 
 	int brickCount = 0;
@@ -45,7 +46,9 @@ public class Stacker implements Stacking {
 		rightGate.resetTachoCount();
 		claw.resetTachoCount();
 
-		claw.rotateTo(clawTopAngle);
+		claw.setSpeed(clawSpeed);
+		claw.rotateTo(clawRaiseAngle);
+		claw.rotateTo(clawPickupAngle);
 	}
 
 	/**
@@ -55,28 +58,11 @@ public class Stacker implements Stacking {
 	*/
 	public boolean pickUp() {
 
-		leftGate.setSpeed(gateSpeed);
-		rightGate.setSpeed(gateSpeed);
 
-		claw.setSpeed(clawSpeed);
-
-		leftGate.resetTachoCount();
-		rightGate.resetTachoCount();
-
-		if(brickCount < 2) {
-			leftGate.rotateTo(gatesPickUpRotation, true);
-			rightGate.rotateTo(gatesPickUpRotation);
-		}
-
-		claw.stop();
-		claw.rotateTo(clawTopStraight);
-
+		claw.setSpeed(clawSpeedLift);
+		claw.rotateTo(clawPickupAngle);
 		try {Thread.sleep(1000);} catch(Exception e) {}
-
-		if(brickCount < 2) {
-			leftGate.rotateTo(0, true);
-			rightGate.rotateTo(0);
-		}
+		claw.stop();
 
 		brickCount += 1;
 
@@ -109,7 +95,7 @@ public class Stacker implements Stacking {
 
 		claw.setSpeed(clawSpeed);
 		claw.rotateTo(clawOpenAngle);
-		claw.flt();
+		claw.stop();
 
 		return true;
 
@@ -137,15 +123,15 @@ public class Stacker implements Stacking {
 	public boolean armsUp() {
 
 		claw.setSpeed(clawSpeed);
-		claw.rotateTo(clawTopAngle);
+		claw.rotateTo(clawRaiseAngle);
+		claw.stop();
 		try {
 			Thread.sleep(500);
 		} catch(Exception e) {
 
 		}
-		claw.setSpeed(clawSpeed/2);
-		claw.rotateTo(clawTopStraight);
-		claw.setSpeed(clawSpeed);
+		claw.setSpeed(clawSpeedLift);
+		claw.rotateTo(clawPickupAngle);
 		claw.stop();
 
 		return true;
@@ -175,12 +161,11 @@ public class Stacker implements Stacking {
 		leftGate.setSpeed(gateSpeed);
 		rightGate.setSpeed(gateSpeed);
 
-		leftGate.resetTachoCount();
-		rightGate.resetTachoCount();
-
 		leftGate.rotateTo(gatesRotation, true);
 		rightGate.rotateTo(gatesRotation);
 
+		leftGate.stop();
+		rightGate.stop();
 	}
 
 	/**
@@ -209,7 +194,7 @@ public class Stacker implements Stacking {
 	*/
 	public boolean getCageStatus() {
 		//checks if the cage is open
-		if(leftGate.getTachoCount() > 0 || rightGate.getTachoCount() > 0) return false;//cage is open
+		if(leftGate.getTachoCount() > 5 || rightGate.getTachoCount() > 5) return false;//cage is open
 		else return true;//cage is closed
 	}
 

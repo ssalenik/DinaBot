@@ -38,7 +38,7 @@ public interface MechConstants {
 
 	/**Maximum distance at which a block may be located in order to be detected = {@value}
 	*/
-	static final int US_TRUST_THRESHOLD = 30;
+	static final int US_TRUST_THRESHOLD = 35;
 
 	/**
 	* Minimum difference allowed between high and low sensor values to assume both are seeing the same object = {@value}
@@ -48,7 +48,7 @@ public interface MechConstants {
 	/**
 	* Size in degrees of the arc the robot should sweep = {@value}
 	*/
-	public final double SWEEP_ARC = Math.PI/3;
+	public final double SWEEP_ARC = Math.PI/2;
 
 	/**Maximum distance at which the map will map an obstacle = {@value}.
 	*/
