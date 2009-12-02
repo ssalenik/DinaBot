@@ -32,7 +32,7 @@ public interface MechConstants {
 
 	//SPEEDS
 	static final int SPEED_ROTATE = 60;
-	static final int SPEED_SLOW = 75;
+	static final int SPEED_SLOW = 120;
 	static final int SPEED_MED = 200;
 	static final int SPEED_FAST = 300;
 

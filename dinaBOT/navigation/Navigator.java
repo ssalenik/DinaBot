@@ -221,7 +221,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 						/*&& low_Readings[1] < 75*/ && map.checkUSCoord(low_Readings[0])) {
 				double[] pallet_position = map.getCoord(low_Readings[0]);
 				if(pallet_position[0]%(UNIT_TILE*4) < 3 || pallet_position[0]%(UNIT_TILE*4) > (UNIT_TILE*4-3) || pallet_position[1]%(UNIT_TILE*4) < 3 || pallet_position[1]%(UNIT_TILE*4) > (UNIT_TILE*4-3)) {
-					System.out.println("CRACK, IT'S BAD");
+					//System.out.println("CRACK, IT'S BAD");
 					return;
 				}
 				suspend_interrupt = true;

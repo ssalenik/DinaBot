@@ -198,15 +198,15 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		double rotate_angle = Math.PI/4;
 
 		//Alignement method
-		movement.goForward(forward_distance, SPEED_MED);
+		movement.goForward(forward_distance+4, SPEED_MED);
 
 		movement.turn(rotate_angle, SPEED_ROTATE);
 
-		movement.goForward(forward_distance, SPEED_MED);
+		movement.goForward(forward_distance+3, SPEED_MED);
 
 		slave_connection.request(HOLD);
 
-		movement.goForward(-forward_distance, SPEED_MED);
+		movement.goForward(-forward_distance-3, SPEED_MED);
 
 		movement.turn(-rotate_angle, SPEED_ROTATE);
 
@@ -234,11 +234,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 			alignPallet(); //If successfull align pallet
 
+			if(pallet_count == 3) movement.goForward(-3, SPEED_MED);
 			if(pallet_count == 4) movement.goForward(-3, SPEED_MED);
 			if(pallet_count > 4) movement.goForward(-6, SPEED_MED);
 
 			map.stop();
 			boolean pickup = slave_connection.request(PICKUP); //Pickup
+
+			if(debug) System.out.println("Pickup: "+pickup);
 
 			if(pickup) {
 				pallet_count++; //Increment pallet count
@@ -471,6 +474,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			i++;
 		}
 	}
+	
+	public void helloTest() {
+		movement.goForward(10, SPEED_SLOW);
+		movement.goForward(-10, SPEED_SLOW);
+		Button.waitForPress();
+	}
+	
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -483,8 +493,9 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {8,8,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
-		dinaBOTmaster.connect();
 		dinaBOTmaster.startTimer();
+		dinaBOTmaster.connect();
+		dinaBOTmaster.helloTest();
 		dinaBOTmaster.run();
 
 
