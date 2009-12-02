@@ -138,12 +138,16 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 				&& blockDistance_A != 255
 				&& blockDistance_B !=255) {
 			lowest_high_reading = 255;
-
 			double angle = (angleA+angleB)/2;
 			double blockDistance = (blockDistance_A+blockDistance_B)/2;
 
 			//check if coord is outside of map
-			if(!mapper.checkCoord(blockDistance, angle)) return false;
+			if(!mapper.checkCoord(blockDistance, angle)) {
+				System.out.println("Block in Illegal Position");
+				System.out.println((float)mapper.getCoord((int)blockDistance)[0]);
+				System.out.println((float)mapper.getCoord((int)blockDistance)[1]);
+				return false;
+			}
 
 			// go to phase 3; go to pallet phase
 			phase = 3;
@@ -158,6 +162,7 @@ public class BlockFinder implements USSensorListener, MechConstants, CommConstan
 			mapper.stop();
 			slave_connection.request(RELEASE);
 			mapper.start();
+
 			mover.goForward((blockDistance_A+blockDistance_B)/2-offset, SPEED_MED);
  			phase = 0;
 

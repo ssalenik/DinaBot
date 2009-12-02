@@ -21,7 +21,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 	/* -- Class Variables -- */
 
-	static final int CAGE_FULL = 3;
+	static final int CAGE_FULL = 6;
 
 	Motor left_motor = Motor.A;
 	Motor right_motor = Motor.B;
@@ -52,6 +52,11 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	int[] dropSetUpCoords;
 	boolean debug;
 
+	/* -- Timer -- */
+
+	Thread timer_thread;
+	boolean timer_flag;
+
 	/**
 	 * This is the constructor for the DinaBOTMaster
 	 *
@@ -77,7 +82,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer = new ArcOdometer(left_motor, right_motor);
 		movement = new BasicMovement(odometer, left_motor, right_motor);
 
-		map = new Map(odometer, 13, 9);
+		map = new Map(odometer, 13);
 		map.stop();
 		pather = new ManhattanPather(map, movement);
 
@@ -179,6 +184,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 	public void connect() {
 		slave_connection.setDebug(true);
 		while(!slave_connection.connect());
+	//	map.connect();
 		slave_connection.setDebug(false);
 	}
 
@@ -225,11 +231,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		if(blockFind.sweep(odometer.getPosition()[2])) { //Perform sweep
 			if(debug) System.out.println("Picking up");
-			
+
 			alignPallet(); //If successfull align pallet
 
-			if(pallet_count >= 5) movement.goForward(-3, SPEED_MED);
+			if(pallet_count == 4) movement.goForward(-3, SPEED_MED);
+			if(pallet_count > 4) movement.goForward(-6, SPEED_MED);
 
+			map.stop();
 			boolean pickup = slave_connection.request(PICKUP); //Pickup
 
 			if(pickup) {
@@ -239,7 +247,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 				movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
 				odometer.enableSnapping(true); //Renable snapping
-			
+
 				map.start(); //Reenable map
 
 				return true;
@@ -249,16 +257,18 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 				movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
 				odometer.enableSnapping(true); //Renable snapping
 
+				map.stop();
+
 				slave_connection.request(RELEASE);
 				slave_connection.request(ARMS_UP);
-			
+
 				map.start(); //Reenable map
-		
+
 				return false;
 			}
 		} else {
 			slave_connection.request(ARMS_UP);
-		
+
 			double[] current_position = odometer.getPosition();
 			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
 			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
@@ -284,8 +294,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			int[] dropCoords = dropper.getDropCoords();
 
 			dropSetUpCoords = new int[2];
-			dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]/UNIT_TILE), dropCoords[0]-1, dropCoords[0]+2);
-			dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]/UNIT_TILE), dropCoords[1]-1, dropCoords[1]+2);
+			dropSetUpCoords[0] = Functions.constrain(Functions.roundToInt(start_position[0]/UNIT_TILE), Functions.constrain(dropCoords[0]-1, 1, 11), Functions.constrain(dropCoords[0]+2, 1, 11));
+			dropSetUpCoords[1] = Functions.constrain(Functions.roundToInt(start_position[1]/UNIT_TILE), Functions.constrain(dropCoords[1]-1, 1, 11), Functions.constrain(dropCoords[1]+2, 1, 11));
 		}
 
 		odometer.enableSnapping(true);
@@ -295,15 +305,15 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			int[] nextDropCoord = dropper.getNextCoordinates(dropSetUpCoords);
 			odometer.enableSnapping(true);
 			navigator.goTo(nextDropCoord[0] * UNIT_TILE, nextDropCoord[1] * UNIT_TILE, true, true);
-			if(i == 8) {
+			if(i >= 12) {
 				if(debug) System.out.println("Impossible Drop Off ..");
+				Sound.playTone(12, 100, 80);
 				map.reset();
 				try {
 					Thread.sleep(1500);
 				} catch(Exception e) {
 
 				}
-				Button.waitForPress();
 			}
 		}
 
@@ -323,6 +333,8 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		}
 
 		pallet_count = 0;
+		timer_flag = false;
+		startTimer();
 		//Go back to start_position?
 	}
 
@@ -334,21 +346,21 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//Setup
 
 		odometer.enableSnapping(true);
-		odometer.setDebug(true);
+		odometer.setDebug(false);
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, Math.PI/2}, new boolean[] {true, true, true});
 		navigator.setBacktrack(false);
-		
-		//localization.localize();
+
+		localization.localize();
 
 		map.start();
 
-		int[][] pattern = {//Zig-zag pattern
-			new int[] {6,7},
+		int[][] pattern = {
+			new int[] {11,6},
+			new int[] {1,11},
+			new int[] {11,11},
+			new int[] {1,6},
 			new int[] {11,1},
-			new int[] {11,7},
-			new int[] {6,1},
-			new int[] {1,7},
-			new int[] {1,1} // Go back to starting node
+			new int[] {1,1},
 		};
 
 		if(debug) System.out.println("Starting...");
@@ -359,56 +371,106 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 
 		}
 
-		//right now finishes once it has dropped off the stack!
-		for(int i = 0;i < pattern.length;) { //For each node in search path
+		while(true) {
+			for(int i = 0;i < pattern.length;) { //For each node in search path
 
-			if(debug) System.out.println("Leg number: "+i);
-			
-			odometer.enableSnapping(true);
-			int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
+				if(debug) System.out.println("Leg number: "+i);
 
-			while(nav_status > 0) { //Keep going till you get there
-				if(debug) System.out.println("Breaking for possible pellet");
-				boolean pickup = pickUpPallet(); //Pick up pallet for interrupt
-				if(pallet_count == CAGE_FULL) {
-					if(debug) System.out.println("Run drop off...");
-					performDropOff(); //This should return us to the same point
-				} else {
-					odometer.enableSnapping(true);
-					nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
-				}
-			}
+				odometer.enableSnapping(true);
+				int nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, true); //Start moving to node
 
-			if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
-				double[] current_position = odometer.getPosition();
-				if(debug) System.out.println("Negative 1");
-				if(map.coordValue(current_position) >= DANGER) {
-					if(debug) {
-						System.out.println("Inside Obstacle Ooops ...");
-						System.out.println(map.coordValue(current_position));
+				if(timer_flag) performDropOff();
+
+				while(nav_status > 0) { //Keep going till you get there
+					if(debug) System.out.println("Breaking for possible pellet");
+					boolean pickup = pickUpPallet(); //Pick up pallet for interrupt
+					if(pallet_count == CAGE_FULL) {
+						if(debug) System.out.println("Run drop off...");
+						performDropOff(); //This should return us to the same point
+					} else {
+						odometer.enableSnapping(true);
+						nav_status = navigator.goTo(pattern[i][0]*UNIT_TILE,pattern[i][1]*UNIT_TILE, false, pickup); //And keep moving to node
 					}
-					map.reset();
-					Button.waitForPress();
-				} else if(map.coordValue(new double[] {pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE}) >= OBSTACLE) {
-					i++;
+
+					if(timer_flag) performDropOff();
+				}
+
+				if(timer_flag) performDropOff();
+
+				if(nav_status < 0) { //Make sure we exited sucess, not impossible path, this should trigger some sort of map reset
+					double[] current_position = odometer.getPosition();
+					if(debug) System.out.println("Negative");
+					if(map.coordValue(current_position) >= DANGER) {
+						if(debug) {
+							System.out.println("Inside Obstacle Ooops ...");
+							System.out.println(map.coordValue(current_position));
+						}
+						Sound.playTone(12, 100, 80);
+						map.reset();
+					} else if(map.coordValue(new double[] {pattern[i][0]*UNIT_TILE, pattern[i][1]*UNIT_TILE}) >= OBSTACLE) {
+						i++;
+					} else {
+						if(debug) System.out.println("Impossible Path ..");
+						Sound.playTone(12, 100, 80);
+						map.reset();
+						try {
+							Thread.sleep(1500);
+						} catch(Exception e) {
+
+						}
+					}
 				} else {
-					if(debug) System.out.println("Impossible Path ..");
-					map.reset();
+					i++;
+				}
+				if(timer_flag) performDropOff();
+			}
+		}
+//		if(debug) System.out.println("Done");
+	}
+
+	public void startTimer() {
+		timer_flag = false;
+		if(timer_thread == null || !timer_thread.isAlive()) {
+			System.out.println("Thread Go");
+			timer_thread = new Thread(new Runnable() {
+				public void run() {
 					try {
-						Thread.sleep(1500);
+						Thread.sleep(7*1000*60); //Sleep 7 minutes
 					} catch(Exception e) {
 
 					}
-					Button.waitForPress();
+					Sound.playTone(12, 100, 80);
+					try {
+						Thread.sleep(500); //Sleep 7 minutes
+					} catch(Exception e) {
+
+					}
+					Sound.playTone(12, 100, 80);
+					timer_flag = true;
 				}
-			} else {
-				i++;				
-			}
+			});
+			timer_thread.setDaemon(true);
+			timer_thread.start();
 		}
-
-		if(debug) System.out.println("Done");
 	}
-
+	public void grabTest() {
+		blockFind.setDebug(true);
+		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, 0}, new boolean[] {true, true, true});
+		int i = 0;
+		while(true) {
+			Button.waitForPress();
+			slave_connection.request(RELEASE);
+			Button.waitForPress();
+			System.out.println(slave_connection.request(PICKUP));
+			if(i > 5) {
+				Button.waitForPress();
+				slave_connection.request(OPEN_CAGE);
+				slave_connection.request(CLOSE_CAGE);
+				i = 0;
+			}
+			i++;
+		}
+	}
 	/**
 	 * This is where the static main method lies. This is where execution begins for the master brick
 	 *
@@ -418,23 +480,13 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = getUserInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {0,7,4}); //Instantiate the DinaBOT Master
-		
-		(new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(180000);
-				} catch(Exception e) {
-					
-				}
-				Sound.playTone(10, 100,80);
-			}
-		})).start();
-		
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {8,8,4}); //Instantiate the DinaBOT Master
+
 		//Run some tests
 		dinaBOTmaster.connect();
+		dinaBOTmaster.startTimer();
 		dinaBOTmaster.run();
-		
+
 
 		while(true); //Never quit
 	}

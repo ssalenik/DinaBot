@@ -162,7 +162,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		y1 = dropCoords[1]*UNIT_TILE;
 		y2 = dropCoords[1]*UNIT_TILE+UNIT_TILE;
 
-		if (dropCoords[0] == 0 || dropCoords[0] == 11 || dropCoords[1] == 0 || dropCoords[1] == 11) {
+		if(dropCoords[0] == 0 || dropCoords[0] == 11 || dropCoords[1] == 0 || dropCoords[1] == 11) {
 			wall_case = true;
 		}
 
@@ -206,20 +206,20 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 		if(stack == 0) {
 			//Essentially raise claws if this isn't already taken care of.
 			//Move to drop point.
-			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
-			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
+			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
+			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
 
 			//Perform Drop off
 			odometer.enableSnapping(false);
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
-			if (!wall_case) {
-				mover.goForward(0.10*UNIT_TILE, SPEED_MED);
+			if(!wall_case) {
+				mover.goForward(0.10*UNIT_TILE, SPEED_SLOW);
 				mover.goForward(-5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
 				mover.goForward(-0.43*UNIT_TILE, SPEED_SLOW);
 				mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
-				mover.goForward(5, SPEED_MED);
+				mover.goForward(5, SPEED_SLOW);
 			} else {
 				mover.goForward(5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
@@ -231,24 +231,24 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 
 			//Go back to initial node after this returns
 			success = true;
-			mover.goTo(position[0], position[1], SPEED_MED);
-			//mover.goTo(odometer.getPosition()[0], position[1], SPEED_MED);
-			//mover.goTo(position[0],odometer.getPosition()[1],SPEED_MED);
+			mover.goTo(position[0], position[1], SPEED_SLOW);
+			//mover.goTo(odometer.getPosition()[0], position[1], SPEED_SLOW);
+			//mover.goTo(position[0],odometer.getPosition()[1],SPEED_SLOW);
 			odometer.enableSnapping(true);
 
 		} else if(stack == 1) {
 			//Second stack, now assume stack 1 is in the middle of the the drop zone already
 
 			//Get aligned with the stack present and push it back. (going backwards)
-			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_MED);
-			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_MED);
+			mover.goTo(dropPoint[0], odometer.getPosition()[1], SPEED_SLOW);
+			mover.goTo(odometer.getPosition()[0], dropPoint[1], SPEED_SLOW);
 
 			odometer.enableSnapping(false);
 			mover.turnTo(facing, SPEED_ROTATE);
 
 			//Probably should verify first stack's presence with US
 
-			mover.goForward(BACK_UP_DISTANCE, SPEED_MED);
+			mover.goForward(BACK_UP_DISTANCE, SPEED_SLOW);
 
 			/*//Redundant step
 			mover.turnTo(facing, SPEED_ROTATE);
@@ -265,7 +265,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 			mover.turnTo(facing+Math.PI, SPEED_ROTATE);
 
 			//Drop the second stack next to the first one.
-			if (!wall_case) {
+			if(!wall_case) {
 				mover.goForward(-5, SPEED_SLOW);
 				slave_connection.request(OPEN_CAGE);
 				mover.goForward(BACK_UP_DISTANCE+2, SPEED_SLOW);
@@ -274,7 +274,7 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				//Get away
 				mover.goForward(DUMP_DISTANCE, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
-				mover.goForward(5, SPEED_MED);
+				mover.goForward(5, SPEED_SLOW);
 			} else {
 				mover.goForward(-10, SPEED_SLOW);
 				mover.goForward(5, SPEED_SLOW);
@@ -282,13 +282,13 @@ public class DropOff implements MechConstants, CommConstants, USSensorListener{
 				mover.goForward(DUMP_DISTANCE-8, SPEED_SLOW);
 				slave_connection.request(CLOSE_CAGE);
 				mover.goForward(-DUMP_DISTANCE, SPEED_SLOW);
-				mover.goForward(0.5*UNIT_TILE, SPEED_MED);
+				mover.goForward(0.5*UNIT_TILE, SPEED_SLOW);
 			}
 
 			success = true;
-			mover.goTo(position[0], position[1], SPEED_MED);
-			//mover.goTo(position[0], odometer.getPosition()[1], SPEED_MED);
-			//mover.goTo(position[0], position[1], SPEED_MED);
+			mover.goTo(position[0], position[1], SPEED_SLOW);
+			//mover.goTo(position[0], odometer.getPosition()[1], SPEED_SLOW);
+			//mover.goTo(position[0], position[1], SPEED_SLOW);
 			odometer.enableSnapping(true);
 		}
 

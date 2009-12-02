@@ -7,7 +7,7 @@ public class LiftDetector implements Runnable {
 
 	LightSensor l_sensor;
 
-	static final int LIFT_THRESHOLD = 500;
+	static final int LIFT_THRESHOLD = 450;
 
 	int latest_reading;
 	boolean running = true;

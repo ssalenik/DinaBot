@@ -2,6 +2,7 @@ package dinaBOT.navigation;
 
 //leJOS imports
 import lejos.nxt.*;
+import lejos.nxt.comm.*;
 import java.lang.Math;
 import java.io.*;
 import java.lang.StringBuffer;
@@ -33,14 +34,14 @@ public class Map implements MechConstants, USSensorListener {
 	double nodeDist;
 
 	int[] high_Readings;
-	int[] low_Readings;
+	//int[] low_Readings;
 
 	boolean newObstacle;
 
 	DinaList<MapListener> listeners;
 
 	boolean stop;
-	
+
 	//file IO stuff
 	static final String fileName = "map.txt";
 	static String text;
@@ -49,6 +50,16 @@ public class Map implements MechConstants, USSensorListener {
 	static File f;
 	static StringBuffer sb;
 	static int fileVersion;
+
+	/* -- BT -- */
+	
+	BTConnection connection; //Actual BT Connection
+
+	//I/O Streams
+	DataInputStream input_stream;
+	DataOutputStream output_stream;
+	
+	boolean bt_connected;
 
 	/**
 	 * creates a new (square) Map where the resolution squared is the number of nodes.
@@ -108,11 +119,21 @@ public class Map implements MechConstants, USSensorListener {
 		for(int y = 0; y < Y; y++) map[0][y] = map[X-1][y] = WALL;
 
 
-		low_Readings = new int[] {255,255,255,255,255,255,255,255};
+		//low_Readings = new int[] {255,255,255,255,255,255,255,255};
 		high_Readings = new int[] {255,255,255,255,255,255,255,255};
 
 		USSensor.high_sensor.registerListener(this);
-		USSensor.low_sensor.registerListener(this);
+		//USSensor.low_sensor.registerListener(this);
+	}
+
+
+	public void connect() {
+		connection = Bluetooth.waitForConnection();
+		
+		input_stream = connection.openDataInputStream();
+		output_stream = connection.openDataOutputStream();
+		
+		bt_connected = true;
 	}
 
 	/**
@@ -349,17 +370,16 @@ public class Map implements MechConstants, USSensorListener {
 		int distance = 255;
 		int[] curr_node = new int[2];	//node at which the robot is currently at
 		double[] curr_coord = new double[2];	// coordinate at which the robot is currently at
-		int minLow, minHigh;
+		int minHigh;
 
 		// checks stop bool
 		if(stop) return;
 
 		// only care about high US sensor values
-		if(sensor == USSensor.low_sensor) low_Readings = new_values;
 		else if(sensor == USSensor.high_sensor) high_Readings = new_values;
 		else return; //should never happen
 
-		minLow = low_Readings[0];
+		//minLow = low_Readings[0];
 		minHigh = high_Readings[0];
 
 		distance = high_Readings[0];
@@ -402,12 +422,71 @@ public class Map implements MechConstants, USSensorListener {
 
 					//mark obstacle
 					map[node[0]][node[1]] = OBSTACLE;
-
+					
+					if(bt_connected) {
+						try {
+							output_stream.writeInt(-1);
+							output_stream.writeInt(node[0]);
+							output_stream.writeInt(node[1]);
+							output_stream.writeInt(OBSTACLE);
+						} catch(Exception e) {
+							
+						}
+					}
+					
 					//mark danger zone(s) all those adjacent to obstacle except the one behind the obstacle
-					if(checkNode(new int[] {node[0] + 1, node[1]})) map[node[0] + 1][node[1]] = DANGER;
-					if(checkNode(new int[] {node[0] - 1, node[1]})) map[node[0] - 1][node[1]] = DANGER;
-					if(checkNode(new int[] {node[0], node[1] + 1})) map[node[0]][node[1] + 1] = DANGER;
-					if(checkNode(new int[] {node[0], node[1] - 1})) map[node[0]][node[1] - 1] = DANGER;
+					if(checkNode(new int[] {node[0] + 1, node[1]})) {
+						map[node[0] + 1][node[1]] = DANGER;
+						if(bt_connected) {
+							try {
+								output_stream.writeInt(-1);
+								output_stream.writeInt(node[0]+1);
+								output_stream.writeInt(node[1]);
+								output_stream.writeInt(DANGER);
+							} catch(Exception e) {
+							
+							}
+						}
+					}
+					if(checkNode(new int[] {node[0] - 1, node[1]})) {
+						map[node[0] - 1][node[1]] = DANGER;
+						if(bt_connected) {
+							try {
+								output_stream.writeInt(-1);
+								output_stream.writeInt(node[0]-1);
+								output_stream.writeInt(node[1]);
+								output_stream.writeInt(DANGER);
+							} catch(Exception e) {
+							
+							}
+						}
+					}
+					if(checkNode(new int[] {node[0], node[1] + 1})) {
+						map[node[0]][node[1] + 1] = DANGER;
+						if(bt_connected) {
+							try {
+								output_stream.writeInt(-1);
+								output_stream.writeInt(node[0]);
+								output_stream.writeInt(node[1]+1);
+								output_stream.writeInt(DANGER);
+							} catch(Exception e) {
+						
+							}
+						}
+					}
+					if(checkNode(new int[] {node[0], node[1] - 1})) {
+						map[node[0]][node[1] - 1] = DANGER;
+						if(bt_connected) {
+							try {
+								output_stream.writeInt(-1);
+								output_stream.writeInt(node[0]);
+								output_stream.writeInt(node[1]-1);
+								output_stream.writeInt(DANGER);
+							} catch(Exception e) {
+							
+							}
+						}
+					}
 
 					notifyListeners(node[0], node[1]);
 				}
@@ -477,63 +556,63 @@ public class Map implements MechConstants, USSensorListener {
 		}
 		this.start();
 	}
-	
+
 	//IO methods
-	private byte[] getBytes(String inputText){
-    	//Debug Point
-        byte[] nameBytes = new byte[inputText.length()+1];
-        
-        for(int i=0;i<inputText.length();i++){
-            nameBytes[i] = (byte) inputText.charAt(i);
-        }
-        nameBytes[inputText.length()] = 0;
- 
-        return nameBytes;
-    }
+	private byte[] getBytes(String inputText) {
+ 	//Debug Point
+ byte[] nameBytes = new byte[inputText.length()+1];
+
+ for(int i=0;i<inputText.length();i++) {
+ nameBytes[i] = (byte) inputText.charAt(i);
+ }
+ nameBytes[inputText.length()] = 0;
+
+ return nameBytes;
+ }
 
 	private void appendToFile(String text) throws IOException{
-        byteText = getBytes(text);
+ byteText = getBytes(text);
 
-        //Critic to add a useless character into file
-        //byteText.length-1
-        for(int i=0;i<byteText.length-1;i++){
-            fos.write((int) byteText[i]);
-		}    	
-    }
-	
+ //Critic to add a useless character into file
+ //byteText.length-1
+ for(int i=0;i<byteText.length-1;i++) {
+ fos.write((int) byteText[i]);
+		} 
+ }
+
 	public boolean printMap() {
-		
+
 		fileVersion = 1;
-        
-        try{
-            f = new File(fileName);
-            if(!f.exists()){
-                f.createNewFile();
-            }else{
-            	f.delete();         	
-            	f.createNewFile();
-            }
-            	
-            fos = new  FileOutputStream(f);
-            
+
+ try{
+ f = new File(fileName);
+ if(!f.exists()) {
+ f.createNewFile();
+ }else{
+ 	f.delete(); 
+ 	f.createNewFile();
+ }
+ 
+ fos = new FileOutputStream(f);
+
 			text = "";
-            for(int x = 0; x < X; x++){
-				for(int y = 0; y < Y; y++){
+ for(int x = 0; x < X; x++) {
+				for(int y = 0; y < Y; y++) {
 					text += this.map[x][y];
 					if(y != Y-1) text += "\t";
 				}
 				text +="\n";
 			}
-			
-            appendToFile(text);
-            
-            fos.close();
 
-        }catch(IOException e){
+ appendToFile(text);
+
+ fos.close();
+
+ }catch(IOException e) {
 			return false;
-        }
-        
-        return true;
+ }
+
+ return true;
 	}
 
 }
