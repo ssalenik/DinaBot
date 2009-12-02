@@ -35,8 +35,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	int suspend_count;
 	double[][] path;
 
-	double[][] history;
-	int history_pointer;
+	double[] history;
 
 	boolean active, suspend_interrupt, soft_interrupt, full_mode, backtrack, external_interrupt;
 
@@ -60,8 +59,12 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		low_Readings = new int[] {255,255,255,255,255,255,255,255};
 		high_Readings = new int[] {255,255,255,255,255,255,255,255};
 
-		history = new double[2][2]; // 2 nodes + x/y
-
+		history = new double[3]; // 2 nodes + x/y
+		
+		history[0] = UNIT_TILE;
+		history[1] = UNIT_TILE;
+		history[2] = 0;
+		
 		map.registerListener(this);
 
 		USSensor.high_sensor.registerListener(this);
@@ -99,9 +102,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 				if(external_interrupt || suspend_interrupt || soft_interrupt || !movement.goTo(path[node][0], path[node][1], SPEED_MED)) break;
 				active = false;
 
-				history[history_pointer%history.length][0] = path[node][0];
-				history[history_pointer%history.length][1] = path[node][1];
-				history_pointer++;
+				history[0] = path[node][0];
+				history[1] = path[node][1];
 
 				if(node == path.length-1) {
 					path = null;
@@ -136,19 +138,22 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	boolean repath(double x, double y) {
 		double[] position = new double[3];
 		position = odometer.getPosition();
+		
+		position[0] = Math.round(position[0]/UNIT_TILE)*UNIT_TILE;
+		position[1] = Math.round(position[1]/UNIT_TILE)*UNIT_TILE;
+		//if(path != null && node != 0) {
+			//position[0] = history[0];
+			//position[1] = history[1];
+			//position[2] = position[2];
+	//	}
 
-		if(path != null && node != 0) {
-			position[0] = path[node - 1][0];
-			position[1] = path[node - 1][1];
-			position[2] = position[2];
-		}
+		path = pathing.generatePath(history[0], history[1], position[2], x, y);
 
-		path = pathing.generatePath(position[0], position[1], position[2], x, y);
-
-		if(path != null && node != 0) {
+	//	if(path != null && node != 0) {
+		if(position[0] != path[0][0] || position[1] != path[0][1]) {
 			double[][] tmp = new double[path.length+1][2];
-			tmp[0][0] = position[0];
-			tmp[0][1] = position[1];
+			tmp[0][0] = history[0];
+			tmp[0][1] = history[1];
 			System.arraycopy(path, 0, tmp, 1, path.length);
 			path = tmp;
 		}
@@ -174,11 +179,11 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	 * Method used to backtrack to previous nodes.
 	 */
 	public void backtrack() {
-		if(history_pointer > 1) {
-			for(int i = 0;i < history.length;i++) {
-				movement.goTo(history[(history_pointer-i)%history.length][0], history[(history_pointer-i)%history.length][1], SPEED_MED);
-			}
-		}
+		// if(history_pointer > 1) {
+		// 		for(int i = 0;i < history.length;i++) {
+		// 			movement.goTo(history[(history_pointer-i)%history.length][0], history[(history_pointer-i)%history.length][1], SPEED_MED);
+		// 		}
+		// 	}
 	}
 
 	/**

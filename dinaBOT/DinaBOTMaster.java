@@ -273,8 +273,14 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 			slave_connection.request(ARMS_UP);
 
 			double[] current_position = odometer.getPosition();
-			movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
-			movement.goForward(-Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1])), SPEED_MED);
+			double distance = Math.sqrt((initial_position[0]-current_position[0])*(initial_position[0]-current_position[0])+(initial_position[1]-current_position[1])*(initial_position[1]-current_position[1]));
+	
+			if(distance > 3 || distance < -3) {
+				if(debug) System.out.println("Backtracking");
+				movement.turnTo(Math.atan2((initial_position[1]-current_position[1]),(initial_position[0]-current_position[0]))+Math.PI, SPEED_ROTATE); //Return to start position
+				movement.goForward(-distance, SPEED_MED);
+			}
+	
 			odometer.enableSnapping(true); //Renable snapping
 
 			return false;
@@ -353,7 +359,7 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, Math.PI/2}, new boolean[] {true, true, true});
 		navigator.setBacktrack(false);
 
-		localization.localize();
+		//localization.localize();
 
 		map.start();
 
