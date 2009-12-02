@@ -3,7 +3,7 @@ package dinaBOT.util;
 /**
  * This is a collection of useful simple functions which come up often when programming, they are all statically accessible here
  *
- * @author Severin Smith
+ * @author Severin Smith, Aexandre Courtemanche
  * @version 1
 
 */

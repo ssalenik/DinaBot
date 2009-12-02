@@ -12,6 +12,7 @@ public class LiftDetector implements Runnable {
 	int latest_reading;
 	boolean running = true;
 
+
 	public LiftDetector(LightSensor l_sensor) {
 		latest_reading = 0;
 		this.l_sensor = l_sensor;

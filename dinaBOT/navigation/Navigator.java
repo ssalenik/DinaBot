@@ -170,6 +170,9 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		this.backtrack = set;
 	}
 
+	/**
+	 * Method used to backtrack to previous nodes.
+	 */
 	public void backtrack() {
 		if(history_pointer > 1) {
 			for(int i = 0;i < history.length;i++) {
@@ -180,6 +183,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	/**
 	 * Interrupts the goTo method if a newly mapped obstacle lies on the current path.
+	 * @param x x-coordinate of the newly mapped obstacle
+	 * @param y y-coordinate of the newly mapped obstacle
 	*/
 	public void newObstacle(int x, int y) {
 		if(active) {
@@ -196,6 +201,8 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 
 	/**
 	 * Interrupts path if a pallet withing the DETECTION_THRESHOLD is seen.
+	 * @param new_values
+	 * @param sensor
 	*/
 	public void newValues(int[] new_values, USSensor sensor) {
 

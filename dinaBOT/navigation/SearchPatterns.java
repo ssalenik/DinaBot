@@ -37,16 +37,13 @@ public interface SearchPatterns {
 	*/
 	public static final int[][] PRACTICE_ZIGZAG_X = {
 		new int[] {6,1},
-		new int[] {6,2},
-		new int[] {1,2},
-		new int[] {1,3},
 		new int[] {6,3},
-		new int[] {6,4},
-		new int[] {1,4},
+		new int[] {1,3},
 		new int[] {1,5},
 		new int[] {6,5},
-		new int[] {6,6},
-		new int[] {1,1} // Go back to starting node
+		new int[] {6,7},
+		new int[] {1,7},
+		new int[] {1,1}
 	};
 
 	/**
@@ -125,7 +122,7 @@ public interface SearchPatterns {
 	};
 
 	/**
-	 * Search pattern that makes th robot go in a counter-clockwise spiral
+	 * Search pattern that makes the robot go in a counter-clockwise spiral
 	*/
 	public static final int[][] CCW_SPIRAL = {
 		new int[] {11,1},
@@ -150,6 +147,19 @@ public interface SearchPatterns {
 		new int[] {5,6},
 		new int[] {1,1}
 	//Go back to starting node
+	};
+	
+	
+	/**
+	 * Search pattern that makes the robot go in an "M" pattern 
+	 */
+	public static final int[][] M = {
+		new int[] {11,6},
+		new int[] {1,11},
+		new int[] {11,11},
+		new int[] {1,6},
+		new int[] {11,1},
+		new int[] {1,1},
 	};
 
 
