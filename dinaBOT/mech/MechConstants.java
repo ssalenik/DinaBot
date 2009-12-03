@@ -33,7 +33,7 @@ public interface MechConstants {
 	//SPEEDS
 	static final int SPEED_ROTATE = 60;
 	static final int SPEED_SLOW = 120;
-	static final int SPEED_MED = 200;
+	static final int SPEED_MED = 250;
 	static final int SPEED_FAST = 300;
 
 	/**Maximum distance at which a block may be located in order to be detected = {@value}

@@ -139,8 +139,6 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 		double[] position = new double[3];
 		position = odometer.getPosition();
 		
-		position[0] = Math.round(position[0]/UNIT_TILE)*UNIT_TILE;
-		position[1] = Math.round(position[1]/UNIT_TILE)*UNIT_TILE;
 		//if(path != null && node != 0) {
 			//position[0] = history[0];
 			//position[1] = history[1];
@@ -148,9 +146,13 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 	//	}
 
 		path = pathing.generatePath(history[0], history[1], position[2], x, y);
-
+		if(path == null) return false;
+	
+		double currentDistance = Math.sqrt((position[0]-path[0][0])*(position[0]-path[0][0])+(position[1]-path[0][1])*(position[1]-path[0][1]));
+		double historyDistance = Math.sqrt((history[0]-path[0][0])*(history[0]-path[0][0])+(history[1]-path[0][1])*(history[1]-path[0][1]));
+		
 	//	if(path != null && node != 0) {
-		if(position[0] != path[0][0] || position[1] != path[0][1]) {
+		if(historyDistance < currentDistance) {
 			double[][] tmp = new double[path.length+1][2];
 			tmp[0][0] = history[0];
 			tmp[0][1] = history[1];
@@ -158,8 +160,7 @@ public class Navigator implements Navigation, MechConstants, USSensorListener {
 			path = tmp;
 		}
 
-		if(path == null) return false;
-		else return true;
+		return true;
 	}
 
 	/**

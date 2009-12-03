@@ -359,17 +359,31 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		odometer.setPosition(new double[] {UNIT_TILE, UNIT_TILE, Math.PI/2}, new boolean[] {true, true, true});
 		navigator.setBacktrack(false);
 
-		//localization.localize();
+		localization.localize();
 
 		map.start();
 
-		int[][] pattern = {
+		/*int[][] pattern = {
 			new int[] {11,6},
 			new int[] {1,11},
 			new int[] {11,11},
 			new int[] {1,6},
 			new int[] {11,1},
 			new int[] {1,1},
+		};*/
+		
+		int[][] pattern = {
+			new int[] {1,10},
+			new int[] {3,10},
+			new int[] {3,6},
+			new int[] {6,6},
+			new int[] {6,3},
+			new int[] {7,3},
+			new int[] {7,9},
+			new int[] {9,9},
+			new int[] {9,6},
+			new int[] {1,6},
+			new int[] {1,1}
 		};
 
 		if(debug) System.out.println("Starting...");
@@ -496,12 +510,12 @@ public class DinaBOTMaster implements MechConstants, CommConstants, SearchPatter
 		//DO some drop off input stuff here
 
 		//int[] dropCoords = getUserInput();
-		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {8,8,4}); //Instantiate the DinaBOT Master
+		DinaBOTMaster dinaBOTmaster = new DinaBOTMaster(new int[] {9,9,4}); //Instantiate the DinaBOT Master
 
 		//Run some tests
-		dinaBOTmaster.startTimer();
 		dinaBOTmaster.connect();
 		dinaBOTmaster.helloTest();
+		dinaBOTmaster.startTimer();
 		dinaBOTmaster.run();
 
 
